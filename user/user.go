@@ -32,15 +32,26 @@ type Token_auth struct {
 }
 
 var store *session.Store = session.New()
-var lista []User
 var dbUser *gorm.DB
+
+var maxAge int32 = 86400 * 30 // 30 days
+var isProd bool = false       // Set to true when serving over https
 
 func ConnectDatabase(db *gorm.DB) {
 	dbUser = db
-	println(dbUser)
-	println(db)
 	dbUser.AutoMigrate(&User{})
 	dbUser.AutoMigrate(&Token_auth{})
+
+	/*store.MaxAge(maxAge)
+	store.Options.Path = "/"
+	store.Options.HttpOnly = true   // HttpOnly should always be enabled
+	store.Options.Secure = isProd*/
+}
+
+func ShowGoogleAuthentication(c *fiber.Ctx) error {
+	return c.Render("index", fiber.Map{
+		"Title": "Inicializar",
+	})
 }
 
 func GetUser(c *fiber.Ctx) error {
@@ -48,6 +59,7 @@ func GetUser(c *fiber.Ctx) error {
 	if !validateToken(token) {
 		return c.SendString("token invalido")
 	}
+
 	item := c.Params("item")
 	var user User
 	dbUser.Where("user = ?", item).First(&user)
@@ -57,6 +69,7 @@ func GetUser(c *fiber.Ctx) error {
 	}
 	return c.JSON(user)
 }
+
 func CreateUser(c *fiber.Ctx) error {
 	newUser := new(User)
 	if err := c.BodyParser(newUser); err != nil {
@@ -67,6 +80,7 @@ func CreateUser(c *fiber.Ctx) error {
 	if user.User != "" {
 		return c.SendString("el usuario ya existe")
 	}
+
 	if newUser.User == "" {
 		newUser.User = strings.Split(newUser.Email, "@")[0]
 	}
