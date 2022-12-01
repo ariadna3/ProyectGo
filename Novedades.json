@@ -1,0 +1,67 @@
+{
+    "Novedades": [
+        {
+            "IdSecuencial": 1,
+            "Tipo": "PP",
+            "Descripcion": "Pago a proveedores",
+            "Fecha": "AAAA-MM-DD",
+            "Hora": "HH:mm:ss",
+            "Usuario": "Usuario",
+            "Proveedor": "Julio Lanzani",
+            "Periodo": "2022-11",
+            "Distribucion":[
+                {
+                    "Porcentaje": 50,
+                    "Cecos": {
+                        "IdCeco": 104,
+                        "Descripcion": "software factory ICBC"
+                    }
+                },
+                {
+                    "Porcentaje": 50,
+                    "Cecos": {
+                        "IdCeco": 33,
+                        "Descripcion": "gastos generales de estructura"
+                    }
+                }
+            ],
+            "ImporteTotal": 1000,
+            "Adjuntos": [
+                {
+                    "Nombre": "informe1.xlms"
+                },
+                {
+                    "Nombre": "imforme2.xlms"
+                }
+            ],
+            "ConceptoDeFacturacion": "?"
+        },
+        {
+            "IdSecuencial": 2,
+            "Tipo": "PP",
+            "Descripcion": "Pago a proveedores",
+            "Fecha": "AAAA-MM-DD",
+            "Hora": "HH:mm:ss",
+            "Usuario": "Usuario",
+            "Proveedor": "Julio Lanzani",
+            "Periodo": "2022-12",
+            "Distribucion":[
+                {
+                    "Porcentaje": 50,
+                    "Cecos": "104 software factory ICBC"
+                },
+                {
+                    "Porcentaje": 50,
+                    "Cecos": "033 gastos generales de estructura"
+                }
+            ],
+            "ImporteTotal": 1500,
+            "Adjuntos": [
+                {
+                    "Nombre": "informe1.xlms"
+                }
+            ],
+            "ConceptoDeFacturacion": "?"
+        }
+    ]
+}

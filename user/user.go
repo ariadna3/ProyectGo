@@ -1,6 +1,9 @@
 package user
 
 import (
+	"context"
+	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -11,6 +14,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 )
 
@@ -31,16 +36,43 @@ type Token_auth struct {
 	Expiracion string `json:"expiracion"`
 }
 
+type Cecos struct {
+	IdCeco      int    `bson:"id_ceco"`
+	Descripcion string `bson:"descripcion"`
+}
+
+type Distribuciones struct {
+	Porcentaje float64 `bson:"porcentaje"`
+	Ceco       Cecos   `bson:"ceco"`
+}
+
+type Novedades struct {
+	IdSecuencial          int              `bson:"idSecuencial"`
+	Tipo                  string           `bson:"tipo"`
+	Descripcion           string           `bson:"descripcion"`
+	Fecha                 string           `bson:"fecha"`
+	Hora                  string           `bson:"hora"`
+	Usuario               string           `bson:"usuario"`
+	Proveedor             string           `bson:"proveedor"`
+	Periodo               string           `bson:"periodo"`
+	ImporteTotal          float64          `bson:"importeTotal"`
+	ConceptoDeFacturacion string           `bson:"conceptoDeFacturacion"`
+	Adjuntos              []string         `bson:"adjuntos"`
+	Distribuciones        []Distribuciones `bson:"distribuciones"`
+}
+
 var store *session.Store = session.New()
 var dbUser *gorm.DB
+var client *mongo.Client
 
 var maxAge int32 = 86400 * 30 // 30 days
 var isProd bool = false       // Set to true when serving over https
 
-func ConnectDatabase(db *gorm.DB) {
+func ConnectDatabase(db *gorm.DB, clientMongo *mongo.Client) {
 	dbUser = db
 	dbUser.AutoMigrate(&User{})
 	dbUser.AutoMigrate(&Token_auth{})
+	client = clientMongo
 
 	/*store.MaxAge(maxAge)
 	store.Options.Path = "/"
@@ -128,6 +160,58 @@ func UpdateUser(c *fiber.Ctx) error {
 	}
 	dbUser.Model(&user).Updates(newUser)
 	return c.JSON(user)
+}
+
+func InsertNovedad(c *fiber.Ctx) error {
+	novedad := new(Novedades)
+	if err := c.BodyParser(novedad); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	result, err := coll.InsertOne(context.TODO(), novedad)
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return c.JSON(novedad)
+}
+
+func GetNovedades(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	if err != nil {
+		fmt.Print(err)
+	}
+	var novedades []Novedades
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(novedades)
+}
+
+func GetNovedadesAll(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	if err != nil {
+		fmt.Print(err)
+	}
+	var novedades []Novedades
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(novedades)
+}
+
+func DeleteNovedad(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	return c.SendString("novedad eliminada")
 }
 
 func Login(c *fiber.Ctx) error {

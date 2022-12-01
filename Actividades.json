@@ -1,0 +1,25 @@
+{
+    "Actividades":[
+        {
+            "IdNovedad": 1,
+            "Usuario": "Julio Lanzani",
+            "Fecha": "2018-01-01",
+            "Hora": "10:00",
+            "Actividad": "Cargo"
+        },
+        {
+            "IdNovedad": 1,
+            "Usuario": "Estela Nievas",
+            "Fecha": "2018-01-02",
+            "Hora": "10:00",
+            "Actividad": "Leyo"
+        },
+        {
+            "IdNovedad": 1,
+            "Usuario": "Estela Nievas",
+            "Fecha": "2018-01-03",
+            "Hora": "10:00",
+            "Actividad": "Proceso"
+        }
+    ]
+}
