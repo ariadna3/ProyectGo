@@ -36,22 +36,26 @@ func main() {
 		Views: engine,
 	})
 
-	createConnectionWithMongo()
-	createConnectionWithMysql()
+	connectedWithMongo := createConnectionWithMongo()
+	connectedWithSql := createConnectionWithMysql()
 
-	//Novedades
-	app.Post("/Novedad", user.InsertNovedad)
-	app.Get("/Novedad/:id", user.GetNovedades)
-	app.Delete("/Novedad/:id", user.DeleteNovedad)
+	if connectedWithMongo {
+		//Novedades
+		app.Post("/Novedad", user.InsertNovedad)
+		app.Get("/Novedad/:id", user.GetNovedades)
+		app.Delete("/Novedad/:id", user.DeleteNovedad)
+	}
 
-	//User
-	app.Post("/User", user.CreateUser)
-	app.Get("/User/:item", user.GetUser)
-	app.Put("/User/:item", user.UpdateUser)
-	app.Delete("/User/:item", user.DeleteUser)
+	if connectedWithSql {
+		//User
+		app.Post("/User", user.CreateUser)
+		app.Get("/User/:item", user.GetUser)
+		app.Put("/User/:item", user.UpdateUser)
+		app.Delete("/User/:item", user.DeleteUser)
 
-	//Login
-	app.Post("/Login", user.Login)
+		//Login
+		app.Post("/Login", user.Login)
+	}
 
 	//Google
 	app.Get("/", user.ShowGoogleAuthentication)
@@ -95,32 +99,43 @@ func goDotEnvVariable(key string) string {
 	return os.Getenv(key)
 }
 
-func createConnectionWithMongo() {
+func createConnectionWithMongo() bool {
 	uri := goDotEnvVariable("MONGOURI")
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
-			panic(err)
+	if uri != "" {
+		client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+		if err != nil {
+			fmt.Println(err)
+			return false
 		}
-	}()
-	// Ping the primary
-	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
-		panic(err)
-	}
-	fmt.Println("Successfully connected and pinged.")
+		defer func() {
+			if err = client.Disconnect(context.TODO()); err != nil {
+				panic(err)
+			}
+		}()
+		// Ping the primary
+		if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
+			fmt.Println(err)
+			return false
+		}
+		fmt.Println("Successfully connected and pinged.")
 
-	user.ConnectMongoDb(client)
+		user.ConnectMongoDb(client)
+		return true
+	}
+	return false
 }
 
-func createConnectionWithMysql() {
+func createConnectionWithMysql() bool {
 	dsn := goDotEnvVariable("MYSQLURI")
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
+	if dsn != "" {
+		db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		if err != nil {
+			fmt.Println(err)
+			return false
+		}
+		fmt.Println("Successfully connected to Sql.")
+		user.ConnectMariaDb(db)
+		return true
 	}
-
-	user.ConnectMariaDb(db)
+	return false
 }
