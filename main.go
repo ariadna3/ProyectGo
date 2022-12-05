@@ -84,7 +84,7 @@ func main() {
 		return nil
 	})
 
-	app.Listen(":4000")
+	app.Listen(":3000")
 }
 
 func goDotEnvVariable(key string) string {
