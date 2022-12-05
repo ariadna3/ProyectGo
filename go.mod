@@ -35,6 +35,7 @@ require (
 	github.com/gorilla/sessions v1.2.1
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/joho/godotenv v1.4.0
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/markbates/goth v1.75.1
 	github.com/mattn/go-colorable v0.1.13 // indirect

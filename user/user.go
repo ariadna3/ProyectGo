@@ -68,16 +68,14 @@ var client *mongo.Client
 var maxAge int32 = 86400 * 30 // 30 days
 var isProd bool = false       // Set to true when serving over https
 
-func ConnectDatabase(db *gorm.DB, clientMongo *mongo.Client) {
+func ConnectMariaDb(db *gorm.DB) {
 	dbUser = db
 	dbUser.AutoMigrate(&User{})
 	dbUser.AutoMigrate(&Token_auth{})
-	client = clientMongo
+}
 
-	/*store.MaxAge(maxAge)
-	store.Options.Path = "/"
-	store.Options.HttpOnly = true   // HttpOnly should always be enabled
-	store.Options.Secure = isProd*/
+func ConnectMongoDb(clientMongo *mongo.Client) {
+	client = clientMongo
 }
 
 func ShowGoogleAuthentication(c *fiber.Ctx) error {
@@ -86,22 +84,65 @@ func ShowGoogleAuthentication(c *fiber.Ctx) error {
 	})
 }
 
-func GetUser(c *fiber.Ctx) error {
-	token := c.Cookies("token")
-	if !validateToken(token) {
-		return c.SendString("token invalido")
+// Novedades
+// insertar novedad
+func InsertNovedad(c *fiber.Ctx) error {
+	novedad := new(Novedades)
+	if err := c.BodyParser(novedad); err != nil {
+		return c.Status(503).SendString(err.Error())
 	}
-
-	item := c.Params("item")
-	var user User
-	dbUser.Where("user = ?", item).First(&user)
-
-	if user.User == "" {
-		return c.SendString("no existe el usuario")
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	result, err := coll.InsertOne(context.TODO(), novedad)
+	if err != nil {
+		fmt.Print(err)
 	}
-	return c.JSON(user)
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return c.JSON(novedad)
 }
 
+// obtener novedad por id
+func GetNovedades(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	if err != nil {
+		fmt.Print(err)
+	}
+	var novedades []Novedades
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(novedades)
+}
+
+// obtener todas las novedades
+func GetNovedadesAll(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	if err != nil {
+		fmt.Print(err)
+	}
+	var novedades []Novedades
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(novedades)
+}
+
+// Borrar novedad por id
+func DeleteNovedad(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	return c.SendString("novedad eliminada")
+}
+
+// usuarios
+// insertar usuario
 func CreateUser(c *fiber.Ctx) error {
 	newUser := new(User)
 	if err := c.BodyParser(newUser); err != nil {
@@ -123,6 +164,24 @@ func CreateUser(c *fiber.Ctx) error {
 
 }
 
+// obtener usuario por user
+func GetUser(c *fiber.Ctx) error {
+	token := c.Cookies("token")
+	if !validateToken(token) {
+		return c.SendString("token invalido")
+	}
+
+	item := c.Params("item")
+	var user User
+	dbUser.Where("user = ?", item).First(&user)
+
+	if user.User == "" {
+		return c.SendString("no existe el usuario")
+	}
+	return c.JSON(user)
+}
+
+// borrar usuario por user
 func DeleteUser(c *fiber.Ctx) error {
 	item := c.Params("item")
 	var user User
@@ -134,6 +193,7 @@ func DeleteUser(c *fiber.Ctx) error {
 	return c.SendString("usuario eliminado")
 }
 
+// actualizar usuario por user
 func UpdateUser(c *fiber.Ctx) error {
 	item := c.Params("item")
 	var user User
@@ -162,58 +222,8 @@ func UpdateUser(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
-func InsertNovedad(c *fiber.Ctx) error {
-	novedad := new(Novedades)
-	if err := c.BodyParser(novedad); err != nil {
-		return c.Status(503).SendString(err.Error())
-	}
-	coll := client.Database("portalDeNovedades").Collection("novedades")
-	result, err := coll.InsertOne(context.TODO(), novedad)
-	if err != nil {
-		fmt.Print(err)
-	}
-	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.JSON(novedad)
-}
-
-func GetNovedades(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("novedades")
-	idNumber, _ := strconv.Atoi(c.Params("id"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
-	if err != nil {
-		fmt.Print(err)
-	}
-	var novedades []Novedades
-	if err = cursor.All(context.Background(), &novedades); err != nil {
-		fmt.Print(err)
-	}
-	return c.JSON(novedades)
-}
-
-func GetNovedadesAll(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("novedades")
-	cursor, err := coll.Find(context.TODO(), bson.M{})
-	if err != nil {
-		fmt.Print(err)
-	}
-	var novedades []Novedades
-	if err = cursor.All(context.Background(), &novedades); err != nil {
-		fmt.Print(err)
-	}
-	return c.JSON(novedades)
-}
-
-func DeleteNovedad(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("novedades")
-	idNumber, _ := strconv.Atoi(c.Params("id"))
-	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
-	if err != nil {
-		fmt.Print(err)
-	}
-	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
-	return c.SendString("novedad eliminada")
-}
-
+// login
+// logeo
 func Login(c *fiber.Ctx) error {
 	login := new(User)
 	if err := c.BodyParser(login); err != nil {
@@ -254,6 +264,8 @@ func Login(c *fiber.Ctx) error {
 	})
 }
 
+// token
+// validar token
 func validateToken(token string) bool {
 	var token_auth Token_auth
 	dbUser.Where("token = ?", token).First(&token_auth)
@@ -266,6 +278,7 @@ func validateToken(token string) bool {
 	return true
 }
 
+// generar token
 func generateToken(length int) string {
 	b := make([]byte, length)
 	if _, err := rand.Read(b); err != nil {
@@ -274,6 +287,7 @@ func generateToken(length int) string {
 	return base64.URLEncoding.EncodeToString(b)
 }
 
+// md5
 func getMD5Hash(message string) string {
 	hash := md5.Sum([]byte(message))
 	return hex.EncodeToString(hash[:])

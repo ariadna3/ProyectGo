@@ -7,6 +7,8 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
+	"github.com/joho/godotenv"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -17,56 +19,41 @@ import (
 
 	"context"
 	"fmt"
-)
-
-const (
-	key = "131501611539-6th1qbgg4qg28ojgho96adlab5tgf0bf.apps.googleusercontent.com"
-	sec = "AIzaSyAbh83KDi_CiEUNODtEnIMPUbNt28IKO4A"
-	uri = "mongodb://localhost:27017/?maxPoolSize=20&w=majority"
+	"os"
 )
 
 func main() {
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
-	// Ping the primary
-	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
-		panic(err)
-	}
-	fmt.Println("Successfully connected and pinged.")
+	key := os.Getenv("GOOGLEKEY")
+	sec := os.Getenv("GOOGLESEC")
+	callback := os.Getenv("GOOGLECALLBACK")
 
 	goth.UseProviders(
-		google.New(key, sec, "http://localhost:4000/auth/google/callback"),
+		google.New(key, sec, callback),
 	)
 	engine := html.New("./user/template", ".html")
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
 
-	dsn := "root:password@tcp(127.0.0.1:3306)/portalDeNovedades?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
+	createConnectionWithMongo()
+	createConnectionWithMysql()
 
-	user.ConnectDatabase(db, client)
-
-	app.Post("/User", user.CreateUser)
-	app.Get("/User/:item", user.GetUser)
-	app.Put("/User/:item", user.UpdateUser)
-	app.Delete("/User/:item", user.DeleteUser)
-	app.Post("/Login", user.Login)
+	//Novedades
 	app.Post("/Novedad", user.InsertNovedad)
 	app.Get("/Novedad/:id", user.GetNovedades)
 	app.Delete("/Novedad/:id", user.DeleteNovedad)
 
+	//User
+	app.Post("/User", user.CreateUser)
+	app.Get("/User/:item", user.GetUser)
+	app.Put("/User/:item", user.UpdateUser)
+	app.Delete("/User/:item", user.DeleteUser)
+
+	//Login
+	app.Post("/Login", user.Login)
+
+	//Google
 	app.Get("/", user.ShowGoogleAuthentication)
 
 	app.Get("/auth/:provider/callback", func(ctx *fiber.Ctx) error {
@@ -94,4 +81,46 @@ func main() {
 	})
 
 	app.Listen(":4000")
+}
+
+func goDotEnvVariable(key string) string {
+
+	// load .env file
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		panic("Error loading .env file")
+	}
+
+	return os.Getenv(key)
+}
+
+func createConnectionWithMongo() {
+	uri := goDotEnvVariable("MONGOURI")
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if err = client.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
+	// Ping the primary
+	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
+		panic(err)
+	}
+	fmt.Println("Successfully connected and pinged.")
+
+	user.ConnectMongoDb(client)
+}
+
+func createConnectionWithMysql() {
+	dsn := goDotEnvVariable("MYSQLURI")
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	user.ConnectMariaDb(db)
 }
