@@ -105,6 +105,7 @@ func GetNovedades(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}

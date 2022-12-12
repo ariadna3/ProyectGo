@@ -22,6 +22,31 @@ import (
 	"os"
 )
 
+type Cecos struct {
+	IdCeco      int    `bson:"id_ceco"`
+	Descripcion string `bson:"descripcion"`
+}
+
+type Distribuciones struct {
+	Porcentaje float64 `bson:"porcentaje"`
+	Ceco       Cecos   `bson:"ceco"`
+}
+
+type Novedades struct {
+	IdSecuencial          int              `bson:"idSecuencial"`
+	Tipo                  string           `bson:"tipo"`
+	Descripcion           string           `bson:"descripcion"`
+	Fecha                 string           `bson:"fecha"`
+	Hora                  string           `bson:"hora"`
+	Usuario               string           `bson:"usuario"`
+	Proveedor             string           `bson:"proveedor"`
+	Periodo               string           `bson:"periodo"`
+	ImporteTotal          float64          `bson:"importeTotal"`
+	ConceptoDeFacturacion string           `bson:"conceptoDeFacturacion"`
+	Adjuntos              []string         `bson:"adjuntos"`
+	Distribuciones        []Distribuciones `bson:"distribuciones"`
+}
+
 func main() {
 
 	key := os.Getenv("GOOGLEKEY")
@@ -44,6 +69,7 @@ func main() {
 		app.Post("/Novedad", user.InsertNovedad)
 		app.Get("/Novedad/:id", user.GetNovedades)
 		app.Delete("/Novedad/:id", user.DeleteNovedad)
+		app.Get("/Novedad", user.GetNovedadesAll)
 	}
 
 	if connectedWithSql {
@@ -107,18 +133,12 @@ func createConnectionWithMongo() bool {
 			fmt.Println(err)
 			return false
 		}
-		defer func() {
-			if err = client.Disconnect(context.TODO()); err != nil {
-				panic(err)
-			}
-		}()
 		// Ping the primary
 		if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
 			fmt.Println(err)
 			return false
 		}
 		fmt.Println("Successfully connected and pinged.")
-
 		user.ConnectMongoDb(client)
 		return true
 	}
