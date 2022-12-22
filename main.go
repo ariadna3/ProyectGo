@@ -72,45 +72,53 @@ func main() {
 		app.Get("/Novedad", user.GetNovedadesAll)
 	}
 
-	if connectedWithSql {
-		//User
-		app.Post("/User", user.CreateUser)
-		app.Get("/User/:item", user.GetUser)
-		app.Put("/User/:item", user.UpdateUser)
-		app.Delete("/User/:item", user.DeleteUser)
+	if connectedWithMongo {
+		//Actividades
+		app.Post("/Actividad", user.InsertActividad)
+		app.Get("/Actividad/:id", user.GetActividad)
+		app.Delete("/Actividad/:id", user.DeleteActividad)
+		app.Get("/Actividad", user.GetActividadAll)
 
-		//Login
-		app.Post("/Login", user.Login)
+		if connectedWithSql {
+			//User
+			app.Post("/User", user.CreateUser)
+			app.Get("/User/:item", user.GetUser)
+			app.Put("/User/:item", user.UpdateUser)
+			app.Delete("/User/:item", user.DeleteUser)
+
+			//Login
+			app.Post("/Login", user.Login)
+		}
+
+		//Google
+		app.Get("/", user.ShowGoogleAuthentication)
+
+		app.Get("/auth/:provider/callback", func(ctx *fiber.Ctx) error {
+			user, err := gf.CompleteUserAuth(ctx)
+			if err != nil {
+				return err
+			}
+			ctx.JSON(user)
+			return nil
+		})
+
+		app.Get("/auth/:provider", func(ctx *fiber.Ctx) error {
+			if gothUser, err := gf.CompleteUserAuth(ctx); err == nil {
+				ctx.JSON(gothUser)
+			} else {
+				gf.BeginAuthHandler(ctx)
+			}
+			return nil
+		})
+
+		app.Get("/logout/:provider", func(ctx *fiber.Ctx) error {
+			gf.Logout(ctx)
+			ctx.Redirect("/")
+			return nil
+		})
+
+		app.Listen(":3000")
 	}
-
-	//Google
-	app.Get("/", user.ShowGoogleAuthentication)
-
-	app.Get("/auth/:provider/callback", func(ctx *fiber.Ctx) error {
-		user, err := gf.CompleteUserAuth(ctx)
-		if err != nil {
-			return err
-		}
-		ctx.JSON(user)
-		return nil
-	})
-
-	app.Get("/auth/:provider", func(ctx *fiber.Ctx) error {
-		if gothUser, err := gf.CompleteUserAuth(ctx); err == nil {
-			ctx.JSON(gothUser)
-		} else {
-			gf.BeginAuthHandler(ctx)
-		}
-		return nil
-	})
-
-	app.Get("/logout/:provider", func(ctx *fiber.Ctx) error {
-		gf.Logout(ctx)
-		ctx.Redirect("/")
-		return nil
-	})
-
-	app.Listen(":3000")
 }
 
 func goDotEnvVariable(key string) string {
