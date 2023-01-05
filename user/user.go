@@ -99,7 +99,10 @@ func InsertNovedad(c *fiber.Ctx) error {
 	if err := c.BodyParser(novedad); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
+
 	coll := client.Database("portalDeNovedades").Collection("novedades")
+	novedades := coll.FindOne(context.TODO(),bson.D{}).SetSort(bson.D{{"idSecuencial",1}}).setLimit(1)
+	novedad.IdSecuencial= novedades[0].IdSecuencial+1
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
