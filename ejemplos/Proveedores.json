@@ -1,0 +1,14 @@
+{
+    "Proveedores":[
+        {
+            "idProveedor": 1,
+            "NumeroDoc": "23239543669",
+            "RazonSocial": "ACOSTA SEBASTIAN LUIS"
+        },
+        {
+            "idProveedor": 2,
+            "NumeroDoc": "30701274764",
+            "RazonSocial": "ALL CONTABLE S.R.L."
+        }
+    ]
+}

@@ -16,6 +16,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
 )
 
@@ -101,8 +102,17 @@ func InsertNovedad(c *fiber.Ctx) error {
 	}
 
 	coll := client.Database("portalDeNovedades").Collection("novedades")
-	novedades := coll.FindOne(context.TODO(),bson.D{}).SetSort(bson.D{{"idSecuencial",1}}).setLimit(1)
-	novedad.IdSecuencial= novedades[0].IdSecuencial+1
+
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{"idSecuencial", -1}})
+
+	cursor, _ := coll.Find(context.TODO(), filter, opts)
+
+	var results []Novedades
+	cursor.All(context.TODO(), &results)
+	
+	//novedades := coll.Find(context.TODO(),bson.D{}).SetSort(bson.D{{"idSecuencial",1}}).setLimit(1)
+	novedad.IdSecuencial= results[0].IdSecuencial+1
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
