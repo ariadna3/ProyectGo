@@ -48,6 +48,20 @@ type Novedades struct {
 	Distribuciones        []Distribuciones `bson:"distribuciones"`
 }
 
+type Actividades struct {
+	IdNovedad int    `bson:"idNovedad"`
+	Usuario   string `bson:"usuario"`
+	Fecha     string `bson:"fecha"`
+	Hora      string `bson:"hora"`
+	Actividad string `bson:"actividad"`
+}
+
+type Proveedores struct {
+	IdProveedor 	int     `bson:"idProveedor"`
+	NumeroDoc  		int	    `bson:"numeroDoc"`
+	RazonSocial		string  `bson:"razonSocial"`
+}
+
 func main() {
 
 	key := os.Getenv("GOOGLEKEY")
@@ -76,6 +90,14 @@ func main() {
 		app.Get("/Novedad/:id", user.GetNovedades)
 		app.Delete("/Novedad/:id", user.DeleteNovedad)
 		app.Get("/Novedad", user.GetNovedadesAll)
+	}
+
+	if connectedWithMongo {
+		//Proveedores
+		app.Post("/Proveedor", user.InsertProveedor)
+		app.Get("/Proveedor/:id", user.GetProveedor)
+		app.Delete("/Proveedor/:id", user.DeleteProveedor)
+		app.Get("/Proveedor", user.GetProveedorAll)
 	}
 
 	if connectedWithMongo {
@@ -125,6 +147,7 @@ func main() {
 
 		app.Listen(":3000")
 	}
+
 }
 
 func goDotEnvVariable(key string) string {
