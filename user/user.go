@@ -48,9 +48,9 @@ type Distribuciones struct {
 }
 
 type Novedades struct {
-	IdSecuencial          int              `bson:"idSecuencial"`
-	Tipo                  string           `bson:"tipo"`
-	Descripcion           string           `bson:"descripcion"`
+	IdSecuencial int    `bson:"idSecuencial"`
+	Tipo         string `bson:"tipo"`
+	//Descripcion           string           `bson:"descripcion"`
 	Fecha                 string           `bson:"fecha"`
 	Hora                  string           `bson:"hora"`
 	Usuario               string           `bson:"usuario"`
@@ -62,6 +62,11 @@ type Novedades struct {
 	Distribuciones        []Distribuciones `bson:"distribuciones"`
 }
 
+type TipoNovedad struct {
+	Tipo        string `bson:"tipo"`
+	Descripcion string `bson:"descripcion"`
+}
+
 type Actividades struct {
 	IdNovedad int    `bson:"idNovedad"`
 	Usuario   string `bson:"usuario"`
@@ -71,9 +76,9 @@ type Actividades struct {
 }
 
 type Proveedores struct {
-	IdProveedor 	int     `bson:"idProveedor"`
-	NumeroDoc  		int	    `bson:"numeroDoc"`
-	RazonSocial		string  `bson:"razonSocial"`
+	IdProveedor int    `bson:"idProveedor"`
+	NumeroDoc   int    `bson:"numeroDoc"`
+	RazonSocial string `bson:"razonSocial"`
 }
 
 var store *session.Store = session.New()
@@ -116,9 +121,9 @@ func InsertNovedad(c *fiber.Ctx) error {
 
 	var results []Novedades
 	cursor.All(context.TODO(), &results)
-	
+
 	//novedades := coll.Find(context.TODO(),bson.D{}).SetSort(bson.D{{"idSecuencial",1}}).setLimit(1)
-	novedad.IdSecuencial= results[0].IdSecuencial+1
+	novedad.IdSecuencial = results[0].IdSecuencial + 1
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
@@ -143,6 +148,22 @@ func GetNovedades(c *fiber.Ctx) error {
 	return c.JSON(novedades)
 }
 
+// obtener novedad por tipo
+func GetTipoNovedad(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	tipo, _ := strconv.Atoi(c.Params("tipoNovedad"))
+	cursor, err := coll.Find(context.TODO(), bson.M{"TipoNovedad": tipo})
+	fmt.Println(coll)
+	if err != nil {
+		fmt.Print(err)
+	}
+	var TipoNovedad []TipoNovedad
+	if err = cursor.All(context.Background(), &TipoNovedad); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(tipo)
+}
+
 // obtener todas las novedades
 func GetNovedadesAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
@@ -157,7 +178,7 @@ func GetNovedadesAll(c *fiber.Ctx) error {
 	return c.JSON(novedades)
 }
 
-// Borrar novedad por id
+// borrar novedad por id
 func DeleteNovedad(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
@@ -435,4 +456,8 @@ func generateToken(length int) string {
 func getMD5Hash(message string) string {
 	hash := md5.Sum([]byte(message))
 	return hex.EncodeToString(hash[:])
+}
+
+func Prueba(c *fiber.Ctx) error {
+	return (c.SendString(c.Params("nombre")))
 }

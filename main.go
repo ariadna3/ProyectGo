@@ -57,9 +57,9 @@ type Actividades struct {
 }
 
 type Proveedores struct {
-	IdProveedor 	int     `bson:"idProveedor"`
-	NumeroDoc  		int	    `bson:"numeroDoc"`
-	RazonSocial		string  `bson:"razonSocial"`
+	IdProveedor int    `bson:"idProveedor"`
+	NumeroDoc   int    `bson:"numeroDoc"`
+	RazonSocial string `bson:"razonSocial"`
 }
 
 func main() {
@@ -91,6 +91,14 @@ func main() {
 		app.Delete("/Novedad/:id", user.DeleteNovedad)
 		app.Get("/Novedad", user.GetNovedadesAll)
 	}
+
+	if connectedWithMongo {
+		//Tipo Novedades
+		app.Get("/Novedad/:Novedad", user.GetTipoNovedad)
+	}
+
+	app.Get("/Prueba/+", user.Prueba)
+	app.Get("/Prueba", user.Prueba)
 
 	if connectedWithMongo {
 		//Proveedores
