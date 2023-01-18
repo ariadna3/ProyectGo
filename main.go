@@ -46,6 +46,15 @@ type Novedades struct {
 	ConceptoDeFacturacion string           `bson:"conceptoDeFacturacion"`
 	Adjuntos              []string         `bson:"adjuntos"`
 	Distribuciones        []Distribuciones `bson:"distribuciones"`
+	Comentarios           string           `bson:"comentarios"`
+	Promovido             bool             `bson:"promovido"`
+	Cliente               string           `bson:"cliente"`
+}
+
+type TipoNovedad struct {
+	IdSecuencial int    `bson:"idSecuencial"`
+	Tipo         string `bson:"tipo"`
+	Descripcion  string `bson:"descripcion"`
 }
 
 type Actividades struct {
@@ -94,11 +103,11 @@ func main() {
 
 	if connectedWithMongo {
 		//Tipo Novedades
-		app.Get("/Novedad/:Novedad", user.GetTipoNovedad)
+		app.Get("/Novedad/:tipo", user.GetTipoNovedad)
 	}
 
-	app.Get("/Prueba/+", user.Prueba)
-	app.Get("/Prueba", user.Prueba)
+	//app.Get("/Prueba/+", user.Prueba)
+	//app.Get("/Prueba", user.Prueba)
 
 	if connectedWithMongo {
 		//Proveedores

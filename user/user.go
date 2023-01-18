@@ -65,8 +65,9 @@ type Novedades struct {
 }
 
 type TipoNovedad struct {
-	Tipo        string `bson:"tipo"`
-	Descripcion string `bson:"descripcion"`
+	IdSecuencial int    `bson:"idSecuencial"`
+	Tipo         string `bson:"tipo"`
+	Descripcion  string `bson:"descripcion"`
 }
 
 type Actividades struct {
@@ -124,7 +125,6 @@ func InsertNovedad(c *fiber.Ctx) error {
 	var results []Novedades
 	cursor.All(context.TODO(), &results)
 
-	//novedades := coll.Find(context.TODO(),bson.D{}).SetSort(bson.D{{"idSecuencial",1}}).setLimit(1)
 	novedad.IdSecuencial = results[0].IdSecuencial + 1
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
@@ -152,15 +152,15 @@ func GetNovedades(c *fiber.Ctx) error {
 
 // obtener novedad por tipo
 func GetTipoNovedad(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("novedades")
-	tipo, _ := strconv.Atoi(c.Params("tipoNovedad"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"TipoNovedad": tipo})
+	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
+	tipo, _ := strconv.Atoi(c.Params("tipo"))
+	cursor, err := coll.Find(context.TODO(), bson.M{"tipo": tipo})
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}
-	var TipoNovedad []TipoNovedad
-	if err = cursor.All(context.Background(), &TipoNovedad); err != nil {
+	var tipoNovedad []TipoNovedad
+	if err = cursor.All(context.Background(), &tipoNovedad); err != nil {
 		fmt.Print(err)
 	}
 	return c.JSON(tipo)
