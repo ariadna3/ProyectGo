@@ -73,12 +73,8 @@ type Proveedores struct {
 
 func main() {
 
-	key := os.Getenv("GOOGLEKEY")
-	sec := os.Getenv("GOOGLESEC")
-	callback := os.Getenv("GOOGLECALLBACK")
-
 	goth.UseProviders(
-		google.New(key, sec, callback),
+		google.New(os.Getenv("GOOGLEKEY"), os.Getenv("GOOGLESEC"), os.Getenv("GOOGLECALLBACK")),
 	)
 	engine := html.New("./user/template", ".html")
 	app := fiber.New(fiber.Config{
@@ -86,7 +82,7 @@ func main() {
 	})
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:3000",
+		AllowOrigins: os.Getenv("PUERTOCORS"),
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 
@@ -99,72 +95,67 @@ func main() {
 		app.Get("/Novedad/:id", user.GetNovedades)
 		app.Delete("/Novedad/:id", user.DeleteNovedad)
 		app.Get("/Novedad", user.GetNovedadesAll)
-	}
 
-	if connectedWithMongo {
 		//Tipo Novedades
-		app.Get("/Novedad/:tipo", user.GetTipoNovedad)
-	}
+		app.Get("/TipoNovedades", user.GetTipoNovedad)
 
-	//app.Get("/Prueba/+", user.Prueba)
-	//app.Get("/Prueba", user.Prueba)
+		//app.Get("/Prueba/+", user.Prueba)
+		//app.Get("/Prueba", user.Prueba)
 
-	if connectedWithMongo {
 		//Proveedores
 		app.Post("/Proveedor", user.InsertProveedor)
 		app.Get("/Proveedor/:id", user.GetProveedor)
 		app.Delete("/Proveedor/:id", user.DeleteProveedor)
 		app.Get("/Proveedor", user.GetProveedorAll)
-	}
 
-	if connectedWithMongo {
 		//Actividades
 		app.Post("/Actividad", user.InsertActividad)
 		app.Get("/Actividad/:id", user.GetActividad)
 		app.Delete("/Actividad/:id", user.DeleteActividad)
 		app.Get("/Actividad", user.GetActividadAll)
 
-		if connectedWithSql {
-			//User
-			app.Post("/User", user.CreateUser)
-			app.Get("/User/:item", user.GetUser)
-			app.Put("/User/:item", user.UpdateUser)
-			app.Delete("/User/:item", user.DeleteUser)
-
-			//Login
-			app.Post("/Login", user.Login)
-		}
-
-		//Google
-		app.Get("/", user.ShowGoogleAuthentication)
-
-		app.Get("/auth/:provider/callback", func(ctx *fiber.Ctx) error {
-			user, err := gf.CompleteUserAuth(ctx)
-			if err != nil {
-				return err
-			}
-			ctx.JSON(user)
-			return nil
-		})
-
-		app.Get("/auth/:provider", func(ctx *fiber.Ctx) error {
-			if gothUser, err := gf.CompleteUserAuth(ctx); err == nil {
-				ctx.JSON(gothUser)
-			} else {
-				gf.BeginAuthHandler(ctx)
-			}
-			return nil
-		})
-
-		app.Get("/logout/:provider", func(ctx *fiber.Ctx) error {
-			gf.Logout(ctx)
-			ctx.Redirect("/")
-			return nil
-		})
-
-		app.Listen(":3000")
 	}
 
+	if connectedWithSql {
+		//User
+		app.Post("/User", user.CreateUser)
+		app.Get("/User/:item", user.GetUser)
+		app.Put("/User/:item", user.UpdateUser)
+		app.Delete("/User/:item", user.DeleteUser)
+
+		//Login
+		app.Post("/Login", user.Login)
+	}
+
+	//Google
+	app.Get("/", user.ShowGoogleAuthentication)
+
+	app.Get("/auth/:provider/callback", func(ctx *fiber.Ctx) error {
+		user, err := gf.CompleteUserAuth(ctx)
+		if err != nil {
+			return err
+		}
+		ctx.JSON(user)
+		return nil
+	})
+
+	app.Get("/auth/:provider", func(ctx *fiber.Ctx) error {
+		if gothUser, err := gf.CompleteUserAuth(ctx); err == nil {
+			ctx.JSON(gothUser)
+		} else {
+			gf.BeginAuthHandler(ctx)
+		}
+		return nil
+	})
+
+	app.Get("/logout/:provider", func(ctx *fiber.Ctx) error {
+		gf.Logout(ctx)
+		ctx.Redirect("/")
+		return nil
+	})
+
+	fmt.Println(os.Getenv("PUERTO"))
+	app.Listen(os.Getenv("PUERTO"))
 }
 
 func goDotEnvVariable(key string) string {

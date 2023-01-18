@@ -65,9 +65,8 @@ type Novedades struct {
 }
 
 type TipoNovedad struct {
-	IdSecuencial int    `bson:"idSecuencial"`
-	Tipo         string `bson:"tipo"`
-	Descripcion  string `bson:"descripcion"`
+	Tipo        string `bson:"tipo"`
+	Descripcion string `bson:"descripcion"`
 }
 
 type Actividades struct {
@@ -152,14 +151,16 @@ func GetNovedades(c *fiber.Ctx) error {
 
 // obtener novedad por tipo
 func GetTipoNovedad(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("novedades")
-	tipo, _ := strconv.Atoi(c.Params("tipo"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"tipo": tipo})
+	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	fmt.Println("tipos")
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}
 	var tipoNovedad []TipoNovedad
+	fmt.Println(tipoNovedad)
+
 	if err = cursor.All(context.Background(), &tipoNovedad); err != nil {
 		fmt.Print(err)
 	}
