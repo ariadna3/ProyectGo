@@ -48,9 +48,8 @@ type Distribuciones struct {
 }
 
 type Novedades struct {
-	IdSecuencial int    `bson:"idSecuencial"`
-	Tipo         string `bson:"tipo"`
-	//Descripcion           string           `bson:"descripcion"`
+	IdSecuencial          int              `bson:"idSecuencial"`
+	Tipo                  string           `bson:"tipo"`
 	Fecha                 string           `bson:"fecha"`
 	Hora                  string           `bson:"hora"`
 	Usuario               string           `bson:"usuario"`
@@ -60,6 +59,9 @@ type Novedades struct {
 	ConceptoDeFacturacion string           `bson:"conceptoDeFacturacion"`
 	Adjuntos              []string         `bson:"adjuntos"`
 	Distribuciones        []Distribuciones `bson:"distribuciones"`
+	Comentarios           string           `bson:"comentarios"`
+	Promovido             bool             `bson:"promovido"`
+	Cliente               string           `bson:"cliente"`
 }
 
 type TipoNovedad struct {
@@ -459,5 +461,5 @@ func getMD5Hash(message string) string {
 }
 
 func Prueba(c *fiber.Ctx) error {
-	return (c.SendString(c.Params("nombre")))
+	return (c.SendString(c.Params("nombrez")))
 }
