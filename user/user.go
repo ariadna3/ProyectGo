@@ -48,9 +48,8 @@ type Distribuciones struct {
 }
 
 type Novedades struct {
-	IdSecuencial int    `bson:"idSecuencial"`
-	Tipo         string `bson:"tipo"`
-	//Descripcion           string           `bson:"descripcion"`
+	IdSecuencial          int              `bson:"idSecuencial"`
+	Tipo                  string           `bson:"tipo"`
 	Fecha                 string           `bson:"fecha"`
 	Hora                  string           `bson:"hora"`
 	Usuario               string           `bson:"usuario"`
@@ -60,6 +59,9 @@ type Novedades struct {
 	ConceptoDeFacturacion string           `bson:"conceptoDeFacturacion"`
 	Adjuntos              []string         `bson:"adjuntos"`
 	Distribuciones        []Distribuciones `bson:"distribuciones"`
+	Comentarios           string           `bson:"comentarios"`
+	Promovido             bool             `bson:"promovido"`
+	Cliente               string           `bson:"cliente"`
 }
 
 type TipoNovedad struct {
@@ -122,7 +124,6 @@ func InsertNovedad(c *fiber.Ctx) error {
 	var results []Novedades
 	cursor.All(context.TODO(), &results)
 
-	//novedades := coll.Find(context.TODO(),bson.D{}).SetSort(bson.D{{"idSecuencial",1}}).setLimit(1)
 	novedad.IdSecuencial = results[0].IdSecuencial + 1
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
@@ -150,18 +151,20 @@ func GetNovedades(c *fiber.Ctx) error {
 
 // obtener novedad por tipo
 func GetTipoNovedad(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("novedades")
-	tipo, _ := strconv.Atoi(c.Params("tipoNovedad"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"TipoNovedad": tipo})
+	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	fmt.Println("tipos")
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}
-	var TipoNovedad []TipoNovedad
-	if err = cursor.All(context.Background(), &TipoNovedad); err != nil {
+	var tipoNovedad []TipoNovedad
+	fmt.Println(tipoNovedad)
+
+	if err = cursor.All(context.Background(), &tipoNovedad); err != nil {
 		fmt.Print(err)
 	}
-	return c.JSON(tipo)
+	return c.JSON(tipoNovedad)
 }
 
 // obtener todas las novedades
@@ -459,5 +462,5 @@ func getMD5Hash(message string) string {
 }
 
 func Prueba(c *fiber.Ctx) error {
-	return (c.SendString(c.Params("nombre")))
+	return (c.SendString(c.Params("nombrez")))
 }
