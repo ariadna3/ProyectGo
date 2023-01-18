@@ -152,7 +152,7 @@ func GetNovedades(c *fiber.Ctx) error {
 
 // obtener novedad por tipo
 func GetTipoNovedad(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
+	coll := client.Database("portalDeNovedades").Collection("novedades")
 	tipo, _ := strconv.Atoi(c.Params("tipo"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"tipo": tipo})
 	fmt.Println(coll)
@@ -163,7 +163,7 @@ func GetTipoNovedad(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &tipoNovedad); err != nil {
 		fmt.Print(err)
 	}
-	return c.JSON(tipo)
+	return c.JSON(tipoNovedad)
 }
 
 // obtener todas las novedades
