@@ -106,6 +106,44 @@ func ShowGoogleAuthentication(c *fiber.Ctx) error {
 	})
 }
 
+// Busqueda con parametros Novedades
+func GetGreddy(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	var busqueda bson.M
+	if c.Query("idSecuencial") != "" {
+		busqueda["idSecuencial"], _ = strconv.Atoi(c.Query("idSecuencial"))
+	}
+	if c.Query("tipo") != "" {
+		busqueda["tipo"], _ = strconv.Atoi(c.Query("tipo"))
+	}
+	if c.Query("fecha") != "" {
+		busqueda["fecha"], _ = strconv.Atoi(c.Query("fecha"))
+	}
+	if c.Query("hora") != "" {
+		busqueda["hora"], _ = strconv.Atoi(c.Query("hora"))
+	}
+	if c.Query("usuario") != "" {
+		busqueda["usuario"], _ = strconv.Atoi(c.Query("usuario"))
+	}
+	if c.Query("proveedor") != "" {
+		busqueda["proveedor"], _ = strconv.Atoi(c.Query("proveedor"))
+	}
+	if c.Query("periodo") != "" {
+		busqueda["periodo"], _ = strconv.Atoi(c.Query("periodo"))
+	}
+	if c.Query("conceptoDeFacturacion") != "" {
+		busqueda["conceptoDeFacturacion"], _ = strconv.Atoi(c.Query("conceptoDeFacturacion"))
+	}
+	if c.Query("comentarios") != "" {
+		busqueda["comentarios"], _ = strconv.Atoi(c.Query("comentarios"))
+	}
+	if c.Query("cliente") != "" {
+		busqueda["cliente"], _ = strconv.Atoi(c.Query("cliente"))
+	}
+	fmt.Println(coll)
+	return c.JSON(busqueda)
+}
+
 // Novedades
 // insertar novedad
 func InsertNovedad(c *fiber.Ctx) error {
@@ -459,8 +497,4 @@ func generateToken(length int) string {
 func getMD5Hash(message string) string {
 	hash := md5.Sum([]byte(message))
 	return hex.EncodeToString(hash[:])
-}
-
-func Prueba(c *fiber.Ctx) error {
-	return (c.SendString(c.Params("nombrez")))
 }
