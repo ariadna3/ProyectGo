@@ -47,6 +47,12 @@ type Distribuciones struct {
 	Ceco       Cecos   `bson:"ceco"`
 }
 
+type Estado struct {
+	Pendiente string `bson:"pendiente"`
+	Aceptada  string `bson:"aceptada"`
+	Rechazada string `bson:"rechazada"`
+}
+
 type Novedades struct {
 	IdSecuencial          int              `bson:"idSecuencial"`
 	Tipo                  string           `bson:"tipo"`
@@ -62,6 +68,8 @@ type Novedades struct {
 	Comentarios           string           `bson:"comentarios"`
 	Promovido             bool             `bson:"promovido"`
 	Cliente               string           `bson:"cliente"`
+	Estado                []Estado         `bson:"estado"`
+	RechazoMotivo         string           `bson:"rechazoMotivo"`
 }
 
 type TipoNovedad struct {
