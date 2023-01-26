@@ -90,6 +90,10 @@ func main() {
 	connectedWithSql := createConnectionWithMysql()
 
 	if connectedWithMongo {
+
+		//Greedy Parameters
+		app.Get("/Busqueda/*", user.GetGreddy)
+
 		//Novedades
 		app.Post("/Novedad", user.InsertNovedad)
 		app.Get("/Novedad/:id", user.GetNovedades)
@@ -98,9 +102,6 @@ func main() {
 
 		//Tipo Novedades
 		app.Get("/TipoNovedades", user.GetTipoNovedad)
-
-		//app.Get("/Prueba/+", user.Prueba)
-		//app.Get("/Prueba", user.Prueba)
 
 		//Proveedores
 		app.Post("/Proveedor", user.InsertProveedor)
