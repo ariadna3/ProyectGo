@@ -66,10 +66,10 @@ type Novedades struct {
 	RechazoMotivo         string           `bson:"rechazoMotivo"`
 }
 
-const estado (
-	Pendiente string	"pendiente"
-	Aceptada   	   		"aceptada"
-	Rechazada 			"rechazada"
+const (
+	Pendiente = "pendiente"
+	Aceptada  = "aceptada"
+	Rechazada = "rechazada"
 )
 
 type TipoNovedad struct {
@@ -160,8 +160,8 @@ func InsertNovedad(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 
-	if (novedad.Estado != estado.Pendiente && novedad.Estado != estado.Aceptada && novedad.Estado != Rechadada){
-	novedad.Estado(estado.Pendiente)
+	if novedad.Estado != Pendiente && novedad.Estado != Aceptada && novedad.Estado != Rechazada {
+		novedad.Estado = Pendiente
 	}
 
 	coll := client.Database("portalDeNovedades").Collection("novedades")
