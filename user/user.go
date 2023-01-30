@@ -62,7 +62,15 @@ type Novedades struct {
 	Comentarios           string           `bson:"comentarios"`
 	Promovido             bool             `bson:"promovido"`
 	Cliente               string           `bson:"cliente"`
+	Estado                string           `bson:"estado"`
+	RechazoMotivo         string           `bson:"rechazoMotivo"`
 }
+
+const (
+	Pendiente = "pendiente"
+	Aceptada  = "aceptada"
+	Rechazada = "rechazada"
+)
 
 type TipoNovedad struct {
 	Tipo        string `bson:"tipo"`
@@ -150,6 +158,10 @@ func InsertNovedad(c *fiber.Ctx) error {
 	novedad := new(Novedades)
 	if err := c.BodyParser(novedad); err != nil {
 		return c.Status(503).SendString(err.Error())
+	}
+
+	if novedad.Estado != Pendiente && novedad.Estado != Aceptada && novedad.Estado != Rechazada {
+		novedad.Estado = Pendiente
 	}
 
 	coll := client.Database("portalDeNovedades").Collection("novedades")
