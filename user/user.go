@@ -47,12 +47,6 @@ type Distribuciones struct {
 	Ceco       Cecos   `bson:"ceco"`
 }
 
-type Estado struct {
-	Pendiente string `bson:"pendiente"`
-	Aceptada  string `bson:"aceptada"`
-	Rechazada string `bson:"rechazada"`
-}
-
 type Novedades struct {
 	IdSecuencial          int              `bson:"idSecuencial"`
 	Tipo                  string           `bson:"tipo"`
@@ -68,9 +62,15 @@ type Novedades struct {
 	Comentarios           string           `bson:"comentarios"`
 	Promovido             bool             `bson:"promovido"`
 	Cliente               string           `bson:"cliente"`
-	Estado                []Estado         `bson:"estado"`
+	Estado                string           `bson:"estado"`
 	RechazoMotivo         string           `bson:"rechazoMotivo"`
 }
+
+const estado (
+	Pendiente string	"pendiente"
+	Aceptada   	   		"aceptada"
+	Rechazada 			"rechazada"
+)
 
 type TipoNovedad struct {
 	Tipo        string `bson:"tipo"`
@@ -158,6 +158,10 @@ func InsertNovedad(c *fiber.Ctx) error {
 	novedad := new(Novedades)
 	if err := c.BodyParser(novedad); err != nil {
 		return c.Status(503).SendString(err.Error())
+	}
+
+	if (novedad.Estado != estado.Pendiente && novedad.Estado != estado.Aceptada && novedad.Estado != Rechadada){
+	novedad.Estado(estado.Pendiente)
 	}
 
 	coll := client.Database("portalDeNovedades").Collection("novedades")
