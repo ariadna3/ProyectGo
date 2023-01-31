@@ -122,31 +122,31 @@ func GetGreddy(c *fiber.Ctx) error {
 		busqueda["idSecuencial"], _ = strconv.Atoi(c.Query("idSecuencial"))
 	}
 	if c.Query("tipo") != "" {
-		busqueda["tipo"], _ = strconv.Atoi(c.Query("tipo"))
+		busqueda["tipo"] = c.Query("tipo")
 	}
 	if c.Query("fecha") != "" {
-		busqueda["fecha"], _ = strconv.Atoi(c.Query("fecha"))
+		busqueda["fecha"] = c.Query("fecha")
 	}
 	if c.Query("hora") != "" {
-		busqueda["hora"], _ = strconv.Atoi(c.Query("hora"))
+		busqueda["hora"] = c.Query("hora")
 	}
 	if c.Query("usuario") != "" {
-		busqueda["usuario"], _ = strconv.Atoi(c.Query("usuario"))
+		busqueda["usuario"] = c.Query("usuario")
 	}
 	if c.Query("proveedor") != "" {
-		busqueda["proveedor"], _ = strconv.Atoi(c.Query("proveedor"))
+		busqueda["proveedor"] = c.Query("proveedor")
 	}
 	if c.Query("periodo") != "" {
-		busqueda["periodo"], _ = strconv.Atoi(c.Query("periodo"))
+		busqueda["periodo"] = c.Query("periodo")
 	}
 	if c.Query("conceptoDeFacturacion") != "" {
-		busqueda["conceptoDeFacturacion"], _ = strconv.Atoi(c.Query("conceptoDeFacturacion"))
+		busqueda["conceptoDeFacturacion"] = c.Query("conceptoDeFacturacion")
 	}
 	if c.Query("comentarios") != "" {
-		busqueda["comentarios"], _ = strconv.Atoi(c.Query("comentarios"))
+		busqueda["comentarios"] = c.Query("comentarios")
 	}
 	if c.Query("cliente") != "" {
-		busqueda["cliente"], _ = strconv.Atoi(c.Query("cliente"))
+		busqueda["cliente"] = c.Query("cliente")
 	}
 	fmt.Println(coll)
 	return c.JSON(busqueda)
