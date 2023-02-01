@@ -117,10 +117,7 @@ func ShowGoogleAuthentication(c *fiber.Ctx) error {
 // Busqueda con parametros Novedades
 func GetGreddy(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
-	var busqueda bson.M
-	if c.Query("idSecuencial") != "" {
-		busqueda["idSecuencial"], _ = strconv.Atoi(c.Query("idSecuencial"))
-	}
+	var busqueda bson.M = bson.M{}
 	if c.Query("tipo") != "" {
 		busqueda["tipo"] = c.Query("tipo")
 	}
@@ -148,8 +145,16 @@ func GetGreddy(c *fiber.Ctx) error {
 	if c.Query("cliente") != "" {
 		busqueda["cliente"] = c.Query("cliente")
 	}
+	cursor, err := coll.Find(context.TODO(), busqueda)
 	fmt.Println(coll)
-	return c.JSON(busqueda)
+	if err != nil {
+		fmt.Print(err)
+	}
+	var novedades []Novedades
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(novedades)
 }
 
 // Novedades

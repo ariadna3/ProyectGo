@@ -92,7 +92,7 @@ func main() {
 	if connectedWithMongo {
 
 		//Greedy Parameters
-		app.Get("/Busqueda/*", user.GetGreddy)
+		app.Get("/Novedad/*", user.GetGreddy)
 
 		//Novedades
 		app.Post("/Novedad", user.InsertNovedad)
