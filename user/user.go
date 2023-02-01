@@ -115,19 +115,30 @@ func ShowGoogleAuthentication(c *fiber.Ctx) error {
 }
 
 func UpdateEstadoNovedades(c *fiber.Ctx) error {
+	//se obtiene el id
 	idNumber, _ := strconv.Atoi(c.Params("id"))
+	//se obtiene el estado
 	estado := c.Params("estado")
+	//se conecta a la DB
 	coll := client.Database("portalDeNovedades").Collection("novedades")
+
+	//Verifica que el estado sea uno valido
 	if estado != Pendiente && estado != Aceptada && estado != Rechazada {
 		return c.SendString("estado no valido")
 	}
 
+	//crea el filtro
 	filter := bson.D{{"idSecuencial", idNumber}}
-	update := bson.D{{"$set", bson.D{{"estado", estado}}}}
+
+	//le dice que es lo que hay que modificar y con que
+	update := bson.D{{"$set", bson.D{{"motivo", novedad.Motivo}}}}
+
+	//hace la modificacion
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		panic(err)
 	}
+	//devuelve el resultado
 	return c.JSON(result)
 }
 
@@ -177,15 +188,18 @@ func GetGreddy(c *fiber.Ctx) error {
 // Novedades
 // insertar novedad
 func InsertNovedad(c *fiber.Ctx) error {
+	//obtiene la novedad
 	novedad := new(Novedades)
 	if err := c.BodyParser(novedad); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
 
+	//se fija que el estado sea valido
 	if novedad.Estado != Pendiente && novedad.Estado != Aceptada && novedad.Estado != Rechazada {
 		novedad.Estado = Pendiente
 	}
 
+	//Se conecta a la DB
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 
 	filter := bson.D{}
