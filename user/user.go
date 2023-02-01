@@ -117,10 +117,7 @@ func ShowGoogleAuthentication(c *fiber.Ctx) error {
 // Busqueda con parametros Novedades
 func GetGreddy(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
-	var busqueda bson.M
-	if c.Query("idSecuencial") != "" {
-		busqueda["idSecuencial"], _ = strconv.Atoi(c.Query("idSecuencial"))
-	}
+	var busqueda bson.M = bson.M{}
 	if c.Query("tipo") != "" {
 		busqueda["tipo"] = c.Query("tipo")
 	}
