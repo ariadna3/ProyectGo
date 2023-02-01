@@ -145,8 +145,16 @@ func GetGreddy(c *fiber.Ctx) error {
 	if c.Query("cliente") != "" {
 		busqueda["cliente"] = c.Query("cliente")
 	}
+	cursor, err := coll.Find(context.TODO(), busqueda)
 	fmt.Println(coll)
-	return c.JSON(busqueda)
+	if err != nil {
+		fmt.Print(err)
+	}
+	var novedades []Novedades
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(novedades)
 }
 
 // Novedades
