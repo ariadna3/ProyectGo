@@ -114,6 +114,23 @@ func ShowGoogleAuthentication(c *fiber.Ctx) error {
 	})
 }
 
+func UpdateEstadoNovedades(c *fiber.Ctx) error {
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	estado := c.Params("estado")
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	if estado != Pendiente && estado != Aceptada && estado != Rechazada {
+		return c.SendString("estado no valido")
+	}
+
+	filter := bson.D{{"idSecuencial", idNumber}}
+	update := bson.D{{"$set", bson.D{{"estado", estado}}}}
+	result, err := coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		panic(err)
+	}
+	return c.JSON(result)
+}
+
 // Busqueda con parametros Novedades
 func GetGreddy(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")

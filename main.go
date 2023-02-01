@@ -90,7 +90,7 @@ func main() {
 	connectedWithSql := createConnectionWithMysql()
 
 	if connectedWithMongo {
-
+		app.Patch("/Novedad/:id/:estado", user.UpdateEstadoNovedades)
 		//Greedy Parameters
 		app.Get("/Novedad/*", user.GetGreddy)
 
