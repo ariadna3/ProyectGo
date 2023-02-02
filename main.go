@@ -118,6 +118,10 @@ func main() {
 		app.Delete("/Actividad/:id", user.DeleteActividad)
 		app.Get("/Actividad", user.GetActividadAll)
 
+		//Centro de Costos
+		app.Get("/Cecos/", user.GetCecosAll)
+		app.Get("/Cecos/:id", user.GetCecos)
+
 	}
 
 	if connectedWithSql {

@@ -42,7 +42,7 @@ type Cecos struct {
 	Descripcion string `bson:"descripcion"`
 	Cliente     string `bson:"cliente"`
 	Proyecto    string `bson:"proyecto"`
-	Cuit        int
+	Cuit        int    `bson:"cuit"`
 }
 
 type Distribuciones struct {
@@ -414,6 +414,36 @@ func DeleteProveedor(c *fiber.Ctx) error {
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
 	return c.SendString("proveedor eliminado")
+}
+
+// obtener todos los centros de costos
+func GetCecosAll(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	if err != nil {
+		fmt.Print(err)
+	}
+	var cecos []Cecos
+	if err = cursor.All(context.Background(), &cecos); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(cecos)
+}
+
+// obtener centro de costos por id
+func GetCecos(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	fmt.Println(coll)
+	if err != nil {
+		fmt.Print(err)
+	}
+	var cecos []Cecos
+	if err = cursor.All(context.Background(), &cecos); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(cecos)
 }
 
 // usuarios
