@@ -40,6 +40,9 @@ type Token_auth struct {
 type Cecos struct {
 	IdCeco      int    `bson:"id_ceco"`
 	Descripcion string `bson:"descripcion"`
+	Cliente     string `bson:"cliente"`
+	Proyecto    string `bson:"proyecto"`
+	Cuit        int
 }
 
 type Distribuciones struct {
@@ -114,38 +117,14 @@ func ShowGoogleAuthentication(c *fiber.Ctx) error {
 	})
 }
 
-func UpdateEstadoNovedades(c *fiber.Ctx) error {
-	//se obtiene el id
-	idNumber, _ := strconv.Atoi(c.Params("id"))
-	//se obtiene el estado
-	estado := c.Params("estado")
-	//se conecta a la DB
-	coll := client.Database("portalDeNovedades").Collection("novedades")
-
-	//Verifica que el estado sea uno valido
-	if estado != Pendiente && estado != Aceptada && estado != Rechazada {
-		return c.SendString("estado no valido")
-	}
-
-	//crea el filtro
-	filter := bson.D{{"idSecuencial", idNumber}}
-
-	//le dice que es lo que hay que modificar y con que
-	update := bson.D{{"$set", bson.D{{"motivo", novedad.Motivo}}}}
-
-	//hace la modificacion
-	result, err := coll.UpdateOne(context.TODO(), filter, update)
-	if err != nil {
-		panic(err)
-	}
-	//devuelve el resultado
-	return c.JSON(result)
-}
-
 // Busqueda con parametros Novedades
 func GetGreddy(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
-	var busqueda bson.M = bson.M{}
+	var busqueda bson.M
+	if c.Query("idSecuencial") != "" {
+		busqueda["idSecuencial"], _ = strconv.Atoi(c.Query("idSecuencial"))
+	}
+
 	if c.Query("tipo") != "" {
 		busqueda["tipo"] = c.Query("tipo")
 	}
@@ -173,33 +152,22 @@ func GetGreddy(c *fiber.Ctx) error {
 	if c.Query("cliente") != "" {
 		busqueda["cliente"] = c.Query("cliente")
 	}
-	cursor, err := coll.Find(context.TODO(), busqueda)
 	fmt.Println(coll)
-	if err != nil {
-		fmt.Print(err)
-	}
-	var novedades []Novedades
-	if err = cursor.All(context.Background(), &novedades); err != nil {
-		fmt.Print(err)
-	}
-	return c.JSON(novedades)
+	return c.JSON(busqueda)
 }
 
 // Novedades
 // insertar novedad
 func InsertNovedad(c *fiber.Ctx) error {
-	//obtiene la novedad
 	novedad := new(Novedades)
 	if err := c.BodyParser(novedad); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
 
-	//se fija que el estado sea valido
 	if novedad.Estado != Pendiente && novedad.Estado != Aceptada && novedad.Estado != Rechazada {
 		novedad.Estado = Pendiente
 	}
 
-	//Se conecta a la DB
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 
 	filter := bson.D{}
