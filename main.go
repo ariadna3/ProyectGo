@@ -92,7 +92,7 @@ func main() {
 	if connectedWithMongo {
 		//Update estado y motivo
 		app.Patch("/Novedad/:id/:estado", user.UpdateEstadoNovedades)
-		app.Patch("/Novedad/:id/motivo", user.UpdateMotivoNovedades)
+		app.Patch("/Novedad/:id", user.UpdateMotivoNovedades)
 
 		//Greedy Parameters
 		app.Get("/Novedad/*", user.GetGreddy)

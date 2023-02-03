@@ -136,9 +136,6 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	filter := bson.D{{"idSecuencial", idNumber}}
 	update := bson.D{{"$set", bson.D{{"estado", estado}}}}
 
-	//le dice que es lo que hay que modificar y con que
-	update = bson.D{{"$set", bson.D{{"motivo", novedad.Estado}}}}
-
 	//hace la modificacion
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
@@ -152,16 +149,16 @@ func UpdateMotivoNovedades(c *fiber.Ctx) error {
 	//se obtiene el id
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	//se obtiene el motivo
-	motivo := c.Params("motivo")
+	novedad := new(Novedades)
+	if err := c.BodyParser(novedad); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
 	//se conecta a la DB
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 
 	//crea el filtro
 	filter := bson.D{{"idSecuencial", idNumber}}
-	update := bson.D{{"$set", bson.D{{"motivo", motivo}}}}
-
-	//le dice que es lo que hay que modificar y con que
-	update = bson.D{{"$set", bson.D{{"motivo", novedad.Motivo}}}}
+	update := bson.D{{"$set", bson.D{{"motivo", novedad.Motivo}}}}
 
 	//hace la modificacion
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
