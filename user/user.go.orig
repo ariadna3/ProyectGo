@@ -117,6 +117,7 @@ func ShowGoogleAuthentication(c *fiber.Ctx) error {
 	})
 }
 
+<<<<<<< HEAD
 //----Periodos----
 
 func GetPeriodos(c *fiber.Ctx) error {
@@ -131,6 +132,45 @@ func GetPeriodos(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(periodos)
+=======
+// Busqueda con parametros Novedades
+func GetGreddy(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	var busqueda bson.M
+	if c.Query("idSecuencial") != "" {
+		busqueda["idSecuencial"], _ = strconv.Atoi(c.Query("idSecuencial"))
+	}
+
+	if c.Query("tipo") != "" {
+		busqueda["tipo"] = c.Query("tipo")
+	}
+	if c.Query("fecha") != "" {
+		busqueda["fecha"] = c.Query("fecha")
+	}
+	if c.Query("hora") != "" {
+		busqueda["hora"] = c.Query("hora")
+	}
+	if c.Query("usuario") != "" {
+		busqueda["usuario"] = c.Query("usuario")
+	}
+	if c.Query("proveedor") != "" {
+		busqueda["proveedor"] = c.Query("proveedor")
+	}
+	if c.Query("periodo") != "" {
+		busqueda["periodo"] = c.Query("periodo")
+	}
+	if c.Query("conceptoDeFacturacion") != "" {
+		busqueda["conceptoDeFacturacion"] = c.Query("conceptoDeFacturacion")
+	}
+	if c.Query("comentarios") != "" {
+		busqueda["comentarios"] = c.Query("comentarios")
+	}
+	if c.Query("cliente") != "" {
+		busqueda["cliente"] = c.Query("cliente")
+	}
+	fmt.Println(coll)
+	return c.JSON(busqueda)
+>>>>>>> be6128e71bae82cdca218d9fe502d203ef9555e2
 }
 
 // ----Novedades----
