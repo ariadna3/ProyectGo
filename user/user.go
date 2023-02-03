@@ -42,7 +42,7 @@ type Cecos struct {
 	Descripcion string `bson:"descripcion"`
 	Cliente     string `bson:"cliente"`
 	Proyecto    string `bson:"proyecto"`
-	Cuit        int
+	Cuit        int    `bson:"cuit"`
 }
 
 type Distribuciones struct {
@@ -66,7 +66,9 @@ type Novedades struct {
 	Promovido             bool             `bson:"promovido"`
 	Cliente               string           `bson:"cliente"`
 	Estado                string           `bson:"estado"`
-	RechazoMotivo         string           `bson:"rechazoMotivo"`
+	Motivo                string           `bson:"motivo"`
+	EnviarA               string           `bson:"enviarA"`
+	Contacto              string           `bson:"contacto"`
 }
 
 const (
@@ -115,6 +117,59 @@ func ShowGoogleAuthentication(c *fiber.Ctx) error {
 	return c.Render("index", fiber.Map{
 		"Title": "Inicializar",
 	})
+}
+
+func UpdateEstadoNovedades(c *fiber.Ctx) error {
+	//se obtiene el id
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	//se obtiene el estado
+	estado := c.Params("estado")
+	//se conecta a la DB
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+
+	//Verifica que el estado sea uno valido
+	if estado != Pendiente && estado != Aceptada && estado != Rechazada {
+		return c.SendString("estado no valido")
+	}
+
+	//crea el filtro
+	filter := bson.D{{"idSecuencial", idNumber}}
+	update := bson.D{{"$set", bson.D{{"estado", estado}}}}
+
+	//le dice que es lo que hay que modificar y con que
+	update = bson.D{{"$set", bson.D{{"motivo", novedad.Estado}}}}
+
+	//hace la modificacion
+	result, err := coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		panic(err)
+	}
+	//devuelve el resultado
+	return c.JSON(result)
+}
+
+func UpdateMotivoNovedades(c *fiber.Ctx) error {
+	//se obtiene el id
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	//se obtiene el motivo
+	motivo := c.Params("motivo")
+	//se conecta a la DB
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+
+	//crea el filtro
+	filter := bson.D{{"idSecuencial", idNumber}}
+	update := bson.D{{"$set", bson.D{{"motivo", motivo}}}}
+
+	//le dice que es lo que hay que modificar y con que
+	update = bson.D{{"$set", bson.D{{"motivo", novedad.Motivo}}}}
+
+	//hace la modificacion
+	result, err := coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		panic(err)
+	}
+	//devuelve el resultado
+	return c.JSON(result)
 }
 
 // Busqueda con parametros Novedades
@@ -361,6 +416,36 @@ func DeleteProveedor(c *fiber.Ctx) error {
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
 	return c.SendString("proveedor eliminado")
+}
+
+// obtener todos los centros de costos
+func GetCecosAll(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	if err != nil {
+		fmt.Print(err)
+	}
+	var cecos []Cecos
+	if err = cursor.All(context.Background(), &cecos); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(cecos)
+}
+
+// obtener centro de costos por id
+func GetCecos(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	fmt.Println(coll)
+	if err != nil {
+		fmt.Print(err)
+	}
+	var cecos []Cecos
+	if err = cursor.All(context.Background(), &cecos); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(cecos)
 }
 
 // usuarios
