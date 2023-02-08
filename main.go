@@ -98,25 +98,28 @@ func main() {
 		app.Get("/Novedad/*", user.GetGreddy)
 
 		//Novedades
+
 		app.Post("/Novedad", user.InsertNovedad)
 		app.Get("/Novedad/:id", user.GetNovedades)
-		app.Delete("/Novedad/:id", user.DeleteNovedad)
+		app.Get("/Novedad/*", user.GetNovedadFiltro)
 		app.Get("/Novedad", user.GetNovedadesAll)
+		app.Delete("/Novedad/:id", user.DeleteNovedad)
+		app.Patch("/Novedad/:id/:estado", user.UpdateEstadoNovedades)
 
 		//Tipo Novedades
 		app.Get("/TipoNovedades", user.GetTipoNovedad)
 
-		//Proveedores
-		app.Post("/Proveedor", user.InsertProveedor)
-		app.Get("/Proveedor/:id", user.GetProveedor)
-		app.Delete("/Proveedor/:id", user.DeleteProveedor)
-		app.Get("/Proveedor", user.GetProveedorAll)
-
 		//Actividades
 		app.Post("/Actividad", user.InsertActividad)
 		app.Get("/Actividad/:id", user.GetActividad)
-		app.Delete("/Actividad/:id", user.DeleteActividad)
 		app.Get("/Actividad", user.GetActividadAll)
+		app.Delete("/Actividad/:id", user.DeleteActividad)
+
+		//Proveedores
+		app.Post("/Proveedor", user.InsertProveedor)
+		app.Get("/Proveedor/:id", user.GetProveedor)
+		app.Get("/Proveedor", user.GetProveedorAll)
+		app.Delete("/Proveedor/:id", user.DeleteProveedor)
 
 		//Centro de Costos
 		app.Get("/Cecos/", user.GetCecosAll)
@@ -135,7 +138,7 @@ func main() {
 		app.Post("/Login", user.Login)
 	}
 
-	//Google
+	//----Google----
 	app.Get("/", user.ShowGoogleAuthentication)
 
 	app.Get("/auth/:provider/callback", func(ctx *fiber.Ctx) error {
