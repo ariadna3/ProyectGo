@@ -7,6 +7,7 @@ import (
 	"github.com/proyectoNovedades/servicios/actividades"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
+	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/user"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -125,10 +126,10 @@ func main() {
 		app.Get("/Cecos/:id", novedades.GetCecos)
 
 		//Recursos
-		//app.Post("/Recurso", recursos.InsertRecurso)
-		//app.Get("/Recurso/:id", recursos.GetRecurso)
-		//app.Get("/Recurso", recursos.GetRecursosAll)
-		//app.Delete("/Recurso/:id", recursos.DeleteRecurso)
+		app.Post("/Recurso", recursos.InsertRecurso)
+		app.Get("/Recurso/:id", recursos.GetRecurso)
+		app.Get("/Recurso", recursos.GetRecursoAll)
+		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 
 	}
 
@@ -204,6 +205,7 @@ func createConnectionWithMongo() bool {
 		novedades.ConnectMongoDb(client)
 		actividades.ConnectMongoDb(client)
 		proveedores.ConnectMongoDb(client)
+		recursos.ConnectMongoDb(client)
 		return true
 	}
 	return false

@@ -6,27 +6,20 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/session"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"gorm.io/gorm"
 )
 
-var store *session.Store = session.New()
-var dbUser *gorm.DB
 var client *mongo.Client
-
-var maxAge int32 = 86400 * 30 // 30 days
-var isProd bool = false       // Set to true when serving over https
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
 	client = clientMongo
 }
 
 type Recursos struct {
-	idRecurso int    `bson:"idRecurso"`
-	Usuario   string `bson:"usuario"`
-	Legajo    int    `bson:"legajo"`
+	idSecuencial int    `bson:"idSecuencial"`
+	Usuario      string `bson:"usuario"`
+	Legajo       int    `bson:"legajo"`
 }
 
 // ----Recursos----
@@ -46,7 +39,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 }
 
 // obtener recurso por id
-func GetRecursos(c *fiber.Ctx) error {
+func GetRecurso(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
@@ -62,7 +55,7 @@ func GetRecursos(c *fiber.Ctx) error {
 }
 
 // obtener todos los recursos
-func GetRecursosAll(c *fiber.Ctx) error {
+func GetRecursoAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
