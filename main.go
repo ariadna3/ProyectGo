@@ -95,7 +95,7 @@ func main() {
 		app.Patch("/Novedad/:id", user.UpdateMotivoNovedades)
 
 		//Greedy Parameters
-		app.Get("/Novedad/*", user.GetGreddy)
+		app.Get("/Novedad/*", user.GetNovedadFiltro)
 
 		//Novedades
 
@@ -124,6 +124,12 @@ func main() {
 		//Centro de Costos
 		app.Get("/Cecos/", user.GetCecosAll)
 		app.Get("/Cecos/:id", user.GetCecos)
+
+		//Recursos
+		app.Post("/Recurso", user.InsertRecurso)
+		app.Get("/Recurso/:id", user.GetRecurso)
+		app.Get("/Recurso", user.GetRecursosAll)
+		app.Delete("/Recurso/:id", user.DeleteRecurso)
 
 	}
 
