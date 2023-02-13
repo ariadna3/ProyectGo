@@ -93,9 +93,12 @@ func main() {
 	connectedWithSql := createConnectionWithMysql()
 
 	if connectedWithMongo {
+		//Update estado y motivo
+		app.Patch("/Novedad/:id/:estado", user.UpdateEstadoNovedades)
+		app.Patch("/Novedad/:id", user.UpdateMotivoNovedades)
 
-		//Periodos
-		app.Get("/Periodos", user.GetPeriodos)
+		//Greedy Parameters
+		app.Get("/Novedad/*", user.GetNovedadFiltro)
 
 		//Novedades
 
@@ -120,6 +123,16 @@ func main() {
 		app.Get("/Proveedor/:id", proveedores.GetProveedor)
 		app.Get("/Proveedor", proveedores.GetProveedorAll)
 		app.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
+
+		//Centro de Costos
+		app.Get("/Cecos/", user.GetCecosAll)
+		app.Get("/Cecos/:id", user.GetCecos)
+
+		//Recursos
+		app.Post("/Recurso", user.InsertRecurso)
+		app.Get("/Recurso/:id", user.GetRecurso)
+		app.Get("/Recurso", user.GetRecursosAll)
+		app.Delete("/Recurso/:id", user.DeleteRecurso)
 
 	}
 
