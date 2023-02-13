@@ -42,7 +42,7 @@ type Novedades struct {
 	Promovido             bool             `bson:"promovido"`
 	Cliente               string           `bson:"cliente"`
 	Estado                string           `bson:"estado"`
-	RechazoMotivo         string           `bson:"rechazoMotivo"`
+	Motivo                string           `bson:"motivo"`
 }
 
 const (
@@ -211,6 +211,21 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	return c.JSON(result)
 }
 
+func UpdateMotivoNovedades(c *fiber.Ctx) error {
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	motivo := c.Params("motivo")
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+
+	filter := bson.D{{"idSecuencial", idNumber}}
+	update := bson.D{{"$set", bson.D{{"motivo", motivo}}}}
+
+	result, err := coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		panic(err)
+	}
+	return c.JSON(result)
+}
+
 // ----Tipo Novedades----
 func GetTipoNovedad(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
@@ -227,4 +242,36 @@ func GetTipoNovedad(c *fiber.Ctx) error {
 		fmt.Print(err)
 	}
 	return c.JSON(tipoNovedad)
+}
+
+// ----Cecos----
+// obtener todos los cecos
+func GetCecosAll(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	if err != nil {
+		fmt.Print(err)
+	}
+	var cecos []Cecos
+	if err = cursor.All(context.Background(), &cecos); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(cecos)
+}
+
+// obtener los cecos por id
+func GetCecos(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	fmt.Println(coll)
+	if err != nil {
+		fmt.Print(err)
+	}
+	var cecos []Cecos
+	if err = cursor.All(context.Background(), &cecos); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(cecos)
+
 }
