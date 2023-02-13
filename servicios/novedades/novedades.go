@@ -145,6 +145,10 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	if c.Query("cliente") != "" {
 		busqueda["cliente"] = c.Query("cliente")
 	}
+	if c.Query("estado") != "" {
+		busqueda["estado"] = c.Query("estado")
+	}
+
 	cursor, err := coll.Find(context.TODO(), busqueda)
 	fmt.Println(coll)
 	if err != nil {
