@@ -4,7 +4,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/template/html"
-	"github.com/proyectoNovedades/user"
+	"github.com/proyectoNovedades/servicios/actividades"
+	"github.com/proyectoNovedades/servicios/novedades"
+	"github.com/proyectoNovedades/servicios/proveedores"
+	"github.com/proyectoNovedades/servicios/recursos"
+	"github.com/proyectoNovedades/servicios/user"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -76,7 +80,7 @@ func main() {
 	goth.UseProviders(
 		google.New(os.Getenv("GOOGLEKEY"), os.Getenv("GOOGLESEC"), os.Getenv("GOOGLECALLBACK")),
 	)
-	engine := html.New("./user/template", ".html")
+	engine := html.New("./servicios/user/template", ".html")
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
@@ -90,33 +94,42 @@ func main() {
 	connectedWithSql := createConnectionWithMysql()
 
 	if connectedWithMongo {
-
-		//Periodos
-		app.Get("/Periodos", user.GetPeriodos)
+		//Update estado y motivo
+		app.Patch("/Novedad/:id/:estado", novedades.UpdateEstadoNovedades)
+		app.Patch("/Novedad/:id", novedades.UpdateMotivoNovedades)
 
 		//Novedades
-
-		app.Post("/Novedad", user.InsertNovedad)
-		app.Get("/Novedad/:id", user.GetNovedades)
-		app.Get("/Novedad/*", user.GetNovedadFiltro)
-		app.Get("/Novedad", user.GetNovedadesAll)
-		app.Delete("/Novedad/:id", user.DeleteNovedad)
-		app.Patch("/Novedad/:id/:estado", user.UpdateEstadoNovedades)
+		app.Post("/Novedad", novedades.InsertNovedad)
+		app.Get("/Novedad/:id", novedades.GetNovedades)
+		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
+		app.Get("/Novedad", novedades.GetNovedadesAll)
+		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
+		app.Patch("/Novedad/:id/:estado", novedades.UpdateEstadoNovedades)
 
 		//Tipo Novedades
-		app.Get("/TipoNovedades", user.GetTipoNovedad)
+		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
 
 		//Actividades
-		app.Post("/Actividad", user.InsertActividad)
-		app.Get("/Actividad/:id", user.GetActividad)
-		app.Get("/Actividad", user.GetActividadAll)
-		app.Delete("/Actividad/:id", user.DeleteActividad)
+		app.Post("/Actividad", actividades.InsertActividad)
+		app.Get("/Actividad/:id", actividades.GetActividad)
+		app.Get("/Actividad", actividades.GetActividadAll)
+		app.Delete("/Actividad/:id", actividades.DeleteActividad)
 
 		//Proveedores
-		app.Post("/Proveedor", user.InsertProveedor)
-		app.Get("/Proveedor/:id", user.GetProveedor)
-		app.Get("/Proveedor", user.GetProveedorAll)
-		app.Delete("/Proveedor/:id", user.DeleteProveedor)
+		app.Post("/Proveedor", proveedores.InsertProveedor)
+		app.Get("/Proveedor/:id", proveedores.GetProveedor)
+		app.Get("/Proveedor", proveedores.GetProveedorAll)
+		app.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
+
+		//Centro de Costos
+		app.Get("/Cecos/", novedades.GetCecosAll)
+		app.Get("/Cecos/:id", novedades.GetCecos)
+
+		//Recursos
+		app.Post("/Recurso", recursos.InsertRecurso)
+		app.Get("/Recurso/:id", recursos.GetRecurso)
+		app.Get("/Recurso", recursos.GetRecursoAll)
+		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 
 	}
 
@@ -189,6 +202,10 @@ func createConnectionWithMongo() bool {
 		}
 		fmt.Println("Successfully connected and pinged.")
 		user.ConnectMongoDb(client)
+		novedades.ConnectMongoDb(client)
+		actividades.ConnectMongoDb(client)
+		proveedores.ConnectMongoDb(client)
+		recursos.ConnectMongoDb(client)
 		return true
 	}
 	return false

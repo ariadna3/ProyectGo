@@ -42,7 +42,7 @@ type Cecos struct {
 	Descripcion string `bson:"descripcion"`
 	Cliente     string `bson:"cliente"`
 	Proyecto    string `bson:"proyecto"`
-	Cuit        int
+	Cuit        int    `bson:"cuit"`
 }
 
 type Distribuciones struct {
@@ -66,7 +66,9 @@ type Novedades struct {
 	Promovido             bool             `bson:"promovido"`
 	Cliente               string           `bson:"cliente"`
 	Estado                string           `bson:"estado"`
-	RechazoMotivo         string           `bson:"rechazoMotivo"`
+	Motivo                string           `bson:"motivo"`
+	EnviarA               string           `bson:"enviarA"`
+	Contacto              string           `bson:"contacto"`
 }
 
 const (
@@ -94,6 +96,12 @@ type Proveedores struct {
 	RazonSocial string `bson:"razonSocial"`
 }
 
+type Recursos struct {
+	IdRecursos int    `bson:"idRecursos"`
+	Usuario    string `bson:"usuario"`
+	Legajo     int    `bson:"legajo"`
+}
+
 var store *session.Store = session.New()
 var dbUser *gorm.DB
 var client *mongo.Client
@@ -115,22 +123,6 @@ func ShowGoogleAuthentication(c *fiber.Ctx) error {
 	return c.Render("index", fiber.Map{
 		"Title": "Inicializar",
 	})
-}
-
-//----Periodos----
-
-func GetPeriodos(c *fiber.Ctx) error {
-
-	var periodos []string
-	currentTime := time.Now()
-	for i := 12; i >= 0; i-- {
-		anio := strconv.Itoa(currentTime.Year())
-		mes := strconv.Itoa(int(currentTime.Month()))
-		periodos = append(periodos, mes+"-"+anio)
-		currentTime = currentTime.AddDate(0, -1, 0)
-	}
-
-	return c.JSON(periodos)
 }
 
 // ----Novedades----
@@ -277,6 +269,30 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	return c.JSON(result)
 }
 
+func UpdateMotivoNovedades(c *fiber.Ctx) error {
+	//se obtiene el id
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	//se obtiene el motivo
+	novedad := new(Novedades)
+	if err := c.BodyParser(novedad); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	//se conecta a la DB
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+
+	//crea el filtro
+	filter := bson.D{{"idSecuencial", idNumber}}
+	update := bson.D{{"$set", bson.D{{"motivo", novedad.Motivo}}}}
+
+	//hace la modificacion
+	result, err := coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		panic(err)
+	}
+	//devuelve el resultado
+	return c.JSON(result)
+}
+
 // ----Tipo Novedades----
 func GetTipoNovedad(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
@@ -411,7 +427,95 @@ func DeleteProveedor(c *fiber.Ctx) error {
 	return c.SendString("proveedor eliminado")
 }
 
-// ----Usuarios----
+// obtener todos los centros de costos
+func GetCecosAll(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	if err != nil {
+		fmt.Print(err)
+	}
+	var cecos []Cecos
+	if err = cursor.All(context.Background(), &cecos); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(cecos)
+}
+
+// obtener centro de costos por id
+func GetCecos(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	fmt.Println(coll)
+	if err != nil {
+		fmt.Print(err)
+	}
+	var cecos []Cecos
+	if err = cursor.All(context.Background(), &cecos); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(cecos)
+}
+
+// recursos
+// insertar recursos
+func InsertRecurso(c *fiber.Ctx) error {
+	recurso := new(Recursos)
+	if err := c.BodyParser(recurso); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	coll := client.Database("portalDeNovedades").Collection("recursos")
+	result, err := coll.InsertOne(context.TODO(), recurso)
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return c.JSON(recurso)
+}
+
+// obtener recursos por id
+func GetRecurso(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("recursos")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	fmt.Println(coll)
+	if err != nil {
+		fmt.Print(err)
+	}
+	var recurso []Recursos
+	if err = cursor.All(context.Background(), &recurso); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(recurso)
+}
+
+// obtener todos los recursos
+func GetRecursosAll(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("recursos")
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	if err != nil {
+		fmt.Print(err)
+	}
+	var recurso []Recursos
+	if err = cursor.All(context.Background(), &recurso); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(recurso)
+}
+
+// borrar recursos por id
+func DeleteRecurso(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("recursos")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	return c.SendString("recurso eliminado")
+}
+
+// usuarios
 // insertar usuario
 func CreateUser(c *fiber.Ctx) error {
 	newUser := new(User)
