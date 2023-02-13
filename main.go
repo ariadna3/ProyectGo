@@ -125,14 +125,14 @@ func main() {
 		app.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
 
 		//Centro de Costos
-		app.Get("/Cecos/", user.GetCecosAll)
-		app.Get("/Cecos/:id", user.GetCecos)
+		//app.Get("/Cecos/", user.GetCecosAll)
+		//app.Get("/Cecos/:id", user.GetCecos)
 
 		//Recursos
-		app.Post("/Recurso", user.InsertRecurso)
-		app.Get("/Recurso/:id", user.GetRecurso)
-		app.Get("/Recurso", user.GetRecursosAll)
-		app.Delete("/Recurso/:id", user.DeleteRecurso)
+		//app.Post("/Recurso", user.InsertRecurso)
+		//app.Get("/Recurso/:id", user.GetRecurso)
+		//app.Get("/Recurso", user.GetRecursosAll)
+		//app.Delete("/Recurso/:id", user.DeleteRecurso)
 
 	}
 
