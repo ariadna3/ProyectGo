@@ -1,9 +1,8 @@
 {
 	"info": {
-		"_postman_id": "0a574bca-a968-4d9d-88c2-02399822bfda",
+		"_postman_id": "70b0f97f-eb97-468f-a2ec-d6cf7f0d3d29",
 		"name": "portal de novedades",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "6631533"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -108,7 +107,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:3000/Novedad/?idSecuencial=1&tipo=PP&fecha=2022-12-03&hora=12:00:00&usuario=jlanzani&proveedor=Julio Lanzani&periodo=2022-12&importeTotal=5000&conceptoDeFacturacion=sueldos&comentarios=pago completado&promovido=false&cliente=pepe&estado=rechazado&rechazoMotivo=falta de documentacion",
+					"raw": "http://127.0.0.1:3000/Novedad/?tipo=PP&usuario=jlanzani",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -124,7 +123,8 @@
 					"query": [
 						{
 							"key": "idSecuencial",
-							"value": "1"
+							"value": "1",
+							"disabled": true
 						},
 						{
 							"key": "tipo",
@@ -132,11 +132,13 @@
 						},
 						{
 							"key": "fecha",
-							"value": "2022-12-03"
+							"value": "2022-12-03",
+							"disabled": true
 						},
 						{
 							"key": "hora",
-							"value": "12:00:00"
+							"value": "12:00:00",
+							"disabled": true
 						},
 						{
 							"key": "usuario",
@@ -144,40 +146,83 @@
 						},
 						{
 							"key": "proveedor",
-							"value": "Julio Lanzani"
+							"value": "Julio Lanzani",
+							"disabled": true
 						},
 						{
 							"key": "periodo",
-							"value": "2022-12"
+							"value": "2022-12",
+							"disabled": true
 						},
 						{
 							"key": "importeTotal",
-							"value": "5000"
+							"value": "5000",
+							"disabled": true
 						},
 						{
 							"key": "conceptoDeFacturacion",
-							"value": "sueldos"
+							"value": "sueldos",
+							"disabled": true
 						},
 						{
 							"key": "comentarios",
-							"value": "pago completado"
+							"value": "pago completado",
+							"disabled": true
 						},
 						{
 							"key": "promovido",
-							"value": "false"
+							"value": "false",
+							"disabled": true
 						},
 						{
 							"key": "cliente",
-							"value": "pepe"
+							"value": "pepe",
+							"disabled": true
 						},
 						{
 							"key": "estado",
-							"value": "rechazado"
+							"value": "rechazado",
+							"disabled": true
 						},
 						{
 							"key": "rechazoMotivo",
-							"value": "falta de documentacion"
+							"value": "falta de documentacion",
+							"disabled": true
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetNovedades",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/Novedad",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"Novedad"
 					]
 				}
 			},
