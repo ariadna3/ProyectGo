@@ -49,7 +49,7 @@ func InsertProveedor(c *fiber.Ctx) error {
 func GetProveedor(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("proveedores")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	cursor, err := coll.Find(context.TODO(), bson.M{"idProveedor": idNumber})
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)

@@ -7,6 +7,7 @@ import (
 	"github.com/proyectoNovedades/servicios/actividades"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
+	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/user"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -94,14 +95,10 @@ func main() {
 
 	if connectedWithMongo {
 		//Update estado y motivo
-		app.Patch("/Novedad/:id/:estado", user.UpdateEstadoNovedades)
-		app.Patch("/Novedad/:id", user.UpdateMotivoNovedades)
-
-		//Greedy Parameters
-		app.Get("/Novedad/*", user.GetNovedadFiltro)
+		app.Patch("/Novedad/:id/:estado", novedades.UpdateEstadoNovedades)
+		app.Patch("/Novedad/:id", novedades.UpdateMotivoNovedades)
 
 		//Novedades
-
 		app.Post("/Novedad", novedades.InsertNovedad)
 		app.Get("/Novedad/:id", novedades.GetNovedades)
 		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
@@ -125,14 +122,14 @@ func main() {
 		app.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
 
 		//Centro de Costos
-		//app.Get("/Cecos/", user.GetCecosAll)
-		//app.Get("/Cecos/:id", user.GetCecos)
+		app.Get("/Cecos/", novedades.GetCecosAll)
+		app.Get("/Cecos/:id", novedades.GetCecos)
 
 		//Recursos
-		//app.Post("/Recurso", user.InsertRecurso)
-		//app.Get("/Recurso/:id", user.GetRecurso)
-		//app.Get("/Recurso", user.GetRecursosAll)
-		//app.Delete("/Recurso/:id", user.DeleteRecurso)
+		app.Post("/Recurso", recursos.InsertRecurso)
+		app.Get("/Recurso/:id", recursos.GetRecurso)
+		app.Get("/Recurso", recursos.GetRecursoAll)
+		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 
 	}
 
@@ -208,6 +205,7 @@ func createConnectionWithMongo() bool {
 		novedades.ConnectMongoDb(client)
 		actividades.ConnectMongoDb(client)
 		proveedores.ConnectMongoDb(client)
+		recursos.ConnectMongoDb(client)
 		return true
 	}
 	return false
