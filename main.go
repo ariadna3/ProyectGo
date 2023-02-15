@@ -27,20 +27,17 @@ import (
 	"os"
 )
 
-type Cecos struct {
-	IdCeco      int    `bson:"id_ceco"`
-	Descripcion string `bson:"descripcion"`
-}
-
-type Distribuciones struct {
-	Porcentaje float64 `bson:"porcentaje"`
-	Ceco       Cecos   `bson:"ceco"`
+type Actividades struct {
+	IdNovedad int    `bson:"idNovedad"`
+	Usuario   string `bson:"usuario"`
+	Fecha     string `bson:"fecha"`
+	Hora      string `bson:"hora"`
+	Actividad string `bson:"actividad"`
 }
 
 type Novedades struct {
 	IdSecuencial          int              `bson:"idSecuencial"`
 	Tipo                  string           `bson:"tipo"`
-	Descripcion           string           `bson:"descripcion"`
 	Fecha                 string           `bson:"fecha"`
 	Hora                  string           `bson:"hora"`
 	Usuario               string           `bson:"usuario"`
@@ -53,6 +50,11 @@ type Novedades struct {
 	Comentarios           string           `bson:"comentarios"`
 	Promovido             bool             `bson:"promovido"`
 	Cliente               string           `bson:"cliente"`
+	Estado                string           `bson:"estado"`
+	Motivo                string           `bson:"motivo"`
+	EnviarA               string           `bson:"enviarA"`
+	Contacto              string           `bson:"contacto"`
+	Plazo                 string           `bson:"plazo"`
 }
 
 type TipoNovedad struct {
@@ -61,18 +63,29 @@ type TipoNovedad struct {
 	Descripcion  string `bson:"descripcion"`
 }
 
-type Actividades struct {
-	IdNovedad int    `bson:"idNovedad"`
-	Usuario   string `bson:"usuario"`
-	Fecha     string `bson:"fecha"`
-	Hora      string `bson:"hora"`
-	Actividad string `bson:"actividad"`
+type Cecos struct {
+	IdCeco      int    `bson:"id_ceco"`
+	Descripcion string `bson:"descripcion"`
+	Cliente     string `bson:"cliente"`
+	Proyecto    string `bson:"proyecto"`
+	Cuit        int    `bson:"cuit"`
+}
+
+type Distribuciones struct {
+	Porcentaje float64 `bson:"porcentaje"`
+	Ceco       Cecos   `bson:"ceco"`
 }
 
 type Proveedores struct {
 	IdProveedor int    `bson:"idProveedor"`
 	NumeroDoc   int    `bson:"numeroDoc"`
 	RazonSocial string `bson:"razonSocial"`
+}
+
+type Recursos struct {
+	idRecurso int    `bson:"idRecurso"`
+	Usuario   string `bson:"usuario"`
+	Legajo    int    `bson:"legajo"`
 }
 
 func main() {
@@ -94,6 +107,13 @@ func main() {
 	connectedWithSql := createConnectionWithMysql()
 
 	if connectedWithMongo {
+
+		//Actividades
+		app.Post("/Actividad", actividades.InsertActividad)
+		app.Get("/Actividad/:id", actividades.GetActividad)
+		app.Get("/Actividad", actividades.GetActividadAll)
+		app.Delete("/Actividad/:id", actividades.DeleteActividad)
+
 		//Update estado y motivo
 		app.Patch("/Novedad/:id/:estado", novedades.UpdateEstadoNovedades)
 		app.Patch("/Novedad/:id", novedades.UpdateMotivoNovedades)
@@ -104,16 +124,9 @@ func main() {
 		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
 		app.Get("/Novedad", novedades.GetNovedadesAll)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
-		app.Patch("/Novedad/:id/:estado", novedades.UpdateEstadoNovedades)
 
 		//Tipo Novedades
 		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
-
-		//Actividades
-		app.Post("/Actividad", actividades.InsertActividad)
-		app.Get("/Actividad/:id", actividades.GetActividad)
-		app.Get("/Actividad", actividades.GetActividadAll)
-		app.Delete("/Actividad/:id", actividades.DeleteActividad)
 
 		//Proveedores
 		app.Post("/Proveedor", proveedores.InsertProveedor)

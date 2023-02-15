@@ -13,11 +13,11 @@ import (
 )
 
 type Actividades struct {
-	IdNovedad int    `bson:"idNovedad"`
-	Usuario   string `bson:"usuario"`
-	Fecha     string `bson:"fecha"`
-	Hora      string `bson:"hora"`
-	Actividad string `bson:"actividad"`
+	IdActividad int    `bson:"idActividad"`
+	Usuario     string `bson:"usuario"`
+	Fecha       string `bson:"fecha"`
+	Hora        string `bson:"hora"`
+	Actividad   string `bson:"actividad"`
 }
 
 var store *session.Store = session.New()
@@ -51,7 +51,7 @@ func InsertActividad(c *fiber.Ctx) error {
 func GetActividad(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("actividades")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	cursor, err := coll.Find(context.TODO(), bson.M{"idActividad": idNumber})
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
@@ -81,7 +81,7 @@ func GetActividadAll(c *fiber.Ctx) error {
 func DeleteActividad(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("actividades")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"idActividad": idNumber})
 	if err != nil {
 		fmt.Print(err)
 	}

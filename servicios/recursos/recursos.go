@@ -17,9 +17,9 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 }
 
 type Recursos struct {
-	idSecuencial int    `bson:"idSecuencial"`
-	Usuario      string `bson:"usuario"`
-	Legajo       int    `bson:"legajo"`
+	idRecurso int    `bson:"idRecurso"`
+	Usuario   string `bson:"usuario"`
+	Legajo    int    `bson:"legajo"`
 }
 
 // ----Recursos----
@@ -42,7 +42,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 func GetRecurso(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	cursor, err := coll.Find(context.TODO(), bson.M{"idRecurso": idNumber})
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)

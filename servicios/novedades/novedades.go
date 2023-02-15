@@ -13,19 +13,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type Cecos struct {
-	IdCeco      int    `bson:"id_ceco"`
-	Descripcion string `bson:"descripcion"`
-	Cliente     string `bson:"cliente"`
-	Proyecto    string `bson:"proyecto"`
-	Cuit        int
-}
-
-type Distribuciones struct {
-	Porcentaje float64 `bson:"porcentaje"`
-	Ceco       Cecos   `bson:"ceco"`
-}
-
 type Novedades struct {
 	IdSecuencial          int              `bson:"idSecuencial"`
 	Tipo                  string           `bson:"tipo"`
@@ -55,8 +42,22 @@ const (
 )
 
 type TipoNovedad struct {
-	Tipo        string `bson:"tipo"`
+	IdSecuencial int    `bson:"idSecuencial"`
+	Tipo         string `bson:"tipo"`
+	Descripcion  string `bson:"descripcion"`
+}
+
+type Cecos struct {
+	IdCeco      int    `bson:"id_ceco"`
 	Descripcion string `bson:"descripcion"`
+	Cliente     string `bson:"cliente"`
+	Proyecto    string `bson:"proyecto"`
+	Cuit        int    `bson:"cuit"`
+}
+
+type Distribuciones struct {
+	Porcentaje float64 `bson:"porcentaje"`
+	Ceco       Cecos   `bson:"ceco"`
 }
 
 var store *session.Store = session.New()
