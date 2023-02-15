@@ -43,6 +43,9 @@ type Novedades struct {
 	Cliente               string           `bson:"cliente"`
 	Estado                string           `bson:"estado"`
 	Motivo                string           `bson:"motivo"`
+	EnviarA               string           `bson:"enviarA"`
+	Contacto              string           `bson:"contacto"`
+	Plazo                 string           `bson:"plazo"`
 }
 
 const (
