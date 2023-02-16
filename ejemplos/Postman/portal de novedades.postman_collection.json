@@ -15,7 +15,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"idActividad\": 0,\r\n    \"usuario\": \"ariadna gonzalez\",\r\n    \"fecha\": \"2023-02-16\",\r\n    \"hora\": \"13:00:00\",\r\n    \"actividad\": \"Cargo\"\r\n}",
+							"raw": "{\r\n    \"usuario\": \"ariadna gonzalez\",\r\n    \"fecha\": \"2023-02-16\",\r\n    \"hora\": \"13:00:00\",\r\n    \"actividad\": \"Cargo\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -76,94 +76,8 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "idSecuencial",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "tipo",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "fecha",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "hora",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "usuario",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "proveedor",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "periodo",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "importeTotal",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "conceptoDeFacturacion",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "comentarios",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "promovido",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "cliente",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "estado",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "motivo",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "enviarA",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "contacto",
-									"value": "",
-									"type": "default"
-								},
-								{
-									"key": "plazo",
-									"value": "",
-									"type": "default"
-								}
-							]
+							"mode": "raw",
+							"raw": "{\r\n    \"tipo\":\"PP\",\r\n    \"fecha\":\"2023-02-16\"\r\n    \"hora\":\"13:00\"\r\n    \"usuario\":\"agonzalez\"\r\n    \"proveedor\":\"jlanzani\"\r\n    \"periodo\":\"2023-01\r\n    \"importeTotal\": 1000,\r\n    \"conceptoDeFacturacion\":\"?\"\r\n    \"adjuntos\":[],\r\n    \"distribuciones\":[],\r\n    \"comentarios\":\"\",\r\n    \"promovido\":,\r\n    \"cliente\":\"\",\r\n    \"estado\":\"\",\r\n    \"estado\":\"\",\r\n    \"motivo\":\"\",\r\n    \"enviarA\":\"\",\r\n    \"contacto\":\"\",\r\n    \"plazo\":\"\"\r\n}"
 						},
 						"url": "http://127.0.0.1:3000/Novedad"
 					},
@@ -362,10 +276,21 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"idProveedor\": 0,\r\n    \"numeroDoc\": 23239543669, \r\n    \"razonSocial\": \"ACOSTA SEBASTIAN LUIS SRL\"\r\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "numeroDoc",
+									"value": "123456789",
+									"type": "default"
+								},
+								{
+									"key": "razonSocial",
+									"value": "ari srl",
+									"type": "default"
+								}
+							]
 						},
-						"url": "http://127.0.0.1:3000//Proveedor"
+						"url": "http://127.0.0.1:3000/Proveedor"
 					},
 					"response": []
 				},
@@ -398,8 +323,19 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"idRecurso\": 1,\r\n    \"usuario\": \"agonzalez\",\r\n    \"legajo\": 1112\r\n}",
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "usuario",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "legajo",
+									"value": "",
+									"type": "default"
+								}
+							],
 							"options": {
 								"raw": {
 									"language": "json"
