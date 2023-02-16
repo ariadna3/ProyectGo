@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
 )
 
@@ -37,6 +38,15 @@ func InsertProveedor(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 	coll := client.Database("portalDeNovedades").Collection("proveedores")
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{"idProveedor", -1}})
+
+	cursor, _ := coll.Find(context.TODO(), filter, opts)
+
+	var results []Proveedores
+	cursor.All(context.TODO(), &results)
+
+	proveedor.IdProveedor = results[0].IdProveedor + 1
 	result, err := coll.InsertOne(context.TODO(), proveedor)
 	if err != nil {
 		fmt.Print(err)
@@ -79,7 +89,7 @@ func GetProveedorAll(c *fiber.Ctx) error {
 func DeleteProveedor(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("proveedores")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"idProveedor": idNumber})
 	if err != nil {
 		fmt.Print(err)
 	}
