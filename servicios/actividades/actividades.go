@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
 )
 
@@ -39,6 +40,15 @@ func InsertActividad(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 	coll := client.Database("portalDeNovedades").Collection("actividades")
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{"idActividad", -1}})
+
+	cursor, _ := coll.Find(context.TODO(), filter, opts)
+
+	var results []Actividades
+	cursor.All(context.TODO(), &results)
+
+	actividad.IdActividad = results[0].IdActividad + 1
 	result, err := coll.InsertOne(context.TODO(), actividad)
 	if err != nil {
 		fmt.Print(err)

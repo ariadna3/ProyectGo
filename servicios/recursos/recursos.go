@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var client *mongo.Client
@@ -17,7 +18,7 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 }
 
 type Recursos struct {
-	idRecurso int    `bson:"idRecurso"`
+	IdRecurso int    `bson:"idRecurso"`
 	Usuario   string `bson:"usuario"`
 	Legajo    int    `bson:"legajo"`
 }
@@ -30,6 +31,15 @@ func InsertRecurso(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 	coll := client.Database("portalDeNovedades").Collection("recursos")
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{"idRecurso", -1}})
+
+	cursor, _ := coll.Find(context.TODO(), filter, opts)
+
+	var results []Recursos
+	cursor.All(context.TODO(), &results)
+
+	recurso.IdRecurso = results[0].IdRecurso + 1
 	result, err := coll.InsertOne(context.TODO(), recurso)
 	if err != nil {
 		fmt.Print(err)
