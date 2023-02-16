@@ -79,7 +79,7 @@ func GetProveedorAll(c *fiber.Ctx) error {
 func DeleteProveedor(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("proveedores")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"idProveedor": idNumber})
 	if err != nil {
 		fmt.Print(err)
 	}

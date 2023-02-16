@@ -48,7 +48,7 @@ type TipoNovedad struct {
 }
 
 type Cecos struct {
-	IdCeco      int    `bson:"id_ceco"`
+	IdCeco      int    `bson:"idSecuencial"`
 	Descripcion string `bson:"descripcion"`
 	Cliente     string `bson:"cliente"`
 	Proyecto    string `bson:"proyecto"`

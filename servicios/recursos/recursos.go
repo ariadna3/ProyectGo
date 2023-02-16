@@ -72,10 +72,10 @@ func GetRecursoAll(c *fiber.Ctx) error {
 func DeleteRecurso(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"idRecurso": idNumber})
 	if err != nil {
 		fmt.Print(err)
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
-	return c.SendString("recurso eliminada")
+	return c.SendString("recurso eliminado")
 }

@@ -6,837 +6,553 @@
 	},
 	"item": [
 		{
-			"name": "GetCecos",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+			"name": "actividades",
+			"item": [
+				{
+					"name": "InsertActividad",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idActividad\": 0,\r\n    \"usuario\": \"ariadna gonzalez\",\r\n    \"fecha\": \"2023-02-16\",\r\n    \"hora\": \"13:00:00\",\r\n    \"actividad\": \"Cargo\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Actividad"
+					},
+					"response": []
 				},
-				"url": "http://127.0.0.1:3000/Cecos"
-			},
-			"response": []
-		},
-		{
-			"name": "GetPeriodo",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+				{
+					"name": "GetActividad",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Actividad"
+					},
+					"response": []
 				},
-				"url": "http://127.0.0.1:3000/Periodo"
-			},
-			"response": []
-		},
-		{
-			"name": "InsertActividad",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"IdSecuencial\": 3,\r\n    \"Tipo\": \"PP\",\r\n    \"Descripcion\": \"Pago a proveedores\",\r\n    \"Fecha\": \"AAAA-MM-DD\",\r\n    \"Hora\": \"HH:mm:ss\",\r\n    \"Usuario\": \"Usuario\",\r\n    \"Proveedor\": \"Pablo Perez\",\r\n    \"Periodo\": \"2022-12\",\r\n    \"Distribuciones\":[\r\n        {\r\n            \"Porcentaje\": 50,\r\n            \"Ceco\": {\r\n                \"IdCeco\": 104,\r\n                \"Descripcion\": \"software factory ICBC\"\r\n            }\r\n        },\r\n        {\r\n            \"Porcentaje\": 50,\r\n            \"Ceco\": {\r\n                \"IdCeco\": 33,\r\n                \"Descripcion\": \"gastos generales de estructura\"\r\n            }\r\n        }\r\n    ],\r\n    \"ImporteTotal\": 1000,\r\n    \"Adjuntos\": [\r\n        \"informe1.xlms\",\r\n        \"imforme2.xlms\"\r\n    ],\r\n    \"ConceptoDeFacturacion\": \"?\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://127.0.0.1:3000/Actividad?IdNovedad=1&Usuario=pepe&Fecha=2023-01-01&Hora=15:00&Actividad=Cargo",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "3000",
-					"path": [
-						"Actividad"
-					],
-					"query": [
-						{
-							"key": "IdNovedad",
-							"value": "1"
+				{
+					"name": "DeleteActividad",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
-						{
-							"key": "Usuario",
-							"value": "pepe"
-						},
-						{
-							"key": "Fecha",
-							"value": "2023-01-01"
-						},
-						{
-							"key": "Hora",
-							"value": "15:00"
-						},
-						{
-							"key": "Actividad",
-							"value": "Cargo"
-						}
-					]
+						"url": "http://127.0.0.1:3000/Actividad/0"
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "GetActividad",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+			"name": "novedades",
+			"item": [
+				{
+					"name": "InsertNovedad",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "idSecuencial",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "tipo",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "fecha",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "hora",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "usuario",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "proveedor",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "periodo",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "importeTotal",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "conceptoDeFacturacion",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "comentarios",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "promovido",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "cliente",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "estado",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "motivo",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "enviarA",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "contacto",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "plazo",
+									"value": "",
+									"type": "default"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:3000/Novedad"
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://127.0.0.1:3000/Novedad/?idSecuencial=1&tipo=PP&fecha=2022-12-03&hora=12:00:00&usuario=jlanzani&proveedor=Julio Lanzani&periodo=2022-12&importeTotal=5000&conceptoDeFacturacion=sueldos&comentarios=pago completado&promovido=false&cliente=pepe&estado=rechazado&rechazoMotivo=falta de documentacion",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "3000",
-					"path": [
-						"Novedad",
-						""
-					],
-					"query": [
-						{
-							"key": "idSecuencial",
-							"value": "1"
+				{
+					"name": "GetNovedad",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
-						{
-							"key": "tipo",
-							"value": "PP"
+						"url": "http://127.0.0.1:3000/Novedad/161"
+					},
+					"response": []
+				},
+				{
+					"name": "GetFiltro",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
-						{
-							"key": "fecha",
-							"value": "2022-12-03"
-						},
-						{
-							"key": "hora",
-							"value": "12:00:00"
-						},
-						{
-							"key": "usuario",
-							"value": "jlanzani"
-						},
-						{
-							"key": "proveedor",
-							"value": "Julio Lanzani"
-						},
-						{
-							"key": "periodo",
-							"value": "2022-12"
-						},
-						{
-							"key": "importeTotal",
-							"value": "5000"
-						},
-						{
-							"key": "conceptoDeFacturacion",
-							"value": "sueldos"
-						},
-						{
-							"key": "comentarios",
-							"value": "pago completado"
-						},
-						{
-							"key": "promovido",
-							"value": "false"
-						},
-						{
-							"key": "cliente",
-							"value": "pepe"
-						},
-						{
-							"key": "estado",
-							"value": "rechazado"
-						},
-						{
-							"key": "rechazoMotivo",
-							"value": "falta de documentacion"
+						"url": {
+							"raw": "http://localhost:3000/Novedad/?tipo=&fecha&hora&usuario&proveedor&periodo&conceptoDeFacturacion&comentarios&cliente&estados",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"Novedad",
+								""
+							],
+							"query": [
+								{
+									"key": "tipo",
+									"value": ""
+								},
+								{
+									"key": "fecha",
+									"value": null
+								},
+								{
+									"key": "hora",
+									"value": null
+								},
+								{
+									"key": "usuario",
+									"value": null
+								},
+								{
+									"key": "proveedor",
+									"value": null
+								},
+								{
+									"key": "periodo",
+									"value": null
+								},
+								{
+									"key": "conceptoDeFacturacion",
+									"value": null
+								},
+								{
+									"key": "comentarios",
+									"value": null
+								},
+								{
+									"key": "cliente",
+									"value": null
+								},
+								{
+									"key": "estados",
+									"value": null
+								}
+							]
 						}
-					]
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteNovedad",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://127.0.0.1:3000/Novedad/161"
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateEstado",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Estado\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Novedad/2"
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateMotivo",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Motivo\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Novedad/2"
+					},
+					"response": []
+				},
+				{
+					"name": "GetTipoNovedades",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/TipoNovedades"
+					},
+					"response": []
+				},
+				{
+					"name": "GetCecos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Cecos"
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "DeleteActividad",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": "http://127.0.0.1:4000/Novedad/2"
-			},
-			"response": []
-		},
-		{
-			"name": "InsertNovedad",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"IdSecuencial\": 3,\r\n    \"Tipo\": \"PP\",\r\n    \"Descripcion\": \"Pago a proveedores\",\r\n    \"Fecha\": \"AAAA-MM-DD\",\r\n    \"Hora\": \"HH:mm:ss\",\r\n    \"Usuario\": \"Usuario\",\r\n    \"Proveedor\": \"Pablo Perez\",\r\n    \"Periodo\": \"2022-12\",\r\n    \"Distribuciones\":[\r\n        {\r\n            \"Porcentaje\": 50,\r\n            \"Ceco\": {\r\n                \"IdCeco\": 104,\r\n                \"Descripcion\": \"software factory ICBC\"\r\n            }\r\n        },\r\n        {\r\n            \"Porcentaje\": 50,\r\n            \"Ceco\": {\r\n                \"IdCeco\": 33,\r\n                \"Descripcion\": \"gastos generales de estructura\"\r\n            }\r\n        }\r\n    ],\r\n    \"ImporteTotal\": 1000,\r\n    \"Adjuntos\": [\r\n        \"informe1.xlms\",\r\n        \"imforme2.xlms\"\r\n    ],\r\n    \"ConceptoDeFacturacion\": \"?\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+			"name": "proveedores",
+			"item": [
+				{
+					"name": "InsertProveedor",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idProveedor\": 0,\r\n    \"numeroDoc\": 23239543669, \r\n    \"razonSocial\": \"ACOSTA SEBASTIAN LUIS SRL\"\r\n}"
+						},
+						"url": "http://127.0.0.1:3000//Proveedor"
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://127.0.0.1:3000/Novedad?IdSecuencial=&Tipo=&Fecha=&Hora=&Usuario=&Proveedor=&Periodo=&ImporteTotal=&ConceptoDeFacturacion=&Adjuntos=&Distribuciones=&Comentarios=&Promovido=&Cliente=&Estado=&RechazoMotivo=",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "3000",
-					"path": [
-						"Novedad"
-					],
-					"query": [
-						{
-							"key": "IdSecuencial",
-							"value": ""
-						},
-						{
-							"key": "Tipo",
-							"value": ""
-						},
-						{
-							"key": "Fecha",
-							"value": ""
-						},
-						{
-							"key": "Hora",
-							"value": ""
-						},
-						{
-							"key": "Usuario",
-							"value": ""
-						},
-						{
-							"key": "Proveedor",
-							"value": ""
-						},
-						{
-							"key": "Periodo",
-							"value": ""
-						},
-						{
-							"key": "ImporteTotal",
-							"value": ""
-						},
-						{
-							"key": "ConceptoDeFacturacion",
-							"value": ""
-						},
-						{
-							"key": "Adjuntos",
-							"value": ""
-						},
-						{
-							"key": "Distribuciones",
-							"value": ""
-						},
-						{
-							"key": "Comentarios",
-							"value": ""
-						},
-						{
-							"key": "Promovido",
-							"value": ""
-						},
-						{
-							"key": "Cliente",
-							"value": ""
-						},
-						{
-							"key": "Estado",
-							"value": ""
-						},
-						{
-							"key": "RechazoMotivo",
-							"value": ""
-						}
-					]
+				{
+					"name": "GetProveedor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:3000/Proveedor/2"
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteProveedor",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://127.0.0.1:3000/Proveedor/1"
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "GetNovedad",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+			"name": "recursos",
+			"item": [
+				{
+					"name": "InsertRecurso",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idRecurso\": 1,\r\n    \"usuario\": \"agonzalez\",\r\n    \"legajo\": 1112\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Recurso"
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://127.0.0.1:3000/Novedad/?idSecuencial=1&tipo=PP&fecha=2022-12-03&hora=12:00:00&usuario=jlanzani&proveedor=Julio Lanzani&periodo=2022-12&importeTotal=5000&conceptoDeFacturacion=sueldos&comentarios=pago completado&promovido=false&cliente=pepe&estado=rechazado&rechazoMotivo=falta de documentacion",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "3000",
-					"path": [
-						"Novedad",
-						""
-					],
-					"query": [
-						{
-							"key": "idSecuencial",
-							"value": "1"
+				{
+					"name": "GetRecurso",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
-						{
-							"key": "tipo",
-							"value": "PP"
-						},
-						{
-							"key": "fecha",
-							"value": "2022-12-03"
-						},
-						{
-							"key": "hora",
-							"value": "12:00:00"
-						},
-						{
-							"key": "usuario",
-							"value": "jlanzani"
-						},
-						{
-							"key": "proveedor",
-							"value": "Julio Lanzani"
-						},
-						{
-							"key": "periodo",
-							"value": "2022-12"
-						},
-						{
-							"key": "importeTotal",
-							"value": "5000"
-						},
-						{
-							"key": "conceptoDeFacturacion",
-							"value": "sueldos"
-						},
-						{
-							"key": "comentarios",
-							"value": "pago completado"
-						},
-						{
-							"key": "promovido",
-							"value": "false"
-						},
-						{
-							"key": "cliente",
-							"value": "pepe"
-						},
-						{
-							"key": "estado",
-							"value": "rechazado"
-						},
-						{
-							"key": "rechazoMotivo",
-							"value": "falta de documentacion"
-						}
-					]
+						"url": "http://127.0.0.1:3000/Recurso"
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteRecurso",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://127.0.0.1:4000/Recurso/2"
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "DeleteNovedad",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": "http://127.0.0.1:4000/Novedad/2"
-			},
-			"response": []
-		},
-		{
-			"name": "UpdateMotivo",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"IdSecuencial\": 3,\r\n    \"Tipo\": \"PP\",\r\n    \"Descripcion\": \"Pago a proveedores\",\r\n    \"Fecha\": \"AAAA-MM-DD\",\r\n    \"Hora\": \"HH:mm:ss\",\r\n    \"Usuario\": \"Usuario\",\r\n    \"Proveedor\": \"Pablo Perez\",\r\n    \"Periodo\": \"2022-12\",\r\n    \"Distribuciones\":[\r\n        {\r\n            \"Porcentaje\": 50,\r\n            \"Ceco\": {\r\n                \"IdCeco\": 104,\r\n                \"Descripcion\": \"software factory ICBC\"\r\n            }\r\n        },\r\n        {\r\n            \"Porcentaje\": 50,\r\n            \"Ceco\": {\r\n                \"IdCeco\": 33,\r\n                \"Descripcion\": \"gastos generales de estructura\"\r\n            }\r\n        }\r\n    ],\r\n    \"ImporteTotal\": 1000,\r\n    \"Adjuntos\": [\r\n        \"informe1.xlms\",\r\n        \"imforme2.xlms\"\r\n    ],\r\n    \"ConceptoDeFacturacion\": \"?\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+			"name": "user",
+			"item": [
+				{
+					"name": "LoginUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Email",
+									"value": "jperez@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "Password",
+									"value": "perez1234",
+									"type": "text"
+								},
+								{
+									"key": "User",
+									"value": "lgonzalez2020",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "Nombre",
+									"value": "Juan Manuel",
+									"type": "text"
+								},
+								{
+									"key": "Apellido",
+									"value": "Perez",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:4000/User"
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://127.0.0.1:3000/Novedad?IdSecuencial=&Tipo=&Fecha=&Hora=&Usuario=&Proveedor=&Periodo=&ImporteTotal=&ConceptoDeFacturacion=&Adjuntos=&Distribuciones=&Comentarios=&Promovido=&Cliente=&Estado=&RechazoMotivo=",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "3000",
-					"path": [
-						"Novedad"
-					],
-					"query": [
-						{
-							"key": "IdSecuencial",
-							"value": ""
+				{
+					"name": "createUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Email",
+									"value": "jperez@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "Password",
+									"value": "perez1234",
+									"type": "text"
+								},
+								{
+									"key": "User",
+									"value": "lgonzalez2020",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "Nombre",
+									"value": "Juan Manuel",
+									"type": "text"
+								},
+								{
+									"key": "Apellido",
+									"value": "Perez",
+									"type": "text"
+								}
+							]
 						},
-						{
-							"key": "Tipo",
-							"value": ""
-						},
-						{
-							"key": "Fecha",
-							"value": ""
-						},
-						{
-							"key": "Hora",
-							"value": ""
-						},
-						{
-							"key": "Usuario",
-							"value": ""
-						},
-						{
-							"key": "Proveedor",
-							"value": ""
-						},
-						{
-							"key": "Periodo",
-							"value": ""
-						},
-						{
-							"key": "ImporteTotal",
-							"value": ""
-						},
-						{
-							"key": "ConceptoDeFacturacion",
-							"value": ""
-						},
-						{
-							"key": "Adjuntos",
-							"value": ""
-						},
-						{
-							"key": "Distribuciones",
-							"value": ""
-						},
-						{
-							"key": "Comentarios",
-							"value": ""
-						},
-						{
-							"key": "Promovido",
-							"value": ""
-						},
-						{
-							"key": "Cliente",
-							"value": ""
-						},
-						{
-							"key": "Estado",
-							"value": ""
-						},
-						{
-							"key": "RechazoMotivo",
-							"value": ""
-						}
-					]
+						"url": "http://127.0.0.1:4000/User"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:4000/User/jperez"
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUser",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://127.0.0.1:4000/User/jperez"
+					},
+					"response": []
+				},
+				{
+					"name": "updateUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:4000/User/jperez"
+					},
+					"response": []
 				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetTipoNovedades",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": "http://127.0.0.1:3000/TipoNovedades"
-			},
-			"response": []
-		},
-		{
-			"name": "GetBusqueda",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": "http://127.0.0.1:3000/Busqueda"
-			},
-			"response": []
-		},
-		{
-			"name": "InsertProveedor",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"idProveedor\": 1,\r\n    \"NumeroDoc\": \"23239543669\",\r\n    \"RazonSocial\": \"ACOSTA SEBASTIAN LUIS\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": "http://127.0.0.1:3000/Proveedor"
-			},
-			"response": []
-		},
-		{
-			"name": "GetProveedor",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": "http://127.0.0.1:4000/Proveedor/2"
-			},
-			"response": []
-		},
-		{
-			"name": "DeleteProveedor",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": "http://127.0.0.1:4000/Proveedor/2"
-			},
-			"response": []
-		},
-		{
-			"name": "InsertRecurso",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"IdSecuencial\": 3,\r\n    \"Tipo\": \"PP\",\r\n    \"Descripcion\": \"Pago a proveedores\",\r\n    \"Fecha\": \"AAAA-MM-DD\",\r\n    \"Hora\": \"HH:mm:ss\",\r\n    \"Usuario\": \"Usuario\",\r\n    \"Proveedor\": \"Pablo Perez\",\r\n    \"Periodo\": \"2022-12\",\r\n    \"Distribuciones\":[\r\n        {\r\n            \"Porcentaje\": 50,\r\n            \"Ceco\": {\r\n                \"IdCeco\": 104,\r\n                \"Descripcion\": \"software factory ICBC\"\r\n            }\r\n        },\r\n        {\r\n            \"Porcentaje\": 50,\r\n            \"Ceco\": {\r\n                \"IdCeco\": 33,\r\n                \"Descripcion\": \"gastos generales de estructura\"\r\n            }\r\n        }\r\n    ],\r\n    \"ImporteTotal\": 1000,\r\n    \"Adjuntos\": [\r\n        \"informe1.xlms\",\r\n        \"imforme2.xlms\"\r\n    ],\r\n    \"ConceptoDeFacturacion\": \"?\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://127.0.0.1:3000/Actividad?IdNovedad=1&Usuario=pepe&Fecha=2023-01-01&Hora=15:00&Actividad=Cargo",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "3000",
-					"path": [
-						"Actividad"
-					],
-					"query": [
-						{
-							"key": "IdNovedad",
-							"value": "1"
-						},
-						{
-							"key": "Usuario",
-							"value": "pepe"
-						},
-						{
-							"key": "Fecha",
-							"value": "2023-01-01"
-						},
-						{
-							"key": "Hora",
-							"value": "15:00"
-						},
-						{
-							"key": "Actividad",
-							"value": "Cargo"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetRecurso",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://127.0.0.1:3000/Novedad/?idSecuencial=1&tipo=PP&fecha=2022-12-03&hora=12:00:00&usuario=jlanzani&proveedor=Julio Lanzani&periodo=2022-12&importeTotal=5000&conceptoDeFacturacion=sueldos&comentarios=pago completado&promovido=false&cliente=pepe&estado=rechazado&rechazoMotivo=falta de documentacion",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "3000",
-					"path": [
-						"Novedad",
-						""
-					],
-					"query": [
-						{
-							"key": "idSecuencial",
-							"value": "1"
-						},
-						{
-							"key": "tipo",
-							"value": "PP"
-						},
-						{
-							"key": "fecha",
-							"value": "2022-12-03"
-						},
-						{
-							"key": "hora",
-							"value": "12:00:00"
-						},
-						{
-							"key": "usuario",
-							"value": "jlanzani"
-						},
-						{
-							"key": "proveedor",
-							"value": "Julio Lanzani"
-						},
-						{
-							"key": "periodo",
-							"value": "2022-12"
-						},
-						{
-							"key": "importeTotal",
-							"value": "5000"
-						},
-						{
-							"key": "conceptoDeFacturacion",
-							"value": "sueldos"
-						},
-						{
-							"key": "comentarios",
-							"value": "pago completado"
-						},
-						{
-							"key": "promovido",
-							"value": "false"
-						},
-						{
-							"key": "cliente",
-							"value": "pepe"
-						},
-						{
-							"key": "estado",
-							"value": "rechazado"
-						},
-						{
-							"key": "rechazoMotivo",
-							"value": "falta de documentacion"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DeleteRecurso",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": "http://127.0.0.1:4000/Recurso/2"
-			},
-			"response": []
-		},
-		{
-			"name": "LoginUser",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "Email",
-							"value": "jperez@gmail.com",
-							"type": "text"
-						},
-						{
-							"key": "Password",
-							"value": "perez1234",
-							"type": "text"
-						},
-						{
-							"key": "User",
-							"value": "lgonzalez2020",
-							"type": "text",
-							"disabled": true
-						},
-						{
-							"key": "Nombre",
-							"value": "Juan Manuel",
-							"type": "text"
-						},
-						{
-							"key": "Apellido",
-							"value": "Perez",
-							"type": "text"
-						}
-					]
-				},
-				"url": "http://127.0.0.1:4000/User"
-			},
-			"response": []
-		},
-		{
-			"name": "createUser",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "Email",
-							"value": "jperez@gmail.com",
-							"type": "text"
-						},
-						{
-							"key": "Password",
-							"value": "perez1234",
-							"type": "text"
-						},
-						{
-							"key": "User",
-							"value": "lgonzalez2020",
-							"type": "text",
-							"disabled": true
-						},
-						{
-							"key": "Nombre",
-							"value": "Juan Manuel",
-							"type": "text"
-						},
-						{
-							"key": "Apellido",
-							"value": "Perez",
-							"type": "text"
-						}
-					]
-				},
-				"url": "http://127.0.0.1:4000/User"
-			},
-			"response": []
-		},
-		{
-			"name": "GetUser",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": "http://127.0.0.1:4000/User/jperez"
-			},
-			"response": []
-		},
-		{
-			"name": "deleteUser",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": "http://127.0.0.1:4000/User/jperez"
-			},
-			"response": []
-		},
-		{
-			"name": "updateUser",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": "http://127.0.0.1:4000/User/jperez"
-			},
-			"response": []
+			]
 		}
 	]
 }
