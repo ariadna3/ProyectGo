@@ -76,8 +76,99 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"tipo\":\"PP\",\r\n    \"fecha\":\"2023-02-16\"\r\n    \"hora\":\"13:00\"\r\n    \"usuario\":\"agonzalez\"\r\n    \"proveedor\":\"jlanzani\"\r\n    \"periodo\":\"2023-01\r\n    \"importeTotal\": 1000,\r\n    \"conceptoDeFacturacion\":\"?\"\r\n    \"adjuntos\":[],\r\n    \"distribuciones\":[],\r\n    \"comentarios\":\"\",\r\n    \"promovido\":,\r\n    \"cliente\":\"\",\r\n    \"estado\":\"\",\r\n    \"estado\":\"\",\r\n    \"motivo\":\"\",\r\n    \"enviarA\":\"\",\r\n    \"contacto\":\"\",\r\n    \"plazo\":\"\"\r\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tipo",
+									"value": "PP",
+									"type": "default"
+								},
+								{
+									"key": "fecha",
+									"value": "2023-02-17",
+									"type": "default"
+								},
+								{
+									"key": "hora",
+									"value": "17:00",
+									"type": "default"
+								},
+								{
+									"key": "usuario",
+									"value": "agonzalez",
+									"type": "default"
+								},
+								{
+									"key": "proveedor",
+									"value": "julio lanzani",
+									"type": "default"
+								},
+								{
+									"key": "periodo",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "importeTotal",
+									"value": "50000",
+									"type": "default"
+								},
+								{
+									"key": "conceptoDeFacturacion",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "comentarios",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "promovido",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "cliente",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "estado",
+									"value": "pendiente",
+									"type": "default"
+								},
+								{
+									"key": "motivo",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "enviarA",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "contacto",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "plazo",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "adjuntos",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "distribuciones",
+									"value": "",
+									"type": "default"
+								}
+							]
 						},
 						"url": "http://127.0.0.1:3000/Novedad"
 					},
