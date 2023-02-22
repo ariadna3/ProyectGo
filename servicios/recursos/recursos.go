@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var client *mongo.Client
@@ -17,9 +18,9 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 }
 
 type Recursos struct {
-	idSecuencial int    `bson:"idSecuencial"`
-	Usuario      string `bson:"usuario"`
-	Legajo       int    `bson:"legajo"`
+	IdRecurso int    `bson:"idRecurso"`
+	Usuario   string `bson:"usuario"`
+	Legajo    int    `bson:"legajo"`
 }
 
 // ----Recursos----
@@ -30,6 +31,15 @@ func InsertRecurso(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 	coll := client.Database("portalDeNovedades").Collection("recursos")
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{"idRecurso", -1}})
+
+	cursor, _ := coll.Find(context.TODO(), filter, opts)
+
+	var results []Recursos
+	cursor.All(context.TODO(), &results)
+
+	recurso.IdRecurso = results[0].IdRecurso + 1
 	result, err := coll.InsertOne(context.TODO(), recurso)
 	if err != nil {
 		fmt.Print(err)
@@ -42,7 +52,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 func GetRecurso(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	cursor, err := coll.Find(context.TODO(), bson.M{"idRecurso": idNumber})
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
@@ -72,10 +82,10 @@ func GetRecursoAll(c *fiber.Ctx) error {
 func DeleteRecurso(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"idRecurso": idNumber})
 	if err != nil {
 		fmt.Print(err)
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
-	return c.SendString("recurso eliminada")
+	return c.SendString("recurso eliminado")
 }

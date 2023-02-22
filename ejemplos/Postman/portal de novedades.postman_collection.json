@@ -6,6 +6,7 @@
 	},
 	"item": [
 		{
+<<<<<<< HEAD
 			"name": "GetCecos",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -295,27 +296,86 @@
 							"value": ""
 						}
 					]
+=======
+			"name": "actividades",
+			"item": [
+				{
+					"name": "InsertActividad",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"usuario\": \"ariadna gonzalez\",\r\n    \"fecha\": \"2023-02-16\",\r\n    \"hora\": \"13:00:00\",\r\n    \"actividad\": \"Cargo\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Actividad"
+					},
+					"response": []
+				},
+				{
+					"name": "GetActividad",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Actividad"
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteActividad",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Actividad/0"
+					},
+					"response": []
+>>>>>>> release/cambios
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "GetNovedad",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+			"name": "novedades",
+			"item": [
+				{
+					"name": "InsertNovedad",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tipo\":\"PP\",\r\n    \"fecha\":\"2023-02-16\"\r\n    \"hora\":\"13:00\"\r\n    \"usuario\":\"agonzalez\"\r\n    \"proveedor\":\"jlanzani\"\r\n    \"periodo\":\"2023-01\r\n    \"importeTotal\": 1000,\r\n    \"conceptoDeFacturacion\":\"?\"\r\n    \"adjuntos\":[],\r\n    \"distribuciones\":[],\r\n    \"comentarios\":\"\",\r\n    \"promovido\":,\r\n    \"cliente\":\"\",\r\n    \"estado\":\"\",\r\n    \"estado\":\"\",\r\n    \"motivo\":\"\",\r\n    \"enviarA\":\"\",\r\n    \"contacto\":\"\",\r\n    \"plazo\":\"\"\r\n}"
+						},
+						"url": "http://127.0.0.1:3000/Novedad"
+					},
+					"response": []
 				},
+<<<<<<< HEAD
 				"url": {
 					"raw": "http://127.0.0.1:3000/Novedad/?idSecuencial=1&tipo=PP&fecha=2022-12-03&hora=12:00:00&usuario=jlanzani&proveedor=Julio Lanzani&periodo=2022-12&importeTotal=5000&conceptoDeFacturacion=sueldos&comentarios=pago completado&promovido=false&cliente=pepe&estado=rechazado&rechazoMotivo=falta de documentacion",
 					"protocol": "http",
@@ -743,30 +803,104 @@
 							"key": "Email",
 							"value": "jperez@gmail.com",
 							"type": "text"
+=======
+				{
+					"name": "GetNovedad",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
-						{
-							"key": "Password",
-							"value": "perez1234",
-							"type": "text"
-						},
-						{
-							"key": "User",
-							"value": "lgonzalez2020",
-							"type": "text",
-							"disabled": true
-						},
-						{
-							"key": "Nombre",
-							"value": "Juan Manuel",
-							"type": "text"
-						},
-						{
-							"key": "Apellido",
-							"value": "Perez",
-							"type": "text"
-						}
-					]
+						"url": "http://127.0.0.1:3000/Novedad/161"
+					},
+					"response": []
 				},
+				{
+					"name": "GetFiltro",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+>>>>>>> release/cambios
+						},
+						"url": {
+							"raw": "http://localhost:3000/Novedad/?tipo=&fecha&hora&usuario&proveedor&periodo&conceptoDeFacturacion&comentarios&cliente&estados",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"Novedad",
+								""
+							],
+							"query": [
+								{
+									"key": "tipo",
+									"value": ""
+								},
+								{
+									"key": "fecha",
+									"value": null
+								},
+								{
+									"key": "hora",
+									"value": null
+								},
+								{
+									"key": "usuario",
+									"value": null
+								},
+								{
+									"key": "proveedor",
+									"value": null
+								},
+								{
+									"key": "periodo",
+									"value": null
+								},
+								{
+									"key": "conceptoDeFacturacion",
+									"value": null
+								},
+								{
+									"key": "comentarios",
+									"value": null
+								},
+								{
+									"key": "cliente",
+									"value": null
+								},
+								{
+									"key": "estados",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+<<<<<<< HEAD
 				"url": "http://127.0.0.1:4000/User"
 			},
 			"response": []
@@ -837,6 +971,319 @@
 				"url": "http://127.0.0.1:4000/User/jperez"
 			},
 			"response": []
+=======
+				{
+					"name": "DeleteNovedad",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://127.0.0.1:3000/Novedad/161"
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateEstado",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Estado\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Novedad/2"
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateMotivo",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Motivo\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Novedad/2"
+					},
+					"response": []
+				},
+				{
+					"name": "GetTipoNovedades",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/TipoNovedades"
+					},
+					"response": []
+				},
+				{
+					"name": "GetCecos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Cecos"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "proveedores",
+			"item": [
+				{
+					"name": "InsertProveedor",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "numeroDoc",
+									"value": "123456789",
+									"type": "default"
+								},
+								{
+									"key": "razonSocial",
+									"value": "ari srl",
+									"type": "default"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:3000/Proveedor"
+					},
+					"response": []
+				},
+				{
+					"name": "GetProveedor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:3000/Proveedor/2"
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteProveedor",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://127.0.0.1:3000/Proveedor/1"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "recursos",
+			"item": [
+				{
+					"name": "InsertRecurso",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "usuario",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "legajo",
+									"value": "",
+									"type": "default"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Recurso"
+					},
+					"response": []
+				},
+				{
+					"name": "GetRecurso",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:3000/Recurso"
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteRecurso",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://127.0.0.1:4000/Recurso/2"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "LoginUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Email",
+									"value": "jperez@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "Password",
+									"value": "perez1234",
+									"type": "text"
+								},
+								{
+									"key": "User",
+									"value": "lgonzalez2020",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "Nombre",
+									"value": "Juan Manuel",
+									"type": "text"
+								},
+								{
+									"key": "Apellido",
+									"value": "Perez",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:4000/User"
+					},
+					"response": []
+				},
+				{
+					"name": "createUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Email",
+									"value": "jperez@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "Password",
+									"value": "perez1234",
+									"type": "text"
+								},
+								{
+									"key": "User",
+									"value": "lgonzalez2020",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "Nombre",
+									"value": "Juan Manuel",
+									"type": "text"
+								},
+								{
+									"key": "Apellido",
+									"value": "Perez",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:4000/User"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:4000/User/jperez"
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUser",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://127.0.0.1:4000/User/jperez"
+					},
+					"response": []
+				},
+				{
+					"name": "updateUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:4000/User/jperez"
+					},
+					"response": []
+				}
+			]
+>>>>>>> release/cambios
 		}
 	]
 }
