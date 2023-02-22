@@ -48,16 +48,15 @@ type TipoNovedad struct {
 }
 
 type Cecos struct {
-	IdCeco      int    `bson:"idSecuencial"`
-	Descripcion string `bson:"descripcion"`
-	Cliente     string `bson:"cliente"`
-	Proyecto    string `bson:"proyecto"`
-	Cuit        int    `bson:"cuit"`
+	DescripcionCecos string `bson:"descripcionCecos"`
+	Cliente          string `bson:"cliente"`
+	Proyecto         string `bson:"proyecto"`
+	Cuit             int    `bson:"cuit"`
 }
 
 type Distribuciones struct {
 	Porcentaje float64 `bson:"porcentaje"`
-	Ceco       Cecos   `bson:"ceco"`
+	Cecos      Cecos   `bson:"cecos"`
 }
 
 var store *session.Store = session.New()
@@ -255,7 +254,7 @@ func GetTipoNovedad(c *fiber.Ctx) error {
 // ----Cecos----
 // obtener todos los cecos
 func GetCecosAll(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	coll := client.Database("portalDeNovedades").Collection("novedades")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		fmt.Print(err)
@@ -269,7 +268,7 @@ func GetCecosAll(c *fiber.Ctx) error {
 
 // obtener los cecos por id
 func GetCecos(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	coll := client.Database("portalDeNovedades").Collection("novedades")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
 	fmt.Println(coll)

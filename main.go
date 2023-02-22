@@ -64,7 +64,6 @@ type TipoNovedad struct {
 }
 
 type Cecos struct {
-	IdCeco      int    `bson:"id_ceco"`
 	Descripcion string `bson:"descripcion"`
 	Cliente     string `bson:"cliente"`
 	Proyecto    string `bson:"proyecto"`
@@ -128,15 +127,15 @@ func main() {
 		//Tipo Novedades
 		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
 
+		//Centro de Costos
+		app.Get("/Cecos/", novedades.GetCecosAll)
+		app.Get("/Cecos/:id", novedades.GetCecos)
+
 		//Proveedores
 		app.Post("/Proveedor", proveedores.InsertProveedor)
 		app.Get("/Proveedor/:id", proveedores.GetProveedor)
 		app.Get("/Proveedor", proveedores.GetProveedorAll)
 		app.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
-
-		//Centro de Costos
-		app.Get("/Cecos/", novedades.GetCecosAll)
-		app.Get("/Cecos/:id", novedades.GetCecos)
 
 		//Recursos
 		app.Post("/Recurso", recursos.InsertRecurso)
