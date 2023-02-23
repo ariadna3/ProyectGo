@@ -33,6 +33,7 @@ type Novedades struct {
 	EnviarA               string           `bson:"enviarA"`
 	Contacto              string           `bson:"contacto"`
 	Plazo                 string           `bson:"plazo"`
+	Recurso               string           `bson:"recurso"`
 }
 
 const (
