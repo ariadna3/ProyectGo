@@ -34,6 +34,7 @@ type Novedades struct {
 	Contacto              string           `bson:"contacto"`
 	Plazo                 string           `bson:"plazo"`
 	Recurso               string           `bson:"recurso"`
+	Descripcion           string           `bson:"descripcion"`
 }
 
 const (
