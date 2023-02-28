@@ -85,12 +85,12 @@
 								},
 								{
 									"key": "fecha",
-									"value": "2023-02-17",
+									"value": "2023-02-02",
 									"type": "default"
 								},
 								{
 									"key": "hora",
-									"value": "17:00",
+									"value": "16:00",
 									"type": "default"
 								},
 								{
@@ -165,6 +165,16 @@
 								},
 								{
 									"key": "distribuciones",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "recursos",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "descripcion",
 									"value": "",
 									"type": "default"
 								}
