@@ -6,11 +6,9 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/session"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"gorm.io/gorm"
 )
 
 type Novedades struct {
@@ -33,8 +31,8 @@ type Novedades struct {
 	EnviarA               string           `bson:"enviarA"`
 	Contacto              string           `bson:"contacto"`
 	Plazo                 string           `bson:"plazo"`
-	Recurso               string           `bson:"recurso"`
 	Descripcion           string           `bson:"descripcion"`
+	Recursos              []Recursos       `bson:"recursos"`
 }
 
 const (
@@ -61,12 +59,14 @@ type Distribuciones struct {
 	Cecos      Cecos   `bson:"cecos"`
 }
 
-var store *session.Store = session.New()
-var dbUser *gorm.DB
-var client *mongo.Client
+type Recursos struct {
+	Importe     int    `bson:"importe"`
+	Comentarios string `bson:"comentarios"`
+	Recurso     string `bson:"recurso"`
+	Periodo     string `bson:"periodo"`
+}
 
-var maxAge int32 = 86400 * 30 // 30 days
-var isProd bool = false       // Set to true when serving over https
+var client *mongo.Client
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
 	client = clientMongo
@@ -86,13 +86,17 @@ func InsertNovedad(c *fiber.Ctx) error {
 
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 
-	filter := bson.D{}
+	filter := bson.D{{}}
 	opts := options.Find().SetSort(bson.D{{"idSecuencial", -1}})
 
-	cursor, _ := coll.Find(context.TODO(), filter, opts)
+	cursor, error := coll.Find(context.TODO(), filter, opts)
 
 	var results []Novedades
 	cursor.All(context.TODO(), &results)
+
+	fmt.Println(results)
+	fmt.Println(client)
+	fmt.Println(error)
 
 	novedad.IdSecuencial = results[0].IdSecuencial + 1
 	result, err := coll.InsertOne(context.TODO(), novedad)
