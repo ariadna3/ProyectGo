@@ -85,7 +85,7 @@
 								},
 								{
 									"key": "fecha",
-									"value": "2023-02-02",
+									"value": "2023-02-27",
 									"type": "default"
 								},
 								{
@@ -169,12 +169,17 @@
 									"type": "default"
 								},
 								{
-									"key": "recursos",
+									"key": "recurso",
 									"value": "",
 									"type": "default"
 								},
 								{
 									"key": "descripcion",
+									"value": "pago a proveedores",
+									"type": "default"
+								},
+								{
+									"key": "recursos",
 									"value": "",
 									"type": "default"
 								}
