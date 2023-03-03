@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,9 +19,26 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 }
 
 type Recursos struct {
-	IdRecurso int    `bson:"idRecurso"`
-	Usuario   string `bson:"usuario"`
-	Legajo    int    `bson:"legajo"`
+	IdRecurso   int       `bson:"idRecurso"`
+	Nombre      string    `bson:"nombre"`
+	Apellido    string    `bson:"apellido"`
+	Legajo      string    `bson:"legajo"`
+	Mail        string    `bson:"mail"`
+	Fecha       time.Time `bson:"date"`
+	FechaString string    `bson:"fechaString"`
+}
+
+// fecha de ingreso
+func GetFecha(c *fiber.Ctx) error {
+	var fecha []string
+	currentTime := time.Now()
+	for i := 12; i >= 0; i-- {
+		anio := strconv.Itoa(currentTime.Year())
+		mes := strconv.Itoa(int(currentTime.Month()))
+		fecha = append(fecha, mes+"-"+anio)
+		currentTime = currentTime.AddDate(0, -1, 0)
+	}
+	return c.JSON(fecha)
 }
 
 // ----Recursos----
@@ -30,6 +48,9 @@ func InsertRecurso(c *fiber.Ctx) error {
 	if err := c.BodyParser(recurso); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
+	recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaString)
+	fmt.Print(recurso.Fecha.Month())
+
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	filter := bson.D{}
 	opts := options.Find().SetSort(bson.D{{"idRecurso", -1}})

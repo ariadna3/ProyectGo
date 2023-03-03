@@ -12,27 +12,27 @@ import (
 )
 
 type Novedades struct {
-	IdSecuencial          int              `bson:"idSecuencial"`
-	Tipo                  string           `bson:"tipo"`
-	Fecha                 string           `bson:"fecha"`
-	Hora                  string           `bson:"hora"`
-	Usuario               string           `bson:"usuario"`
-	Proveedor             string           `bson:"proveedor"`
-	Periodo               string           `bson:"periodo"`
-	ImporteTotal          float64          `bson:"importeTotal"`
-	ConceptoDeFacturacion string           `bson:"conceptoDeFacturacion"`
-	Adjuntos              []string         `bson:"adjuntos"`
-	Distribuciones        []Distribuciones `bson:"distribuciones"`
-	Comentarios           string           `bson:"comentarios"`
-	Promovido             bool             `bson:"promovido"`
-	Cliente               string           `bson:"cliente"`
-	Estado                string           `bson:"estado"`
-	Motivo                string           `bson:"motivo"`
-	EnviarA               string           `bson:"enviarA"`
-	Contacto              string           `bson:"contacto"`
-	Plazo                 string           `bson:"plazo"`
-	Descripcion           string           `bson:"descripcion"`
-	Recursos              []Recursos       `bson:"recursos"`
+	IdSecuencial          int                 `bson:"idSecuencial"`
+	Tipo                  string              `bson:"tipo"`
+	Fecha                 string              `bson:"fecha"`
+	Hora                  string              `bson:"hora"`
+	Usuario               string              `bson:"usuario"`
+	Proveedor             string              `bson:"proveedor"`
+	Periodo               string              `bson:"periodo"`
+	ImporteTotal          float64             `bson:"importeTotal"`
+	ConceptoDeFacturacion string              `bson:"conceptoDeFacturacion"`
+	Adjuntos              []string            `bson:"adjuntos"`
+	Distribuciones        []Distribuciones    `bson:"distribuciones"`
+	Comentarios           string              `bson:"comentarios"`
+	Promovido             bool                `bson:"promovido"`
+	Cliente               string              `bson:"cliente"`
+	Estado                string              `bson:"estado"`
+	Motivo                string              `bson:"motivo"`
+	EnviarA               string              `bson:"enviarA"`
+	Contacto              string              `bson:"contacto"`
+	Plazo                 string              `bson:"plazo"`
+	Descripcion           string              `bson:"descripcion"`
+	Recursos              []RecursosNovedades `bson:"recursos"`
 }
 
 const (
@@ -48,6 +48,7 @@ type TipoNovedad struct {
 }
 
 type Cecos struct {
+	IdCecos          int    `bson:"idCecos"`
 	DescripcionCecos string `bson:"descripcionCecos"`
 	Cliente          string `bson:"cliente"`
 	Proyecto         string `bson:"proyecto"`
@@ -59,7 +60,7 @@ type Distribuciones struct {
 	Cecos      Cecos   `bson:"cecos"`
 }
 
-type Recursos struct {
+type RecursosNovedades struct {
 	Importe     int    `bson:"importe"`
 	Comentarios string `bson:"comentarios"`
 	Recurso     string `bson:"recurso"`
@@ -258,6 +259,30 @@ func GetTipoNovedad(c *fiber.Ctx) error {
 }
 
 // ----Cecos----
+// insertar cecos
+func InsertCecos(c *fiber.Ctx) error {
+	cecos := new(Cecos)
+	if err := c.BodyParser(cecos); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{"idCecos", -1}})
+
+	cursor, _ := coll.Find(context.TODO(), filter, opts)
+
+	var results []Cecos
+	cursor.All(context.TODO(), &results)
+
+	cecos.IdCecos = results[0].IdCecos + 1
+	result, err := coll.InsertOne(context.TODO(), cecos)
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return c.JSON(cecos)
+}
+
 // obtener todos los cecos
 func GetCecosAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
