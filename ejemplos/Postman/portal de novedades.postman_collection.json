@@ -432,14 +432,30 @@
 							"mode": "formdata",
 							"formdata": [
 								{
-									"key": "usuario",
-									"value": "",
+									"key": "nombre",
+									"value": "lautaro",
+									"type": "default"
+								},
+								{
+									"key": "apellido",
+									"value": "gonzalez",
 									"type": "default"
 								},
 								{
 									"key": "legajo",
-									"value": "",
+									"value": "1020",
 									"type": "default"
+								},
+								{
+									"key": "mail",
+									"value": "lgonzalez",
+									"type": "default"
+								},
+								{
+									"key": "fecha",
+									"value": "03-03",
+									"type": "default",
+									"disabled": true
 								}
 							],
 							"options": {

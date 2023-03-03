@@ -55,8 +55,8 @@ type Novedades struct {
 	EnviarA               string           `bson:"enviarA"`
 	Contacto              string           `bson:"contacto"`
 	Plazo                 string           `bson:"plazo"`
-	Recurso               string           `bson:"recurso"`
 	Descripcion           string           `bson:"descripcion"`
+	Recursos              []Recursos       `bson:"recursos"`
 }
 
 type TipoNovedad struct {
@@ -66,10 +66,11 @@ type TipoNovedad struct {
 }
 
 type Cecos struct {
-	Descripcion string `bson:"descripcion"`
-	Cliente     string `bson:"cliente"`
-	Proyecto    string `bson:"proyecto"`
-	Cuit        int    `bson:"cuit"`
+	IdCecos          int    `bson:"idCecos"`
+	DescripcionCecos string `bson:"descripcionCeoos"`
+	Cliente          string `bson:"cliente"`
+	Proyecto         string `bson:"proyecto"`
+	Cuit             int    `bson:"cuit"`
 }
 
 type Distribuciones struct {
@@ -83,10 +84,20 @@ type Proveedores struct {
 	RazonSocial string `bson:"razonSocial"`
 }
 
+type RecursosNovedades struct {
+	Importe     int    `bson:"importe"`
+	Comentarios string `bson:"comentarios"`
+	Recurso     string `bson:"recurso"`
+	Periodo     string `bson:"periodo"`
+}
+
 type Recursos struct {
-	idRecurso int    `bson:"idRecurso"`
-	Usuario   string `bson:"usuario"`
-	Legajo    int    `bson:"legajo"`
+	IdRecurso int    `bson:"idRecurso"`
+	Nombre    string `bson:"nombre"`
+	Apellido  string `bson:"apellido"`
+	Legajo    string `bson:"legajo"`
+	Mail      string `bson:"mail"`
+	Fecha     int    `bson:"date"`
 }
 
 func main() {
@@ -130,6 +141,7 @@ func main() {
 		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
 
 		//Centro de Costos
+		app.Post("Cecos", novedades.InsertCecos)
 		app.Get("/Cecos/", novedades.GetCecosAll)
 		app.Get("/Cecos/:id", novedades.GetCecos)
 
