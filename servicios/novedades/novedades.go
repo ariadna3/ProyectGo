@@ -33,6 +33,9 @@ type Novedades struct {
 	Plazo                 string              `bson:"plazo"`
 	Descripcion           string              `bson:"descripcion"`
 	Recursos              []RecursosNovedades `bson:"recursos"`
+	Cantidad              string              `bson:"cantidad"`
+	FechaDesde            string              `bson:"fechaDesde"`
+	FechaHasta            string              `bson:"fechaHasta"`
 }
 
 const (
