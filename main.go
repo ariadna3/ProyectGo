@@ -28,11 +28,11 @@ import (
 )
 
 type Actividades struct {
-	IdNovedad int    `bson:"idNovedad"`
-	Usuario   string `bson:"usuario"`
-	Fecha     string `bson:"fecha"`
-	Hora      string `bson:"hora"`
-	Actividad string `bson:"actividad"`
+	IdActividad int    `bson:"idActividad"`
+	Usuario     string `bson:"usuario"`
+	Fecha       string `bson:"fecha"`
+	Hora        string `bson:"hora"`
+	Actividad   string `bson:"actividad"`
 }
 
 type Novedades struct {

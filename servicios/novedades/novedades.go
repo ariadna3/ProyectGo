@@ -202,7 +202,7 @@ func DeleteNovedad(c *fiber.Ctx) error {
 
 func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	//se obtiene el id
-	idNumber, _ := strconv.Atoi(c.Params("id"))
+	idNumber, _ := strconv.Atoi(c.Params("idSecuencial"))
 	//se obtiene el estado
 	estado := c.Params("estado")
 	//se conecta a la DB
@@ -218,6 +218,8 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 
 	//le dice que es lo que hay que modificar y con que
 	update := bson.D{{"$set", bson.D{{"estado", estado}}}}
+
+	fmt.Println(estado)
 
 	//hace la modificacion
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
