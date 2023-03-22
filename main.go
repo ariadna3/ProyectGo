@@ -36,27 +36,30 @@ type Actividades struct {
 }
 
 type Novedades struct {
-	IdSecuencial          int              `bson:"idSecuencial"`
-	Tipo                  string           `bson:"tipo"`
-	Fecha                 string           `bson:"fecha"`
-	Hora                  string           `bson:"hora"`
-	Usuario               string           `bson:"usuario"`
-	Proveedor             string           `bson:"proveedor"`
-	Periodo               string           `bson:"periodo"`
-	ImporteTotal          float64          `bson:"importeTotal"`
-	ConceptoDeFacturacion string           `bson:"conceptoDeFacturacion"`
-	Adjuntos              []string         `bson:"adjuntos"`
-	Distribuciones        []Distribuciones `bson:"distribuciones"`
-	Comentarios           string           `bson:"comentarios"`
-	Promovido             bool             `bson:"promovido"`
-	Cliente               string           `bson:"cliente"`
-	Estado                string           `bson:"estado"`
-	Motivo                string           `bson:"motivo"`
-	EnviarA               string           `bson:"enviarA"`
-	Contacto              string           `bson:"contacto"`
-	Plazo                 string           `bson:"plazo"`
-	Descripcion           string           `bson:"descripcion"`
-	Recursos              []Recursos       `bson:"recursos"`
+	IdSecuencial          int                 `bson:"idSecuencial"`
+	Tipo                  string              `bson:"tipo"`
+	Fecha                 string              `bson:"fecha"`
+	Hora                  string              `bson:"hora"`
+	Usuario               string              `bson:"usuario"`
+	Proveedor             string              `bson:"proveedor"`
+	Periodo               string              `bson:"periodo"`
+	ImporteTotal          float64             `bson:"importeTotal"`
+	ConceptoDeFacturacion string              `bson:"conceptoDeFacturacion"`
+	Adjuntos              []string            `bson:"adjuntos"`
+	Distribuciones        []Distribuciones    `bson:"distribuciones"`
+	Comentarios           string              `bson:"comentarios"`
+	Promovido             bool                `bson:"promovido"`
+	Cliente               string              `bson:"cliente"`
+	Estado                string              `bson:"estado"`
+	Motivo                string              `bson:"motivo"`
+	EnviarA               string              `bson:"enviarA"`
+	Contacto              string              `bson:"contacto"`
+	Plazo                 string              `bson:"plazo"`
+	Descripcion           string              `bson:"descripcion"`
+	Recursos              []RecursosNovedades `bson:"recursos"`
+	Cantidad              string              `bson:"cantidad"`
+	FechaDesde            string              `bson:"fechaDesde"`
+	FechaHasta            string              `bson:"fechaHasta"`
 }
 
 type TipoNovedad struct {
@@ -67,20 +70,19 @@ type TipoNovedad struct {
 
 type Cecos struct {
 	IdCecos          int    `bson:"idCecos"`
-	DescripcionCecos string `bson:"descripcionCeoos"`
+	NCecos           string `bson:"nCecos"`
+	DescripcionCecos string `bson:"descripcionCecos"`
 	Cliente          string `bson:"cliente"`
-	Proyecto         string `bson:"proyecto"`
-	Cuit             int    `bson:"cuit"`
 }
 
 type Distribuciones struct {
 	Porcentaje float64 `bson:"porcentaje"`
-	Ceco       Cecos   `bson:"ceco"`
+	Cecos      Cecos   `bson:"cecos"`
 }
 
 type Proveedores struct {
 	IdProveedor int    `bson:"idProveedor"`
-	NumeroDoc   int    `bson:"numeroDoc"`
+	Cuit        string `bson:"cuit"`
 	RazonSocial string `bson:"razonSocial"`
 }
 
@@ -92,12 +94,12 @@ type RecursosNovedades struct {
 }
 
 type Recursos struct {
-	IdRecurso int    `bson:"idRecurso"`
-	Nombre    string `bson:"nombre"`
-	Apellido  string `bson:"apellido"`
-	Legajo    string `bson:"legajo"`
-	Mail      string `bson:"mail"`
-	Fecha     int    `bson:"date"`
+	IdRecurso   int    `bson:"idRecurso"`
+	Nombre      string `bson:"nombre"`
+	Apellido    string `bson:"apellido"`
+	Legajo      string `bson:"legajo"`
+	Mail        string `bson:"mail"`
+	FechaString string `bson:"fechaString"`
 }
 
 func main() {
