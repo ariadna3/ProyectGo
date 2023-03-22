@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "cba61f86-eb36-4797-b072-8c10fb9758e5",
+		"_postman_id": "c26f90a5-2fe5-4973-b0d3-490cfeb11d7d",
 		"name": "portal de novedades",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -22,7 +22,20 @@
 								}
 							}
 						},
-						"url": "http://127.0.0.1:3000/Actividad"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Actividad",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Actividad"
+							]
+						}
 					},
 					"response": []
 				},
@@ -43,7 +56,20 @@
 								}
 							}
 						},
-						"url": "http://127.0.0.1:3000/Actividad"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Actividad",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Actividad"
+							]
+						}
 					},
 					"response": []
 				},
@@ -61,7 +87,21 @@
 								}
 							}
 						},
-						"url": "http://127.0.0.1:3000/Actividad/0"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Actividad/0",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Actividad",
+								"0"
+							]
+						}
 					},
 					"response": []
 				}
@@ -185,7 +225,20 @@
 								}
 							]
 						},
-						"url": "http://127.0.0.1:3000/Novedad"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Novedad",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Novedad"
+							]
+						}
 					},
 					"response": []
 				},
@@ -206,7 +259,21 @@
 								}
 							}
 						},
-						"url": "http://127.0.0.1:3000/Novedad/161"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Novedad/100",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Novedad",
+								"100"
+							]
+						}
 					},
 					"response": []
 				},
@@ -289,7 +356,21 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": "http://127.0.0.1:3000/Novedad/161"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Novedad/161",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Novedad",
+								"161"
+							]
+						}
 					},
 					"response": []
 				},
@@ -300,14 +381,29 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Estado\": \"\"\r\n}",
+							"raw": "{\r\n    \"Motivo\": \"prueba\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": "http://127.0.0.1:3000/Novedad/2"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Novedad/100/aceptada",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Novedad",
+								"100",
+								"aceptada"
+							]
+						}
 					},
 					"response": []
 				},
@@ -325,7 +421,21 @@
 								}
 							}
 						},
-						"url": "http://127.0.0.1:3000/Novedad/2"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Novedad/2",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Novedad",
+								"2"
+							]
+						}
 					},
 					"response": []
 				},
@@ -346,7 +456,20 @@
 								}
 							}
 						},
-						"url": "http://127.0.0.1:3000/TipoNovedades"
+						"url": {
+							"raw": "http://127.0.0.1:3000/TipoNovedades",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"TipoNovedades"
+							]
+						}
 					},
 					"response": []
 				},
@@ -367,7 +490,20 @@
 								}
 							}
 						},
-						"url": "http://127.0.0.1:3000/Cecos"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Cecos",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Cecos"
+							]
+						}
 					},
 					"response": []
 				}
@@ -396,7 +532,20 @@
 								}
 							]
 						},
-						"url": "http://127.0.0.1:3000/Proveedor"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Proveedor",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Proveedor"
+							]
+						}
 					},
 					"response": []
 				},
@@ -405,7 +554,21 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "http://127.0.0.1:3000/Proveedor/2"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Proveedor/2",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Proveedor",
+								"2"
+							]
+						}
 					},
 					"response": []
 				},
@@ -414,7 +577,21 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": "http://127.0.0.1:3000/Proveedor/1"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Proveedor/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Proveedor",
+								"1"
+							]
+						}
 					},
 					"response": []
 				}
@@ -464,7 +641,20 @@
 								}
 							}
 						},
-						"url": "http://127.0.0.1:3000/Recurso"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Recurso",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Recurso"
+							]
+						}
 					},
 					"response": []
 				},
@@ -485,7 +675,20 @@
 								}
 							}
 						},
-						"url": "http://127.0.0.1:3000/Recurso"
+						"url": {
+							"raw": "http://127.0.0.1:3000/Recurso",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Recurso"
+							]
+						}
 					},
 					"response": []
 				},
@@ -494,7 +697,21 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": "http://127.0.0.1:4000/Recurso/2"
+						"url": {
+							"raw": "http://127.0.0.1:4000/Recurso/2",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "4000",
+							"path": [
+								"Recurso",
+								"2"
+							]
+						}
 					},
 					"response": []
 				}
@@ -539,7 +756,20 @@
 								}
 							]
 						},
-						"url": "http://127.0.0.1:4000/User"
+						"url": {
+							"raw": "http://127.0.0.1:4000/User",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "4000",
+							"path": [
+								"User"
+							]
+						}
 					},
 					"response": []
 				},
@@ -579,7 +809,20 @@
 								}
 							]
 						},
-						"url": "http://127.0.0.1:4000/User"
+						"url": {
+							"raw": "http://127.0.0.1:4000/User",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "4000",
+							"path": [
+								"User"
+							]
+						}
 					},
 					"response": []
 				},
@@ -588,7 +831,21 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "http://127.0.0.1:4000/User/jperez"
+						"url": {
+							"raw": "http://127.0.0.1:4000/User/jperez",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "4000",
+							"path": [
+								"User",
+								"jperez"
+							]
+						}
 					},
 					"response": []
 				},
@@ -597,7 +854,21 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": "http://127.0.0.1:4000/User/jperez"
+						"url": {
+							"raw": "http://127.0.0.1:4000/User/jperez",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "4000",
+							"path": [
+								"User",
+								"jperez"
+							]
+						}
 					},
 					"response": []
 				},
@@ -606,7 +877,21 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "http://127.0.0.1:4000/User/jperez"
+						"url": {
+							"raw": "http://127.0.0.1:4000/User/jperez",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "4000",
+							"path": [
+								"User",
+								"jperez"
+							]
+						}
 					},
 					"response": []
 				}
