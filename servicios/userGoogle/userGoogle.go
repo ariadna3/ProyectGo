@@ -50,7 +50,7 @@ func getGooglePublicKey(keyID string) (string, error) {
 	return key, nil
 }
 
-func ValidateGoogleJWT(c *fiber.Ctx) (GoogleClaims, error) {
+func ValidateGoogleJWT(c *fiber.Ctx) error {
 	tokenString := c.Params("tokenString")
 	claimsStruct := GoogleClaims{}
 
@@ -70,27 +70,27 @@ func ValidateGoogleJWT(c *fiber.Ctx) (GoogleClaims, error) {
 		},
 	)
 	if err != nil {
-		return GoogleClaims{}, err
+		return err
 	}
 
 	claims, ok := token.Claims.(*GoogleClaims)
 	if !ok {
-		return GoogleClaims{}, errors.New("Invalid Google JWT")
+		return errors.New("Invalid Google JWT")
 	}
 
 	if claims.Issuer != "accounts.google.com" && claims.Issuer != "https://accounts.google.com" {
-		return GoogleClaims{}, errors.New("iss is invalid")
+		return errors.New("iss is invalid")
 	}
 
 	if claims.Audience != os.Getenv("GOOGLEKEY") {
-		return GoogleClaims{}, errors.New("aud is invalid")
+		return errors.New("aud is invalid")
 	}
 
 	if claims.ExpiresAt < time.Now().UTC().Unix() {
-		return GoogleClaims{}, errors.New("JWT is expired")
+		return errors.New("JWT is expired")
 	}
 
-	return *claims, nil
+	return c.JSON(*claims)
 }
 
 /*
