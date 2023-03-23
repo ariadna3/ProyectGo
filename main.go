@@ -9,6 +9,7 @@ import (
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/user"
+	"github.com/proyectoNovedades/servicios/userGoogle"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -156,6 +157,9 @@ func main() {
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
+
+		//GoogleUser
+		app.Get("/user/:tokenString", userGoogle.ValidateGoogleJWT)
 
 	}
 
