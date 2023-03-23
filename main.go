@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/template/html"
 	"github.com/proyectoNovedades/servicios/actividades"
+	"github.com/proyectoNovedades/servicios/files"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
@@ -100,6 +101,10 @@ type Recursos struct {
 	Fecha     int    `bson:"date"`
 }
 
+type Files struct {
+	Nombre string `bson:"nombre"`
+}
+
 func main() {
 
 	goth.UseProviders(
@@ -156,6 +161,9 @@ func main() {
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
+
+		//Upload File
+		app.Post("/Upload", files.UploadFile)
 
 	}
 
