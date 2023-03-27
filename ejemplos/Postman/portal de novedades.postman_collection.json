@@ -278,6 +278,40 @@
 					"response": []
 				},
 				{
+					"name": "GetNovedadAll",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/Novedad",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Novedad"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GetFiltro",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true

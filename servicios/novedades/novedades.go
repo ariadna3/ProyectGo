@@ -2,6 +2,7 @@ package novedades
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -36,6 +37,7 @@ type Novedades struct {
 	Cantidad              string              `bson:"cantidad"`
 	FechaDesde            string              `bson:"fechaDesde"`
 	FechaHasta            string              `bson:"fechaHasta"`
+	Resumen               string              `bson:"resumen"`
 }
 
 const (
@@ -123,6 +125,9 @@ func GetNovedades(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &novedades); err != nil {
 		fmt.Print(err)
 	}
+	for index, element := range novedades {
+		novedades[index].Resumen = resumenNovedad(element)
+	}
 	return c.JSON(novedades)
 }
 
@@ -170,6 +175,9 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &novedades); err != nil {
 		fmt.Print(err)
 	}
+	for index, element := range novedades {
+		novedades[index].Resumen = resumenNovedad(element)
+	}
 	return c.JSON(novedades)
 }
 
@@ -183,6 +191,9 @@ func GetNovedadesAll(c *fiber.Ctx) error {
 	var novedades []Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
 		fmt.Print(err)
+	}
+	for index, element := range novedades {
+		novedades[index].Resumen = resumenNovedad(element)
 	}
 	return c.JSON(novedades)
 }
@@ -326,4 +337,50 @@ func GetCecos(c *fiber.Ctx) error {
 	}
 	return c.JSON(cecos)
 
+}
+
+func resumenNovedad(novedad Novedades) string {
+	var resumen string
+	var resumenDict map[string]interface{}
+	if novedad.Tipo == "PP" {
+		resumenDict = map[string]interface{}{
+			"Proveedor":    novedad.Proveedor,
+			"Plazo":        novedad.Plazo,
+			"ImporteTotal": novedad.ImporteTotal,
+			"Adjuntos":     novedad.Adjuntos,
+		}
+	}
+	if novedad.Tipo == "HE" || novedad.Tipo == "IG" || novedad.Tipo == "FS" {
+		resumenDict = map[string]interface{}{
+			"Cliente":      novedad.Cliente,
+			"Periodo":      novedad.Periodo,
+			"Descripcion":  novedad.Descripcion,
+			"ImporteTotal": novedad.ImporteTotal,
+			"Adjuntos":     novedad.Adjuntos,
+			"Recursos":     novedad.Recursos,
+		}
+	}
+	if novedad.Tipo == "RH" {
+		resumenDict = map[string]interface{}{
+			"Descripcion":  novedad.Descripcion,
+			"ImporteTotal": novedad.ImporteTotal,
+			"Adjuntos":     novedad.Adjuntos,
+			"Recursos":     novedad.Recursos,
+		}
+	}
+	if novedad.Tipo == "NP" {
+		resumenDict = map[string]interface{}{
+			"Descripcion": novedad.Descripcion,
+			"Usuario":     novedad.Usuario,
+			"Adjuntos":    novedad.Adjuntos,
+			"Periodo":     novedad.Periodo,
+		}
+	}
+	resumenJson, err := json.Marshal(resumenDict)
+	if err != nil {
+		fmt.Printf("Error: %s", err.Error())
+	} else {
+		resumen = string(resumenJson)
+	}
+	return resumen
 }
