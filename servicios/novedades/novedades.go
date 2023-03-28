@@ -54,11 +54,11 @@ type TipoNovedad struct {
 }
 
 type Cecos struct {
-	IdCecos          int    `bson:"idCecos"`
-	DescripcionCecos string `bson:"descripcionCecos"`
-	Cliente          string `bson:"cliente"`
-	Proyecto         string `bson:"proyecto"`
-	Cuit             int    `bson:"cuit"`
+	IdCecos     int    `bson:"idCecos"`
+	Descripcion string `bson:"descripcion"`
+	Cliente     string `bson:"cliente"`
+	Proyecto    string `bson:"proyecto"`
+	Codigo      string `bson:"codigo"`
 }
 
 type Distribuciones struct {
@@ -105,7 +105,11 @@ func InsertNovedad(c *fiber.Ctx) error {
 	fmt.Println(client)
 	fmt.Println(error)
 
-	novedad.IdSecuencial = results[0].IdSecuencial + 1
+	if len(results) == 0 {
+		novedad.IdSecuencial = 1
+	} else {
+		novedad.IdSecuencial = results[0].IdSecuencial + 1
+	}
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
@@ -299,9 +303,11 @@ func InsertCecos(c *fiber.Ctx) error {
 	var results []Cecos
 	cursor.All(context.TODO(), &results)
 
-	fmt.Println(results)
-
-	cecos.IdCecos = results[0].IdCecos + 1
+	if len(results) == 0 {
+		cecos.IdCecos = 1
+	} else {
+		cecos.IdCecos = results[0].IdCecos + 1
+	}
 	result, err := coll.InsertOne(context.TODO(), cecos)
 	if err != nil {
 		fmt.Print(err)

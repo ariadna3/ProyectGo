@@ -15,7 +15,7 @@ import (
 
 type Proveedores struct {
 	IdProveedor int    `bson:"idProveedor"`
-	NumeroDoc   int    `bson:"numeroDoc"`
+	NumeroDoc   string `bson:"numeroDoc"`
 	RazonSocial string `bson:"razonSocial"`
 }
 
