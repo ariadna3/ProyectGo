@@ -84,7 +84,7 @@ type Distribuciones struct {
 
 type Proveedores struct {
 	IdProveedor int    `bson:"idProveedor"`
-	Cuit        string `bson:"cuit"`
+	NumeroDoc   int    `bson:"numeroDoc"`
 	RazonSocial string `bson:"razonSocial"`
 }
 
@@ -96,12 +96,12 @@ type RecursosNovedades struct {
 }
 
 type Recursos struct {
-	IdRecurso   int    `bson:"idRecurso"`
-	Nombre      string `bson:"nombre"`
-	Apellido    string `bson:"apellido"`
-	Legajo      string `bson:"legajo"`
-	Mail        string `bson:"mail"`
-	FechaString string `bson:"fechaString"`
+	IdRecurso int    `bson:"idRecurso"`
+	Nombre    string `bson:"nombre"`
+	Apellido  string `bson:"apellido"`
+	Legajo    string `bson:"legajo"`
+	Mail      string `bson:"mail"`
+	Fecha     int    `bson:"date"`
 }
 
 type Files struct {
