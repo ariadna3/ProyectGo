@@ -278,6 +278,40 @@
 					"response": []
 				},
 				{
+					"name": "GetNovedadAll",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/Novedad",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Novedad"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GetFiltro",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -827,6 +861,29 @@
 					"response": []
 				},
 				{
+					"name": "GetUserGoogle",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:4000/User/jperez",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "4000",
+							"path": [
+								"User",
+								"jperez"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GetUser",
 					"request": {
 						"method": "GET",
@@ -890,6 +947,131 @@
 							"path": [
 								"User",
 								"jperez"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "cecos",
+			"item": [
+				{
+					"name": "GetCecosAll",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/Cecos",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Cecos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetCeco",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/Cecos",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Cecos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InsertCeco",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "descripcionCecos",
+									"value": "prueba",
+									"type": "text"
+								},
+								{
+									"key": "cliente",
+									"value": "clienteprueba",
+									"type": "default"
+								},
+								{
+									"key": "proyecto",
+									"value": "proyectoprueba",
+									"type": "default"
+								},
+								{
+									"key": "cuit",
+									"value": "222222",
+									"type": "default"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/Cecos",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Cecos"
 							]
 						}
 					},
