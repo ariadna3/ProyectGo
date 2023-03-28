@@ -861,6 +861,29 @@
 					"response": []
 				},
 				{
+					"name": "GetUserGoogle",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:4000/User/jperez",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "4000",
+							"path": [
+								"User",
+								"jperez"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GetUser",
 					"request": {
 						"method": "GET",
