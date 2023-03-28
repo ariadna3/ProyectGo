@@ -299,6 +299,8 @@ func InsertCecos(c *fiber.Ctx) error {
 	var results []Cecos
 	cursor.All(context.TODO(), &results)
 
+	fmt.Println(results)
+
 	cecos.IdCecos = results[0].IdCecos + 1
 	result, err := coll.InsertOne(context.TODO(), cecos)
 	if err != nil {
@@ -310,7 +312,7 @@ func InsertCecos(c *fiber.Ctx) error {
 
 // obtener todos los cecos
 func GetCecosAll(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		fmt.Print(err)
@@ -324,9 +326,9 @@ func GetCecosAll(c *fiber.Ctx) error {
 
 // obtener los cecos por id
 func GetCecos(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	cursor, err := coll.Find(context.TODO(), bson.M{"idCecos": idNumber})
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
@@ -336,7 +338,6 @@ func GetCecos(c *fiber.Ctx) error {
 		fmt.Print(err)
 	}
 	return c.JSON(cecos)
-
 }
 
 func resumenNovedad(novedad Novedades) string {
