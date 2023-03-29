@@ -142,34 +142,34 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 	var busqueda bson.M = bson.M{}
 	if c.Query("tipo") != "" {
-		busqueda["tipo"] = c.Query("tipo")
+		busqueda["tipo"] = bson.M{"$regex": c.Query("tipo"), "$options": "im"}
 	}
 	if c.Query("fecha") != "" {
-		busqueda["fecha"] = c.Query("fecha")
+		busqueda["fecha"] = bson.M{"$regex": c.Query("fecha"), "$options": "im"}
 	}
 	if c.Query("hora") != "" {
-		busqueda["hora"] = c.Query("hora")
+		busqueda["hora"] = bson.M{"$regex": c.Query("hora"), "$options": "im"}
 	}
 	if c.Query("usuario") != "" {
-		busqueda["usuario"] = c.Query("usuario")
+		busqueda["usuario"] = bson.M{"$regex": c.Query("usuario"), "$options": "im"}
 	}
 	if c.Query("proveedor") != "" {
-		busqueda["proveedor"] = c.Query("proveedor")
+		busqueda["proveedor"] = bson.M{"$regex": c.Query("proveedor"), "$options": "im"}
 	}
 	if c.Query("periodo") != "" {
-		busqueda["periodo"] = c.Query("periodo")
+		busqueda["periodo"] = bson.M{"$regex": c.Query("periodo"), "$options": "im"}
 	}
 	if c.Query("conceptoDeFacturacion") != "" {
-		busqueda["conceptoDeFacturacion"] = c.Query("conceptoDeFacturacion")
+		busqueda["conceptoDeFacturacion"] = bson.M{"$regex": c.Query("conceptoDeFacturacion"), "$options": "im"}
 	}
 	if c.Query("comentarios") != "" {
-		busqueda["comentarios"] = c.Query("comentarios")
+		busqueda["comentarios"] = bson.M{"$regex": c.Query("comentarios"), "$options": "im"}
 	}
 	if c.Query("cliente") != "" {
-		busqueda["cliente"] = c.Query("cliente")
+		busqueda["cliente"] = bson.M{"$regex": c.Query("cliente"), "$options": "im"}
 	}
 	if c.Query("estado") != "" {
-		busqueda["estado"] = c.Query("estado")
+		busqueda["estado"] = bson.M{"$regex": c.Query("estado"), "$options": "im"}
 	}
 
 	cursor, err := coll.Find(context.TODO(), busqueda)
