@@ -55,10 +55,10 @@ type TipoNovedad struct {
 
 type Cecos struct {
 	IdCecos     int    `bson:"idCecos"`
-	Descripcion string `bson:"descripcion"`
+	Descripcion string `bson:"descripcioncecos"`
 	Cliente     string `bson:"cliente"`
 	Proyecto    string `bson:"proyecto"`
-	Codigo      string `bson:"codigo"`
+	Codigo      int    `bson:"codigo"`
 }
 
 type Distribuciones struct {
@@ -337,11 +337,11 @@ func GetCecosAll(c *fiber.Ctx) error {
 	return c.JSON(cecos)
 }
 
-// obtener los cecos por id
+// obtener los cecos por codigo
 func GetCecos(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"idCecos": idNumber})
+	cursor, err := coll.Find(context.TODO(), bson.M{"codigo": idNumber})
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
@@ -351,6 +351,31 @@ func GetCecos(c *fiber.Ctx) error {
 		fmt.Print(err)
 	}
 	return c.JSON(cecos)
+}
+
+func GetCecosFiltro(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	var busqueda bson.M = bson.M{}
+	if c.Query("descripcion") != "" {
+		busqueda["descripcion"] = bson.M{"$regex": c.Query("descripcion"), "$options": "im"}
+	}
+	if c.Query("cliente") != "" {
+		busqueda["cliente"] = bson.M{"$regex": c.Query("cliente"), "$options": "im"}
+	}
+	if c.Query("proyecto") != "" {
+		busqueda["proyecto"] = bson.M{"$regex": c.Query("proyecto"), "$options": "im"}
+	}
+
+	cursor, err := coll.Find(context.TODO(), busqueda)
+	fmt.Println(coll)
+	if err != nil {
+		fmt.Print(err)
+	}
+	var result []Cecos
+	if err = cursor.All(context.Background(), &result); err != nil {
+		fmt.Print(err)
+	}
+	return c.JSON(result)
 }
 
 func resumenNovedad(novedad Novedades) string {
