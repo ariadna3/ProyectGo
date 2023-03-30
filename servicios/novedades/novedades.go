@@ -71,6 +71,13 @@ type RecursosNovedades struct {
 	Comentarios string `bson:"comentarios"`
 	Recurso     string `bson:"recurso"`
 	Periodo     string `bson:"periodo"`
+	Porc        []P    `bson:"p"`
+}
+
+type P struct {
+	Cc       string  `bson:"cc"`
+	PorcCC   float32 `bson:"porcCC"`
+	Cantidad int     `bson:"cantidad"`
 }
 
 var client *mongo.Client
@@ -351,13 +358,14 @@ func resumenNovedad(novedad Novedades) string {
 	var resumenDict map[string]interface{}
 	if novedad.Tipo == "PP" {
 		resumenDict = map[string]interface{}{
-			"Proveedor":    novedad.Proveedor,
-			"Plazo":        novedad.Plazo,
-			"ImporteTotal": novedad.ImporteTotal,
-			"Adjuntos":     novedad.Adjuntos,
+			"Proveedor":      novedad.Proveedor,
+			"Plazo":          novedad.Plazo,
+			"ImporteTotal":   novedad.ImporteTotal,
+			"Adjuntos":       novedad.Adjuntos,
+			"Distribuciones": novedad.Distribuciones,
 		}
 	}
-	if novedad.Tipo == "HE" || novedad.Tipo == "IG" || novedad.Tipo == "FS" {
+	if novedad.Tipo == "HE" || novedad.Tipo == "IG" {
 		resumenDict = map[string]interface{}{
 			"Cliente":      novedad.Cliente,
 			"Periodo":      novedad.Periodo,
@@ -365,6 +373,17 @@ func resumenNovedad(novedad Novedades) string {
 			"ImporteTotal": novedad.ImporteTotal,
 			"Adjuntos":     novedad.Adjuntos,
 			"Recursos":     novedad.Recursos,
+		}
+	}
+	if novedad.Tipo == "FS" {
+		resumenDict = map[string]interface{}{
+			"Cliente":       novedad.Cliente,
+			"Periodo":       novedad.Periodo,
+			"Descripcion":   novedad.Descripcion,
+			"ImporteTotal":  novedad.ImporteTotal,
+			"Adjuntos":      novedad.Adjuntos,
+			"Recursos":      novedad.Recursos,
+			"OrdenDeCompra": novedad.OrdenDeCompra,
 		}
 	}
 	if novedad.Tipo == "RH" {
