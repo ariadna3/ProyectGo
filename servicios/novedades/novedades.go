@@ -337,11 +337,11 @@ func GetCecosAll(c *fiber.Ctx) error {
 	return c.JSON(cecos)
 }
 
-// obtener los cecos por id
+// obtener los cecos por codigo
 func GetCecos(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"idCecos": idNumber})
+	cursor, err := coll.Find(context.TODO(), bson.M{"codigo": idNumber})
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
