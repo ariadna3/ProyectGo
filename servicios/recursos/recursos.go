@@ -22,10 +22,17 @@ type Recursos struct {
 	IdRecurso   int       `bson:"idRecurso"`
 	Nombre      string    `bson:"nombre"`
 	Apellido    string    `bson:"apellido"`
-	Legajo      string    `bson:"legajo"`
+	Legajo      int       `bson:"legajo"`
 	Mail        string    `bson:"mail"`
 	Fecha       time.Time `bson:"date"`
 	FechaString string    `bson:"fechaString"`
+	Sueldo      int       `bson:"sueldo"`
+	Porc        []P       `bson:"p"`
+}
+
+type P struct {
+	Cc     string `bson:"cc"`
+	PorcCC string `bson:"porcCC"`
 }
 
 // fecha de ingreso

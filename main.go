@@ -29,6 +29,7 @@ import (
 	"os"
 )
 
+<<<<<<< HEAD
 type Actividades struct {
 	IdActividad int    `bson:"idActividad"`
 	Usuario     string `bson:"usuario"`
@@ -108,6 +109,8 @@ type Files struct {
 	Nombre string `bson:"nombre"`
 }
 
+=======
+>>>>>>> 7c0b7e34509afa657639918f53fe8e15ab8b43e8
 func main() {
 
 	goth.UseProviders(

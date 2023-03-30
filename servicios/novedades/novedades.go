@@ -54,10 +54,18 @@ type TipoNovedad struct {
 }
 
 type Cecos struct {
+<<<<<<< HEAD
 	IdCecos          int    `bson:"idCecos"`
 	NCecos           string `bson:"nCecos"`
 	DescripcionCecos string `bson:"descripcionCecos"`
 	Cliente          string `bson:"cliente"`
+=======
+	IdCecos     int    `bson:"idCecos"`
+	Descripcion string `bson:"descripcion"`
+	Cliente     string `bson:"cliente"`
+	Proyecto    string `bson:"proyecto"`
+	Codigo      string `bson:"codigo"`
+>>>>>>> 7c0b7e34509afa657639918f53fe8e15ab8b43e8
 }
 
 type Distribuciones struct {
@@ -104,7 +112,11 @@ func InsertNovedad(c *fiber.Ctx) error {
 	fmt.Println(client)
 	fmt.Println(error)
 
-	novedad.IdSecuencial = results[0].IdSecuencial + 1
+	if len(results) == 0 {
+		novedad.IdSecuencial = 1
+	} else {
+		novedad.IdSecuencial = results[0].IdSecuencial + 1
+	}
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
@@ -137,34 +149,34 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 	var busqueda bson.M = bson.M{}
 	if c.Query("tipo") != "" {
-		busqueda["tipo"] = c.Query("tipo")
+		busqueda["tipo"] = bson.M{"$regex": c.Query("tipo"), "$options": "im"}
 	}
 	if c.Query("fecha") != "" {
-		busqueda["fecha"] = c.Query("fecha")
+		busqueda["fecha"] = bson.M{"$regex": c.Query("fecha"), "$options": "im"}
 	}
 	if c.Query("hora") != "" {
-		busqueda["hora"] = c.Query("hora")
+		busqueda["hora"] = bson.M{"$regex": c.Query("hora"), "$options": "im"}
 	}
 	if c.Query("usuario") != "" {
-		busqueda["usuario"] = c.Query("usuario")
+		busqueda["usuario"] = bson.M{"$regex": c.Query("usuario"), "$options": "im"}
 	}
 	if c.Query("proveedor") != "" {
-		busqueda["proveedor"] = c.Query("proveedor")
+		busqueda["proveedor"] = bson.M{"$regex": c.Query("proveedor"), "$options": "im"}
 	}
 	if c.Query("periodo") != "" {
-		busqueda["periodo"] = c.Query("periodo")
+		busqueda["periodo"] = bson.M{"$regex": c.Query("periodo"), "$options": "im"}
 	}
 	if c.Query("conceptoDeFacturacion") != "" {
-		busqueda["conceptoDeFacturacion"] = c.Query("conceptoDeFacturacion")
+		busqueda["conceptoDeFacturacion"] = bson.M{"$regex": c.Query("conceptoDeFacturacion"), "$options": "im"}
 	}
 	if c.Query("comentarios") != "" {
-		busqueda["comentarios"] = c.Query("comentarios")
+		busqueda["comentarios"] = bson.M{"$regex": c.Query("comentarios"), "$options": "im"}
 	}
 	if c.Query("cliente") != "" {
-		busqueda["cliente"] = c.Query("cliente")
+		busqueda["cliente"] = bson.M{"$regex": c.Query("cliente"), "$options": "im"}
 	}
 	if c.Query("estado") != "" {
-		busqueda["estado"] = c.Query("estado")
+		busqueda["estado"] = bson.M{"$regex": c.Query("estado"), "$options": "im"}
 	}
 
 	cursor, err := coll.Find(context.TODO(), busqueda)
@@ -300,7 +312,11 @@ func InsertCecos(c *fiber.Ctx) error {
 	var results []Cecos
 	cursor.All(context.TODO(), &results)
 
-	cecos.IdCecos = results[0].IdCecos + 1
+	if len(results) == 0 {
+		cecos.IdCecos = 1
+	} else {
+		cecos.IdCecos = results[0].IdCecos + 1
+	}
 	result, err := coll.InsertOne(context.TODO(), cecos)
 	if err != nil {
 		fmt.Print(err)
@@ -311,7 +327,7 @@ func InsertCecos(c *fiber.Ctx) error {
 
 // obtener todos los cecos
 func GetCecosAll(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		fmt.Print(err)
@@ -325,9 +341,9 @@ func GetCecosAll(c *fiber.Ctx) error {
 
 // obtener los cecos por id
 func GetCecos(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
+	cursor, err := coll.Find(context.TODO(), bson.M{"idCecos": idNumber})
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
@@ -337,7 +353,6 @@ func GetCecos(c *fiber.Ctx) error {
 		fmt.Print(err)
 	}
 	return c.JSON(cecos)
-
 }
 
 func resumenNovedad(novedad Novedades) string {
