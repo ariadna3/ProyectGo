@@ -54,22 +54,15 @@ type TipoNovedad struct {
 }
 
 type Cecos struct {
-<<<<<<< HEAD
-	IdCecos          int    `bson:"idCecos"`
-	NCecos           string `bson:"nCecos"`
-	DescripcionCecos string `bson:"descripcionCecos"`
-	Cliente          string `bson:"cliente"`
-=======
 	IdCecos     int    `bson:"idCecos"`
 	Descripcion string `bson:"descripcion"`
 	Cliente     string `bson:"cliente"`
 	Proyecto    string `bson:"proyecto"`
 	Codigo      string `bson:"codigo"`
->>>>>>> 7c0b7e34509afa657639918f53fe8e15ab8b43e8
 }
 
 type Distribuciones struct {
-	Porcentaje float64 `bson:"porcentaje"`
+	Porcentaje float32 `bson:"porcentaje"`
 	Cecos      Cecos   `bson:"cecos"`
 }
 

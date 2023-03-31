@@ -15,11 +15,7 @@ import (
 
 type Proveedores struct {
 	IdProveedor int    `bson:"idProveedor"`
-<<<<<<< HEAD
 	Cuit        string `bson:"cuit"`
-=======
-	NumeroDoc   string `bson:"numeroDoc"`
->>>>>>> 7c0b7e34509afa657639918f53fe8e15ab8b43e8
 	RazonSocial string `bson:"razonSocial"`
 }
 

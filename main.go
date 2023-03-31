@@ -29,7 +29,6 @@ import (
 	"os"
 )
 
-<<<<<<< HEAD
 type Actividades struct {
 	IdActividad int    `bson:"idActividad"`
 	Usuario     string `bson:"usuario"`
@@ -109,8 +108,6 @@ type Files struct {
 	Nombre string `bson:"nombre"`
 }
 
-=======
->>>>>>> 7c0b7e34509afa657639918f53fe8e15ab8b43e8
 func main() {
 
 	goth.UseProviders(
@@ -168,13 +165,11 @@ func main() {
 		app.Get("/Recurso", recursos.GetRecursoAll)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 
-<<<<<<< HEAD
 		//Upload File
 		app.Post("/Upload", files.UploadFile)
-=======
+
 		//GoogleUser
 		app.Get("/user/:tokenString", userGoogle.ValidateGoogleJWT)
->>>>>>> fb4b3f2a2e353192652420aad644f3f908ad304c
 
 	}
 
