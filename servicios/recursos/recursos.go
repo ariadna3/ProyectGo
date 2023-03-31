@@ -31,8 +31,8 @@ type Recursos struct {
 }
 
 type P struct {
-	Cc     string `bson:"cc"`
-	PorcCC string `bson:"porcCC"`
+	Cc     string  `bson:"cc"`
+	PorcCC float32 `bson:"porcCC"`
 }
 
 // fecha de ingreso
