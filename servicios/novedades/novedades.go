@@ -39,6 +39,7 @@ type Novedades struct {
 	FechaHasta            string              `bson:"fechaHasta"`
 	OrdenDeCompra         string              `bson:"ordenDeCompra"`
 	Resumen               string              `bson:"resumen"`
+	Aprobador             string              `bson:"aprobador"`
 }
 
 const (
