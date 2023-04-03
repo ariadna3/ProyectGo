@@ -414,10 +414,11 @@ func resumenNovedad(novedad Novedades) string {
 	}
 	if novedad.Tipo == "RH" {
 		resumenDict = map[string]interface{}{
-			"Descripcion":  novedad.Descripcion,
-			"ImporteTotal": novedad.ImporteTotal,
-			"Adjuntos":     novedad.Adjuntos,
-			"Recursos":     novedad.Recursos,
+			"Descripcion":    novedad.Descripcion,
+			"ImporteTotal":   novedad.ImporteTotal,
+			"Adjuntos":       novedad.Adjuntos,
+			"Recursos":       novedad.Recursos,
+			"Distribuciones": novedad.Distribuciones,
 		}
 	}
 	if novedad.Tipo == "NP" {
