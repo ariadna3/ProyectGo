@@ -90,38 +90,57 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 // ----Novedades----
 // insertar novedad
 func InsertNovedad(c *fiber.Ctx) error {
+	//obtiene los datos
 	novedad := new(Novedades)
 	if err := c.BodyParser(novedad); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
 
+	// valida el estado
 	if novedad.Estado != Pendiente && novedad.Estado != Aceptada && novedad.Estado != Rechazada {
 		novedad.Estado = Pendiente
 	}
 
+	//le asigna un idSecuencial
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 
 	filter := bson.D{{}}
 	opts := options.Find().SetSort(bson.D{{"idSecuencial", -1}})
 
 	cursor, error := coll.Find(context.TODO(), filter, opts)
+	if error != nil {
+		fmt.Println(error)
+	}
 
 	var results []Novedades
 	cursor.All(context.TODO(), &results)
-
-	fmt.Println(results)
-	fmt.Println(client)
-	fmt.Println(error)
 
 	if len(results) == 0 {
 		novedad.IdSecuencial = 1
 	} else {
 		novedad.IdSecuencial = results[0].IdSecuencial + 1
 	}
+
+	//ingresa los archivos los archivos
+	form, err := c.MultipartForm()
+	if err != nil { /* handle error */
+	}
+	var adjuntosNuevos []string
+	for _, fileHeaders := range form.File {
+		for _, fileHeader := range fileHeaders {
+			c.SaveFile(fileHeader, fmt.Sprintf("./archivosSubidos/%s", fileHeader.Filename))
+			adjuntosNuevos = append(adjuntosNuevos, fileHeader.Filename)
+		}
+	}
+
+	novedad.Adjuntos = adjuntosNuevos
+
+	//inserta la novedad
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
 	}
+
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.JSON(novedad)
 }
