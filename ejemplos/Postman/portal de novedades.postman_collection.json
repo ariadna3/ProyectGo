@@ -200,7 +200,12 @@
 								},
 								{
 									"key": "adjuntos",
-									"value": "",
+									"value": "Novedades.json",
+									"type": "default"
+								},
+								{
+									"key": "adjuntos",
+									"value": "Proveedores.json",
 									"type": "default"
 								},
 								{
@@ -227,9 +232,15 @@
 									"key": "documentos",
 									"type": "file",
 									"src": [
-										"/C:/Users/Lgonzalez/Documents/Carta de presentacion de trabajo}.txt",
-										"/C:/Users/Lgonzalez/Documents/categoriasEmpresa.txt"
+										"/C:/Users/Lgonzalez/Documents/ProyectGo/ejemplos/Novedades.json",
+										"/C:/Users/Lgonzalez/Documents/ProyectGo/ejemplos/Proveedores.json",
+										"/C:/Users/Lgonzalez/Documents/ProyectGo/ejemplos/Recursos.json"
 									]
+								},
+								{
+									"key": "adjuntoMotivo",
+									"value": "Recursos.json",
+									"type": "default"
 								}
 							]
 						},
@@ -1108,6 +1119,43 @@
 							"path": [
 								"user",
 								"eyJhbGciOiJSUzI1NiIsImtpZCI6IjFhYWU4ZDdjOTIwNThiNWVlYTQ1Njg5NWJmODkwODQ1NzFlMzA2ZjMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODAwOTc0OTYsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgwMDk3Nzk2LCJleHAiOjE2ODAxMDEzOTYsImp0aSI6ImM5Yzg4MDEwMmI2ZDI4NzYyODYyNmM3MzllYWMxMjNkZGQ4MmQ2ZTEifQ.iuMgE3rY3Hs86jg1TCK_WnG7EgmqZYCBY52PAV2hXr3AO4vN3xxQ00bxn54eukrgWOAJnEj1giMrpMWb9b3jkDwhXU58IdqzXh9OdsK3j5-vGIFde8tYQzNHZgPS4kmodi9KmuS3iUfdZrWRlPgkZxyaEvQDlT031vNwxhf7JBhzUrx3XKXi7Q2NLhJFzeHqLsbjHnAoq8Skt36ie4IAOGoIGcfcy9iU-pEJYXdxGuNSO8m0nwnrC6PodQp4gd1mLOQNXPsYjaPK_GPKlkLSemPyQww-IFmiriNwFkTVN8cVx88L0e0xHUtaqYFNfhzOkHsS9mA9bU9KqJZvP-G1bA"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Archivos",
+			"item": [
+				{
+					"name": "GetArchivo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/Archivos/Novedad/Adjuntos/255/?nombre=Recursos.json",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"Archivos",
+								"Novedad",
+								"Adjuntos",
+								"255",
+								""
+							],
+							"query": [
+								{
+									"key": "nombre",
+									"value": "Recursos.json"
+								}
 							]
 						}
 					},

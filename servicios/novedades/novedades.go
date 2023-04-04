@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,6 +24,7 @@ type Novedades struct {
 	ImporteTotal          float64             `bson:"importeTotal"`
 	ConceptoDeFacturacion string              `bson:"conceptoDeFacturacion"`
 	Adjuntos              []string            `bson:"adjuntos"`
+	AdjuntoMotivo         string              `bson:"adjuntoMotivo"`
 	Distribuciones        []Distribuciones    `bson:"distribuciones"`
 	Comentarios           string              `bson:"comentarios"`
 	Promovido             bool                `bson:"promovido"`
@@ -123,17 +125,14 @@ func InsertNovedad(c *fiber.Ctx) error {
 
 	//ingresa los archivos los archivos
 	form, err := c.MultipartForm()
-	if err != nil { /* handle error */
+	if err != nil {
+		fmt.Println("No se subieron archivos")
 	}
-	var adjuntosNuevos []string
 	for _, fileHeaders := range form.File {
 		for _, fileHeader := range fileHeaders {
 			c.SaveFile(fileHeader, fmt.Sprintf("./archivosSubidos/%s", fileHeader.Filename))
-			adjuntosNuevos = append(adjuntosNuevos, fileHeader.Filename)
 		}
 	}
-
-	novedad.Adjuntos = adjuntosNuevos
 
 	//inserta la novedad
 	result, err := coll.InsertOne(context.TODO(), novedad)
@@ -298,6 +297,34 @@ func UpdateMotivoNovedades(c *fiber.Ctx) error {
 	return c.JSON(result)
 }
 
+func GetFiles(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	var novedad Novedades
+	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
+	if err != nil {
+		return c.SendString("novedad no encontrada")
+	}
+
+	if c.Query("nombre") != "" {
+		nombre := c.Query("nombre")
+		existeArchivo, _ := findInStringArray(novedad.Adjuntos, nombre)
+		if !strings.Contains(nombre, "/") && strings.Count(nombre, ".") == 1 && (existeArchivo || novedad.AdjuntoMotivo == nombre) {
+			return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", c.Query("nombre")))
+		} else {
+			return c.SendString("nombre invalido")
+		}
+	}
+	if c.Query("pos") != "" {
+		posicion, _ := strconv.Atoi(c.Query("pos"))
+		if len(novedad.Adjuntos) <= posicion {
+			return c.SendString("posicion inexistente")
+		}
+		return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", novedad.Adjuntos[posicion]))
+	}
+	return c.SendString("debe especificar el archivo")
+}
+
 // ----Tipo Novedades----
 func GetTipoNovedad(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
@@ -457,4 +484,13 @@ func resumenNovedad(novedad Novedades) string {
 		resumen = string(resumenJson)
 	}
 	return resumen
+}
+
+func findInStringArray(arrayString []string, palabra string) (bool, int) {
+	for posicion, dato := range arrayString {
+		if dato == palabra {
+			return true, posicion
+		}
+	}
+	return false, len(arrayString)
 }
