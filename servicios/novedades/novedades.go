@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,6 +24,7 @@ type Novedades struct {
 	ImporteTotal          float64             `bson:"importeTotal"`
 	ConceptoDeFacturacion string              `bson:"conceptoDeFacturacion"`
 	Adjuntos              []string            `bson:"adjuntos"`
+	AdjuntoMotivo         string              `bson:"adjuntoMotivo"`
 	Distribuciones        []Distribuciones    `bson:"distribuciones"`
 	Comentarios           string              `bson:"comentarios"`
 	Promovido             bool                `bson:"promovido"`
@@ -90,38 +92,54 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 // ----Novedades----
 // insertar novedad
 func InsertNovedad(c *fiber.Ctx) error {
+	//obtiene los datos
 	novedad := new(Novedades)
 	if err := c.BodyParser(novedad); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
 
+	// valida el estado
 	if novedad.Estado != Pendiente && novedad.Estado != Aceptada && novedad.Estado != Rechazada {
 		novedad.Estado = Pendiente
 	}
 
+	//le asigna un idSecuencial
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 
 	filter := bson.D{{}}
 	opts := options.Find().SetSort(bson.D{{"idSecuencial", -1}})
 
 	cursor, error := coll.Find(context.TODO(), filter, opts)
+	if error != nil {
+		fmt.Println(error)
+	}
 
 	var results []Novedades
 	cursor.All(context.TODO(), &results)
-
-	fmt.Println(results)
-	fmt.Println(client)
-	fmt.Println(error)
 
 	if len(results) == 0 {
 		novedad.IdSecuencial = 1
 	} else {
 		novedad.IdSecuencial = results[0].IdSecuencial + 1
 	}
+
+	//ingresa los archivos los archivos
+	form, err := c.MultipartForm()
+	if err != nil {
+		fmt.Println("No se subieron archivos")
+	}
+	for _, fileHeaders := range form.File {
+		for _, fileHeader := range fileHeaders {
+			c.SaveFile(fileHeader, fmt.Sprintf("./archivosSubidos/%s", fileHeader.Filename))
+		}
+	}
+
+	//inserta la novedad
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
 	}
+
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.JSON(novedad)
 }
@@ -277,6 +295,34 @@ func UpdateMotivoNovedades(c *fiber.Ctx) error {
 		panic(err)
 	}
 	return c.JSON(result)
+}
+
+func GetFiles(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	var novedad Novedades
+	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
+	if err != nil {
+		return c.SendString("novedad no encontrada")
+	}
+
+	if c.Query("nombre") != "" {
+		nombre := c.Query("nombre")
+		existeArchivo, _ := findInStringArray(novedad.Adjuntos, nombre)
+		if !strings.Contains(nombre, "/") && strings.Count(nombre, ".") == 1 && (existeArchivo || novedad.AdjuntoMotivo == nombre) {
+			return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", c.Query("nombre")))
+		} else {
+			return c.SendString("nombre invalido")
+		}
+	}
+	if c.Query("pos") != "" {
+		posicion, _ := strconv.Atoi(c.Query("pos"))
+		if len(novedad.Adjuntos) <= posicion {
+			return c.SendString("posicion inexistente")
+		}
+		return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", novedad.Adjuntos[posicion]))
+	}
+	return c.SendString("debe especificar el archivo")
 }
 
 // ----Tipo Novedades----
@@ -438,4 +484,13 @@ func resumenNovedad(novedad Novedades) string {
 		resumen = string(resumenJson)
 	}
 	return resumen
+}
+
+func findInStringArray(arrayString []string, palabra string) (bool, int) {
+	for posicion, dato := range arrayString {
+		if dato == palabra {
+			return true, posicion
+		}
+	}
+	return false, len(arrayString)
 }

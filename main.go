@@ -5,7 +5,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/template/html"
 	"github.com/proyectoNovedades/servicios/actividades"
-	"github.com/proyectoNovedades/servicios/files"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
@@ -145,6 +144,9 @@ func main() {
 		app.Get("/Novedad", novedades.GetNovedadesAll)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
+		//obtener adjuntos novedades
+		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
+
 		//Tipo Novedades
 		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
 
@@ -164,9 +166,6 @@ func main() {
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
-
-		//Upload File
-		app.Post("/Upload", files.UploadFile)
 
 		//GoogleUser
 		app.Get("/user/:tokenString", userGoogle.ValidateGoogleJWT)
