@@ -169,11 +169,14 @@ func main() {
 		app.Get("/Recurso", recursos.GetRecursoAll)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 
+<<<<<<< HEAD
 		//GoogleUser
 		app.Get("/user/:tokenString", userGoogle.ValidateGoogleJWT)
 
+=======
 	} else {
 		fmt.Println("Problema al conectarse con mongo")
+>>>>>>> 1.3.7
 	}
 
 	if connectedWithSql {
