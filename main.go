@@ -47,6 +47,8 @@ func main() {
 
 	if connectedWithMongo {
 
+		fmt.Println("Conectado con mongo")
+
 		//Actividades
 		app.Post("/Actividad", actividades.InsertActividad)
 		app.Get("/Actividad/:id", actividades.GetActividad)
@@ -84,9 +86,13 @@ func main() {
 		app.Get("/Recurso", recursos.GetRecursoAll)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 
+	} else {
+		fmt.Println("Problema al conectarse con mongo")
 	}
 
 	if connectedWithSql {
+		fmt.Println("Conectado con la base sql")
+
 		//User
 		app.Post("/User", user.CreateUser)
 		app.Get("/User/:item", user.GetUser)
@@ -95,6 +101,8 @@ func main() {
 
 		//Login
 		app.Post("/Login", user.Login)
+	} else {
+		fmt.Println("Problema al conectado con la base sql")
 	}
 
 	//----Google----
