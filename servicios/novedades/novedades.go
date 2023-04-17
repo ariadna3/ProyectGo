@@ -197,6 +197,9 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	if c.Query("estado") != "" {
 		busqueda["estado"] = bson.M{"$regex": c.Query("estado"), "$options": "im"}
 	}
+	if c.Query("aprobador") != "" {
+		busqueda["aprobador"] = bson.M{"$regex": c.Query("aprobador"), "$options": "im"}
+	}
 
 	cursor, err := coll.Find(context.TODO(), busqueda)
 	fmt.Println(coll)
