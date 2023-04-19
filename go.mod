@@ -6,6 +6,7 @@ require go.mongodb.org/mongo-driver v1.11.4
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
@@ -32,25 +33,25 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
-	github.com/go-sql-driver/mysql v1.6.0 // indirect
-	github.com/gofiber/fiber/v2 v2.43.0
-	github.com/gofiber/template v1.7.2
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
+	github.com/gofiber/fiber/v2 v2.44.0
+	github.com/gofiber/template v1.8.1
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/sessions v1.2.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/joho/godotenv v1.4.0
+	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.16.3 // indirect
-	github.com/markbates/goth v1.75.1
+	github.com/markbates/goth v1.77.0
 	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.17 // indirect
+	github.com/mattn/go-isatty v0.0.18 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/shareed2k/goth_fiber v0.2.9
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.45.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/sys v0.6.0 // indirect
-	gorm.io/driver/mysql v1.4.3
-	gorm.io/gorm v1.24.0
+	golang.org/x/sys v0.7.0 // indirect
+	gorm.io/driver/mysql v1.5.0
+	gorm.io/gorm v1.25.0
 )
