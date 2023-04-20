@@ -127,10 +127,11 @@ func InsertNovedad(c *fiber.Ctx) error {
 	form, err := c.MultipartForm()
 	if err != nil {
 		fmt.Println("No se subieron archivos")
-	}
-	for _, fileHeaders := range form.File {
-		for _, fileHeader := range fileHeaders {
-			c.SaveFile(fileHeader, fmt.Sprintf("./archivosSubidos/%s", fileHeader.Filename))
+	} else {
+		for _, fileHeaders := range form.File {
+			for _, fileHeader := range fileHeaders {
+				c.SaveFile(fileHeader, fmt.Sprintf("./archivosSubidos/%s", fileHeader.Filename))
+			}
 		}
 	}
 
