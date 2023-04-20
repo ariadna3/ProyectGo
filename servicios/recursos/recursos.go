@@ -27,12 +27,14 @@ type Recursos struct {
 	Fecha       time.Time `bson:"date"`
 	FechaString string    `bson:"fechaString"`
 	Sueldo      int       `bson:"sueldo"`
-	Porc        []P       `bson:"p"`
+	Rcc         []P       `bson:"p"`
 }
 
 type P struct {
-	Cc     string  `bson:"cc"`
-	PorcCC float32 `bson:"porcCC"`
+	CcNum     string  `bson:"cc"`
+	CcPorc    float32 `bson:"porcCC"`
+	CcNombre  string  `bson:"ccNombre"`
+	CcCliente string  `bson:"ccCliente"`
 }
 
 type Cecos struct {
@@ -88,54 +90,15 @@ func InsertRecurso(c *fiber.Ctx) error {
 func GetRecurso(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"idRecurso": idNumber})
+	var recurso Recursos
+	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
-	}
-	var recursos []Recursos
-	if err = cursor.All(context.Background(), &recursos); err != nil {
-		fmt.Print(err)
+		return c.SendString("No encontrado")
 	}
 
-	var recursosInterface []interface{}
-	for _, recurso := range recursos {
-		recursoI := map[string]interface{}{
-			"IdRecurso": recurso.IdRecurso,
-			"Nombre":    recurso.Nombre,
-			"Apellido":  recurso.Apellido,
-			"Legajo":    recurso.Legajo,
-			"Mail":      recurso.Mail,
-			"Fecha":     recurso.Fecha,
-			"Sueldo":    recurso.Sueldo,
-		}
-		var sliceDePorcentajes []map[string]interface{}
-		for _, p := range recurso.Porc {
-			porcentaje := map[string]interface{}{
-				"ccNum":     p.Cc,
-				"ccNombre":  "No encontrado",
-				"ccCliente": "No encontrado",
-				"ccPorc":    p.PorcCC,
-			}
-
-			coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
-			codigoInt, _ := strconv.Atoi(p.Cc)
-			filter := bson.D{{"codigo", codigoInt}}
-			var result Cecos
-			err = coll.FindOne(context.TODO(), filter).Decode(&result)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				porcentaje["ccNombre"] = result.Cliente
-				porcentaje["ccCliente"] = result.Descripcion
-			}
-			sliceDePorcentajes = append(sliceDePorcentajes, porcentaje)
-		}
-		recursoI["Rcc"] = sliceDePorcentajes
-		recursosInterface = append(recursosInterface, recursoI)
-	}
-
-	return c.JSON(recursosInterface)
+	return c.JSON(recurso)
 }
 
 // obtener todos los recursos
@@ -143,13 +106,14 @@ func GetRecursoAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(err)
 	}
-	var recurso []Recursos
-	if err = cursor.All(context.Background(), &recurso); err != nil {
-		fmt.Print(err)
+	var recursos []Recursos
+	if err = cursor.All(context.Background(), &recursos); err != nil {
+		fmt.Println(err)
 	}
-	return c.JSON(recurso)
+
+	return c.JSON(recursos)
 }
 
 // borrar recurso por id
