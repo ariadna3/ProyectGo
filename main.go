@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/template/html"
 	"github.com/proyectoNovedades/servicios/actividades"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
@@ -112,10 +111,7 @@ func main() {
 	goth.UseProviders(
 		google.New(os.Getenv("GOOGLEKEY"), os.Getenv("GOOGLESEC"), os.Getenv("GOOGLECALLBACK")),
 	)
-	engine := html.New("./servicios/user/template", ".html")
-	app := fiber.New(fiber.Config{
-		Views: engine,
-	})
+	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: os.Getenv("PUERTOCORS"),
@@ -219,7 +215,10 @@ func main() {
 	})
 
 	fmt.Println(os.Getenv("PUERTO"))
-	app.Listen(os.Getenv("PUERTO"))
+	err := app.Listen(os.Getenv("PUERTO"))
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func goDotEnvVariable(key string) string {

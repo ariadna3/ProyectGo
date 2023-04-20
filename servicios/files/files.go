@@ -23,7 +23,7 @@ func UploadFile(c *fiber.Ctx) error {
 	if err == nil {
 
 		c.SaveFile(file, fmt.Sprintf("./%s", file.Filename))
-		c.SaveFile(file, fmt.Sprintf("./uploads/%s", file.Filename))
+		c.SaveFile(file, fmt.Sprintf("./archivosSubidos/%s", file.Filename))
 		c.SaveFile(file, fmt.Sprintf("/tmp/uploads_relative/%s", file.Filename))
 	}
 	return (c.SendString("Subido"))

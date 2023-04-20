@@ -35,6 +35,14 @@ type P struct {
 	PorcCC float32 `bson:"porcCC"`
 }
 
+type Cecos struct {
+	IdCecos     int    `bson:"idCecos"`
+	Descripcion string `bson:"descripcioncecos"`
+	Cliente     string `bson:"cliente"`
+	Proyecto    string `bson:"proyecto"`
+	Codigo      int    `bson:"codigo"`
+}
+
 // fecha de ingreso
 func GetFecha(c *fiber.Ctx) error {
 	var fecha []string
@@ -85,11 +93,49 @@ func GetRecurso(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Print(err)
 	}
-	var recurso []Recursos
-	if err = cursor.All(context.Background(), &recurso); err != nil {
+	var recursos []Recursos
+	if err = cursor.All(context.Background(), &recursos); err != nil {
 		fmt.Print(err)
 	}
-	return c.JSON(recurso)
+
+	var recursosInterface []interface{}
+	for _, recurso := range recursos {
+		recursoI := map[string]interface{}{
+			"IdRecurso": recurso.IdRecurso,
+			"Nombre":    recurso.Nombre,
+			"Apellido":  recurso.Apellido,
+			"Legajo":    recurso.Legajo,
+			"Mail":      recurso.Mail,
+			"Fecha":     recurso.Fecha,
+			"Sueldo":    recurso.Sueldo,
+		}
+		var sliceDePorcentajes []map[string]interface{}
+		for _, p := range recurso.Porc {
+			porcentaje := map[string]interface{}{
+				"ccNum":     p.Cc,
+				"ccNombre":  "No encontrado",
+				"ccCliente": "No encontrado",
+				"ccPorc":    p.PorcCC,
+			}
+
+			coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+			codigoInt, _ := strconv.Atoi(p.Cc)
+			filter := bson.D{{"codigo", codigoInt}}
+			var result Cecos
+			err = coll.FindOne(context.TODO(), filter).Decode(&result)
+			if err != nil {
+				fmt.Println(err)
+			} else {
+				porcentaje["ccNombre"] = result.Cliente
+				porcentaje["ccCliente"] = result.Descripcion
+			}
+			sliceDePorcentajes = append(sliceDePorcentajes, porcentaje)
+		}
+		recursoI["Rcc"] = sliceDePorcentajes
+		recursosInterface = append(recursosInterface, recursoI)
+	}
+
+	return c.JSON(recursosInterface)
 }
 
 // obtener todos los recursos
