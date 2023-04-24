@@ -447,6 +447,7 @@ func resumenNovedad(novedad Novedades) string {
 			"ImporteTotal":   novedad.ImporteTotal,
 			"Adjuntos":       novedad.Adjuntos,
 			"Distribuciones": novedad.Distribuciones,
+			"Comentarios":    novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "HE" || novedad.Tipo == "IG" {
@@ -457,6 +458,7 @@ func resumenNovedad(novedad Novedades) string {
 			"ImporteTotal": novedad.ImporteTotal,
 			"Adjuntos":     novedad.Adjuntos,
 			"Recursos":     novedad.Recursos,
+			"Comentarios":  novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "FS" {
@@ -468,6 +470,7 @@ func resumenNovedad(novedad Novedades) string {
 			"Adjuntos":      novedad.Adjuntos,
 			"Recursos":      novedad.Recursos,
 			"OrdenDeCompra": novedad.OrdenDeCompra,
+			"Comentarios":   novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "RH" {
@@ -477,6 +480,7 @@ func resumenNovedad(novedad Novedades) string {
 			"Adjuntos":       novedad.Adjuntos,
 			"Recursos":       novedad.Recursos,
 			"Distribuciones": novedad.Distribuciones,
+			"Comentarios":    novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "NP" {
@@ -485,6 +489,7 @@ func resumenNovedad(novedad Novedades) string {
 			"Usuario":     novedad.Usuario,
 			"Adjuntos":    novedad.Adjuntos,
 			"Periodo":     novedad.Periodo,
+			"Comentarios": novedad.Comentarios,
 		}
 	}
 	resumenJson, err := json.Marshal(resumenDict)
