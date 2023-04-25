@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -121,6 +122,15 @@ func InsertNovedad(c *fiber.Ctx) error {
 		novedad.IdSecuencial = 1
 	} else {
 		novedad.IdSecuencial = results[0].IdSecuencial + 1
+	}
+
+	//crear carpeta para ingrear los archivos
+	_, err := os.Stat("archivosSubidos")
+	if os.IsNotExist(err) {
+		err := os.Mkdir("archivosSubidos", 0755)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	//ingresa los archivos los archivos
