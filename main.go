@@ -166,7 +166,9 @@ func main() {
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 
 		//GoogleUser
-		app.Get("/user/:tokenString", userGoogle.ValidateGoogleJWT)
+		app.Post("/user", userGoogle.InsertUserITP)
+		app.Get("/user", userGoogle.GetSelfUserITP)
+		app.Get("/user/:email", userGoogle.GetUserITP)
 
 	} else {
 		fmt.Println("Problema al conectarse con mongo")

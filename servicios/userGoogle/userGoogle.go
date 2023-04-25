@@ -1,16 +1,19 @@
 package userGoogle
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -18,6 +21,19 @@ var client *mongo.Client
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
 	client = clientMongo
+}
+
+type UserITPVerification struct {
+	Token           string
+	Email           string
+	EsAdministrador bool
+	Rol             string
+}
+
+type UserITP struct {
+	Email           string `bson:"email"`
+	EsAdministrador bool   `bson:"esAdministrador"`
+	Rol             string `bson:"rol"`
 }
 
 type GoogleClaims struct {
@@ -50,8 +66,124 @@ func getGooglePublicKey(keyID string) (string, error) {
 	return key, nil
 }
 
-func ValidateGoogleJWT(c *fiber.Ctx) error {
-	tokenString := c.Params("tokenString")
+func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, token string) error {
+	//valida el token
+	err, email := ValidateGoogleJWT(token)
+	if err != nil {
+		return err
+	}
+	//valida el mail
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	var usuario UserITP
+	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
+	if err2 != nil {
+		return errors.New("email no encontrado")
+	}
+
+	if obligatorioAdministrador && usuario.EsAdministrador == false {
+		return errors.New("el usuario no tiene permiso para esta acción, no es administrador")
+	}
+
+	if rolEsperado != "" && rolEsperado == usuario.Rol {
+		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol")
+	}
+
+	return nil
+}
+
+func InsertUserITP(c *fiber.Ctx) error {
+	//obtiene los datos
+	var body UserITPVerification
+	userITP := new(UserITP)
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	//valida el token
+	if body.Token != "" {
+		err := validacionDeUsuario(true, "", body.Token)
+		if err != nil {
+			return c.Status(403).SendString(err.Error())
+		}
+	}
+
+	//ingresa los datos
+	userITP.Email = body.Email
+	userITP.EsAdministrador = body.EsAdministrador
+	userITP.Rol = body.Rol
+
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+
+	//inserta el usuario
+	result, err := coll.InsertOne(context.TODO(), userITP)
+	if err != nil {
+		return c.SendString(err.Error())
+	}
+
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return c.JSON(userITP)
+}
+
+func GetUserITP(c *fiber.Ctx) error {
+	//obtiene los datos
+	var body UserITPVerification
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	//valida el token
+	if body.Token != "" {
+		err := validacionDeUsuario(true, "", body.Token)
+		if err != nil {
+			return c.Status(403).SendString(err.Error())
+		}
+	}
+
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	email, _ := strconv.Atoi(c.Params("email"))
+	var usuario UserITP
+	err := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
+	if err != nil {
+		return c.SendString("novedad no encontrada")
+	}
+	return c.JSON(usuario)
+}
+
+func GetSelfUserITP(c *fiber.Ctx) error {
+	//obtiene los datos
+	var body UserITPVerification
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	//valida el token
+	if body.Token != "" {
+		err := validacionDeUsuario(true, "", body.Token)
+		if err != nil {
+			return c.Status(403).SendString(err.Error())
+		}
+	}
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	userITP := new(UserITP)
+	err := coll.FindOne(context.TODO(), bson.M{"email": body.Email}).Decode(&userITP)
+	if err != nil {
+		return c.SendString("usuario no encontrada")
+	}
+	return c.JSON(userITP)
+}
+
+func DeleteUserITP(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	email, _ := strconv.Atoi(c.Params("email"))
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"email": email})
+	if err != nil {
+		return c.SendString(err.Error())
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	return c.SendString("novedad eliminada")
+}
+
+func ValidateGoogleJWT(tokenString string) (error, string) {
 	claimsStruct := GoogleClaims{}
 
 	token, err := jwt.ParseWithClaims(
@@ -70,27 +202,27 @@ func ValidateGoogleJWT(c *fiber.Ctx) error {
 		},
 	)
 	if err != nil {
-		return err
+		return err, ""
 	}
 
 	claims, ok := token.Claims.(*GoogleClaims)
 	if !ok {
-		return errors.New("Invalid Google JWT")
+		return errors.New("Invalid Google JWT"), ""
 	}
 
 	if claims.Issuer != "accounts.google.com" && claims.Issuer != "https://accounts.google.com" {
-		return errors.New("iss is invalid")
+		return errors.New("iss is invalid"), ""
 	}
 
 	if claims.Audience != os.Getenv("GOOGLEKEY") {
-		return errors.New("aud is invalid")
+		return errors.New("aud is invalid"), ""
 	}
 
 	if claims.ExpiresAt < time.Now().UTC().Unix() {
-		return errors.New("JWT is expired")
+		return errors.New("JWT is expired"), ""
 	}
 
-	return c.JSON(*claims)
+	return nil, *&claims.Email
 }
 
 /*
