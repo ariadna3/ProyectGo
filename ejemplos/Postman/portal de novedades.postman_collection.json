@@ -1104,10 +1104,35 @@
 				{
 					"name": "InsertEmail",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Email",
+									"value": "lgonzalez@itpatagonia.com",
+									"type": "default"
+								},
+								{
+									"key": "EsAdministrador",
+									"value": "false",
+									"type": "default"
+								},
+								{
+									"key": "",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "Token",
+									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI0NDY4OTAsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNDQ3MTkwLCJleHAiOjE2ODI0NTA3OTAsImp0aSI6ImQ0ZTliODQyYTE1YTlkYTliNDg0NWRhODExYzg4YTlhZjI0YzA2ZDMifQ.GiQnuE2kedJFoOR7A9ZHOtU9_zDdqpwQGqGwE7SrYVP3ULzbEar2TmOCCBOOwpfC2QvoA5z2KHRINQglCaHwatUVZboBm51FnCfsYM3UkXAMSmnzvrS7rLwgGdBWtdC_HaAnlS3SQZP9NCFgRnBkffi_TaxoWqLTUsY0VSoWg6Dd5X7GOLN3PVuWxSvwCZH7aMdPfDv8Zx2QOGevprHrLz8XcnMlHJf8uSam56aki94pvo9RanK5VMG7mYHe9pQZGqnOQlZ680-qkjSzkQS8DZ83JXI3fpZ_Ixt4UwedjVBew8nEH896F8NlarZP-4woZEoyteD2UNxUg1coIeY9rw",
+									"type": "default"
+								}
+							]
+						},
 						"url": {
-							"raw": "http://127.0.0.1:3000/user/eyJhbGciOiJSUzI1NiIsImtpZCI6IjFhYWU4ZDdjOTIwNThiNWVlYTQ1Njg5NWJmODkwODQ1NzFlMzA2ZjMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODAwOTc0OTYsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgwMDk3Nzk2LCJleHAiOjE2ODAxMDEzOTYsImp0aSI6ImM5Yzg4MDEwMmI2ZDI4NzYyODYyNmM3MzllYWMxMjNkZGQ4MmQ2ZTEifQ.iuMgE3rY3Hs86jg1TCK_WnG7EgmqZYCBY52PAV2hXr3AO4vN3xxQ00bxn54eukrgWOAJnEj1giMrpMWb9b3jkDwhXU58IdqzXh9OdsK3j5-vGIFde8tYQzNHZgPS4kmodi9KmuS3iUfdZrWRlPgkZxyaEvQDlT031vNwxhf7JBhzUrx3XKXi7Q2NLhJFzeHqLsbjHnAoq8Skt36ie4IAOGoIGcfcy9iU-pEJYXdxGuNSO8m0nwnrC6PodQp4gd1mLOQNXPsYjaPK_GPKlkLSemPyQww-IFmiriNwFkTVN8cVx88L0e0xHUtaqYFNfhzOkHsS9mA9bU9KqJZvP-G1bA",
+							"raw": "http://127.0.0.1:4000/user",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -1115,12 +1140,27 @@
 								"0",
 								"1"
 							],
-							"port": "3000",
+							"port": "4000",
 							"path": [
-								"user",
-								"eyJhbGciOiJSUzI1NiIsImtpZCI6IjFhYWU4ZDdjOTIwNThiNWVlYTQ1Njg5NWJmODkwODQ1NzFlMzA2ZjMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODAwOTc0OTYsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgwMDk3Nzk2LCJleHAiOjE2ODAxMDEzOTYsImp0aSI6ImM5Yzg4MDEwMmI2ZDI4NzYyODYyNmM3MzllYWMxMjNkZGQ4MmQ2ZTEifQ.iuMgE3rY3Hs86jg1TCK_WnG7EgmqZYCBY52PAV2hXr3AO4vN3xxQ00bxn54eukrgWOAJnEj1giMrpMWb9b3jkDwhXU58IdqzXh9OdsK3j5-vGIFde8tYQzNHZgPS4kmodi9KmuS3iUfdZrWRlPgkZxyaEvQDlT031vNwxhf7JBhzUrx3XKXi7Q2NLhJFzeHqLsbjHnAoq8Skt36ie4IAOGoIGcfcy9iU-pEJYXdxGuNSO8m0nwnrC6PodQp4gd1mLOQNXPsYjaPK_GPKlkLSemPyQww-IFmiriNwFkTVN8cVx88L0e0xHUtaqYFNfhzOkHsS9mA9bU9KqJZvP-G1bA"
+								"user"
 							]
 						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetSelfUser",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "GetUser",
+					"request": {
+						"method": "GET",
+						"header": []
 					},
 					"response": []
 				}
