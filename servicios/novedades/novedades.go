@@ -141,10 +141,11 @@ func InsertNovedad(c *fiber.Ctx) error {
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
+		fmt.Println("fail")
 	}
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.JSON(novedad)
+	return c.SendString("ok")
 }
 
 // obtener novedad por id
