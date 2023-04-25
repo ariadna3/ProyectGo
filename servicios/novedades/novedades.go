@@ -42,6 +42,8 @@ type Novedades struct {
 	OrdenDeCompra         string              `bson:"ordenDeCompra"`
 	Resumen               string              `bson:"resumen"`
 	Aprobador             string              `bson:"aprobador"`
+	Prioridad             string              `bson:"prioridad"`
+	Reclamo               bool                `bson:"reclamo"`
 }
 
 const (
