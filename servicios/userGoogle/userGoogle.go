@@ -24,13 +24,6 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 	client = clientMongo
 }
 
-type UserITPVerification struct {
-	Token           string
-	Email           string
-	EsAdministrador bool
-	Rol             string
-}
-
 type UserITP struct {
 	Email           string `bson:"email"`
 	EsAdministrador bool   `bson:"esAdministrador"`
@@ -93,25 +86,29 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 }
 
 func InsertUserITP(c *fiber.Ctx) error {
+
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
+
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+	fmt.Println(tokenString)
+
+	//valida el token
+	err2, _ := validacionDeUsuario(true, "", tokenString)
+	if err2 != nil {
+		return c.Status(403).SendString(err2.Error())
+	}
+
 	//obtiene los datos
-	var body UserITPVerification
+	var body UserITP
 	userITP := new(UserITP)
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
-
-	//valida el token
-	if body.Token != "" {
-		err, _ := validacionDeUsuario(true, "", body.Token)
-		if err != nil {
-			return c.Status(403).SendString(err.Error())
-		}
-	}
-
-	//ingresa los datos
-	userITP.Email = body.Email
-	userITP.EsAdministrador = body.EsAdministrador
-	userITP.Rol = body.Rol
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 

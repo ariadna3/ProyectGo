@@ -1104,6 +1104,16 @@
 				{
 					"name": "InsertEmail",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI1MTg4NTgsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNTE5MTU4LCJleHAiOjE2ODI1MjI3NTgsImp0aSI6Ijk2ZmFkMzg3YmFhMDg1ZGQzZDdhMjNjMGJkMGQ2ODZkMmEzMWQ0NjEifQ.oS2vwGmB8OVfLPvkO5mc44BGeJcIOrLTeYui-kv-7EZE_QpBZR8p62Nqh8I_tYJQqbOYqvZclJrcfUTe2GYdUhpR_el-H2u6aGLqsjEN1Ss8sZZfv0WXnesL2uQKSwja-V2G_kEJnJs8btd8JjHJp3-9eBRKJmtO3KQPIDgWOcSArMRWNY7-W9kKLQ6WNAYsXsgfReSK-1mtXoMOubcaJ7uQkNGCMNzgEEqTuON5gP6n6tA2TfvOu5SBvIQXW4Hg5WNQfHOaEJsVYd6hpTy_ECqQeGEpzApxt1OSjm561aHKNre_PTx3Un4woy2SJEPgzYGOl01Gkqy6dX1yAeci_w",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -1127,7 +1137,8 @@
 								{
 									"key": "Token",
 									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI0NDY4OTAsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNDQ3MTkwLCJleHAiOjE2ODI0NTA3OTAsImp0aSI6ImQ0ZTliODQyYTE1YTlkYTliNDg0NWRhODExYzg4YTlhZjI0YzA2ZDMifQ.GiQnuE2kedJFoOR7A9ZHOtU9_zDdqpwQGqGwE7SrYVP3ULzbEar2TmOCCBOOwpfC2QvoA5z2KHRINQglCaHwatUVZboBm51FnCfsYM3UkXAMSmnzvrS7rLwgGdBWtdC_HaAnlS3SQZP9NCFgRnBkffi_TaxoWqLTUsY0VSoWg6Dd5X7GOLN3PVuWxSvwCZH7aMdPfDv8Zx2QOGevprHrLz8XcnMlHJf8uSam56aki94pvo9RanK5VMG7mYHe9pQZGqnOQlZ680-qkjSzkQS8DZ83JXI3fpZ_Ixt4UwedjVBew8nEH896F8NlarZP-4woZEoyteD2UNxUg1coIeY9rw",
-									"type": "default"
+									"type": "default",
+									"disabled": true
 								}
 							]
 						},
@@ -1151,16 +1162,82 @@
 				{
 					"name": "GetSelfUser",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI1MTg4NTgsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNTE5MTU4LCJleHAiOjE2ODI1MjI3NTgsImp0aSI6Ijk2ZmFkMzg3YmFhMDg1ZGQzZDdhMjNjMGJkMGQ2ODZkMmEzMWQ0NjEifQ.oS2vwGmB8OVfLPvkO5mc44BGeJcIOrLTeYui-kv-7EZE_QpBZR8p62Nqh8I_tYJQqbOYqvZclJrcfUTe2GYdUhpR_el-H2u6aGLqsjEN1Ss8sZZfv0WXnesL2uQKSwja-V2G_kEJnJs8btd8JjHJp3-9eBRKJmtO3KQPIDgWOcSArMRWNY7-W9kKLQ6WNAYsXsgfReSK-1mtXoMOubcaJ7uQkNGCMNzgEEqTuON5gP6n6tA2TfvOu5SBvIQXW4Hg5WNQfHOaEJsVYd6hpTy_ECqQeGEpzApxt1OSjm561aHKNre_PTx3Un4woy2SJEPgzYGOl01Gkqy6dX1yAeci_w",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:4000/user",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "4000",
+							"path": [
+								"user"
+							],
+							"query": [
+								{
+									"key": "Email",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "esAdministrador",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "GetUser",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI1MTg4NTgsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNTE5MTU4LCJleHAiOjE2ODI1MjI3NTgsImp0aSI6Ijk2ZmFkMzg3YmFhMDg1ZGQzZDdhMjNjMGJkMGQ2ODZkMmEzMWQ0NjEifQ.oS2vwGmB8OVfLPvkO5mc44BGeJcIOrLTeYui-kv-7EZE_QpBZR8p62Nqh8I_tYJQqbOYqvZclJrcfUTe2GYdUhpR_el-H2u6aGLqsjEN1Ss8sZZfv0WXnesL2uQKSwja-V2G_kEJnJs8btd8JjHJp3-9eBRKJmtO3KQPIDgWOcSArMRWNY7-W9kKLQ6WNAYsXsgfReSK-1mtXoMOubcaJ7uQkNGCMNzgEEqTuON5gP6n6tA2TfvOu5SBvIQXW4Hg5WNQfHOaEJsVYd6hpTy_ECqQeGEpzApxt1OSjm561aHKNre_PTx3Un4woy2SJEPgzYGOl01Gkqy6dX1yAeci_w",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/user/lgonzalez@itpatagonia.com",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								"lgonzalez@itpatagonia.com"
+							]
+						}
 					},
 					"response": []
 				}
