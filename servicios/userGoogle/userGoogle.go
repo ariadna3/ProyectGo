@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -125,52 +126,56 @@ func InsertUserITP(c *fiber.Ctx) error {
 }
 
 func GetUserITP(c *fiber.Ctx) error {
-	//obtiene los datos
-	var body UserITPVerification
-	if err := c.BodyParser(&body); err != nil {
-		return c.Status(503).SendString(err.Error())
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
 	}
 
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+	fmt.Println(tokenString)
+
 	//valida el token
-	if body.Token != "" {
-		err, _ := validacionDeUsuario(true, "", body.Token)
-		if err != nil {
-			return c.Status(403).SendString(err.Error())
-		}
+	err, _ := validacionDeUsuario(true, "", tokenString)
+	if err != nil {
+		return c.Status(403).SendString(err.Error())
 	}
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 	email, _ := strconv.Atoi(c.Params("email"))
 	var usuario UserITP
-	err := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
-	if err != nil {
+	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
+	if err2 != nil {
 		return c.SendString("novedad no encontrada")
 	}
 	return c.JSON(usuario)
 }
 
 func GetSelfUserITP(c *fiber.Ctx) error {
-	//obtiene los datos
-	var body UserITPVerification
-	if err := c.BodyParser(&body); err != nil {
-		return c.Status(503).SendString(err.Error())
+
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
 	}
 
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+	fmt.Println(tokenString)
+
 	//valida el token
-	if body.Token != "" {
-		err, email := validacionDeUsuario(true, "", body.Token)
-		if err != nil {
-			return c.Status(403).SendString(err.Error())
-		}
-		coll := client.Database("portalDeNovedades").Collection("usersITP")
-		userITP := new(UserITP)
-		err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
-		if err2 != nil {
-			return c.SendString("usuario no encontrado")
-		}
-		return c.JSON(userITP)
+	err, email := validacionDeUsuario(true, "", tokenString)
+	if err != nil {
+		return c.Status(403).SendString(err.Error())
 	}
-	return c.SendString("token no recibido")
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	userITP := new(UserITP)
+	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
+	if err2 != nil {
+		return c.SendString("usuario no encontrado")
+	}
+	return c.JSON(userITP)
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
