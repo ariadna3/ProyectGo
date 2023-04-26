@@ -66,29 +66,29 @@ func getGooglePublicKey(keyID string) (string, error) {
 	return key, nil
 }
 
-func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, token string) error {
+func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, token string) (error, string) {
 	//valida el token
 	err, email := ValidateGoogleJWT(token)
 	if err != nil {
-		return err
+		return err, ""
 	}
 	//valida el mail
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 	var usuario UserITP
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 	if err2 != nil {
-		return errors.New("email no encontrado")
+		return errors.New("email no encontrado"), ""
 	}
 
 	if obligatorioAdministrador && usuario.EsAdministrador == false {
-		return errors.New("el usuario no tiene permiso para esta acción, no es administrador")
+		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), ""
 	}
 
 	if rolEsperado != "" && rolEsperado == usuario.Rol {
-		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol")
+		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), ""
 	}
 
-	return nil
+	return nil, email
 }
 
 func InsertUserITP(c *fiber.Ctx) error {
@@ -101,7 +101,7 @@ func InsertUserITP(c *fiber.Ctx) error {
 
 	//valida el token
 	if body.Token != "" {
-		err := validacionDeUsuario(true, "", body.Token)
+		err, _ := validacionDeUsuario(true, "", body.Token)
 		if err != nil {
 			return c.Status(403).SendString(err.Error())
 		}
@@ -133,7 +133,7 @@ func GetUserITP(c *fiber.Ctx) error {
 
 	//valida el token
 	if body.Token != "" {
-		err := validacionDeUsuario(true, "", body.Token)
+		err, _ := validacionDeUsuario(true, "", body.Token)
 		if err != nil {
 			return c.Status(403).SendString(err.Error())
 		}
@@ -158,18 +158,19 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 
 	//valida el token
 	if body.Token != "" {
-		err := validacionDeUsuario(true, "", body.Token)
+		err, email := validacionDeUsuario(true, "", body.Token)
 		if err != nil {
 			return c.Status(403).SendString(err.Error())
 		}
+		coll := client.Database("portalDeNovedades").Collection("usersITP")
+		userITP := new(UserITP)
+		err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
+		if err2 != nil {
+			return c.SendString("usuario no encontrado")
+		}
+		return c.JSON(userITP)
 	}
-	coll := client.Database("portalDeNovedades").Collection("usersITP")
-	userITP := new(UserITP)
-	err := coll.FindOne(context.TODO(), bson.M{"email": body.Email}).Decode(&userITP)
-	if err != nil {
-		return c.SendString("usuario no encontrada")
-	}
-	return c.JSON(userITP)
+	return c.SendString("token no recibido")
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
