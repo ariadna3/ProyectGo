@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -140,11 +139,11 @@ func GetUserITP(c *fiber.Ctx) error {
 	}
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
-	email, _ := strconv.Atoi(c.Params("email"))
+	email := c.Params("email")
 	var usuario UserITP
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 	if err2 != nil {
-		return c.SendString("novedad no encontrada")
+		return c.SendString("usuario no encontrada")
 	}
 	return c.JSON(usuario)
 }
@@ -190,13 +189,13 @@ func DeleteUserITP(c *fiber.Ctx) error {
 	err, _ := validacionDeUsuario(true, "", tokenString)
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
-	emailDelete, _ := strconv.Atoi(c.Params("email"))
+	emailDelete := c.Params("email")
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"email": emailDelete})
 	if err != nil {
 		return c.SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
-	return c.SendString("novedad eliminada")
+	return c.SendString("usuario eliminado")
 }
 
 func UpdateUserITP(c *fiber.Ctx) error {
