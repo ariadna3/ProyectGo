@@ -85,27 +85,26 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 }
 
 func InsertUserITP(c *fiber.Ctx) error {
+	/*
+		authHeader := c.Get("Authorization")
+		if authHeader == "" {
+			// El token no está presente
+			return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+		}
 
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		// El token no está presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
-	}
+		// Parsea el token
+		tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+		fmt.Println(tokenString)
 
-	// Parsea el token
-	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(tokenString)
-
-	//valida el token
-	err2, _ := validacionDeUsuario(true, "", tokenString)
-	if err2 != nil {
-		return c.Status(403).SendString(err2.Error())
-	}
+		//valida el token
+		err2, _ := validacionDeUsuario(true, "", tokenString)
+		if err2 != nil {
+			return c.Status(403).SendString(err2.Error())
+		}*/
 
 	//obtiene los datos
-	var body UserITP
 	userITP := new(UserITP)
-	if err := c.BodyParser(&body); err != nil {
+	if err := c.BodyParser(&userITP); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
 
