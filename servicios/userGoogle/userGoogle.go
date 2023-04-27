@@ -103,7 +103,7 @@ func InsertUserITP(c *fiber.Ctx) error {
 	}
 
 	//obtiene los datos
-	userITP := new(UserITP)
+	var userITP UserITP
 	if err := c.BodyParser(&userITP); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
@@ -113,6 +113,7 @@ func InsertUserITP(c *fiber.Ctx) error {
 	//inserta el usuario
 	result, err := coll.InsertOne(context.TODO(), userITP)
 	if err != nil {
+
 		return c.SendString(err.Error())
 	}
 
