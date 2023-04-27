@@ -199,7 +199,7 @@ func DeleteUserITP(c *fiber.Ctx) error {
 	return c.SendString("novedad eliminada")
 }
 
-func UpdateUser(c *fiber.Ctx) error {
+func UpdateUserITP(c *fiber.Ctx) error {
 	authHeader := c.Get("Authorization")
 	if authHeader == "" {
 		// El token no está presente

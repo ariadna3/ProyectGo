@@ -169,7 +169,8 @@ func main() {
 		app.Post("/user", userGoogle.InsertUserITP)
 		app.Get("/user", userGoogle.GetSelfUserITP)
 		app.Get("/user/:email", userGoogle.GetUserITP)
-		app.Patch("/user", userGoogle.UpdateUser)
+		app.Delete("user/:email", userGoogle.DeleteUserITP)
+		app.Patch("/user", userGoogle.UpdateUserITP)
 
 	} else {
 		fmt.Println("Problema al conectarse con mongo")
