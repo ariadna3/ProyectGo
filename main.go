@@ -3,12 +3,12 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/template/html"
 	"github.com/proyectoNovedades/servicios/actividades"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/user"
+	"github.com/proyectoNovedades/servicios/userGoogle"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -27,19 +27,95 @@ import (
 	"os"
 )
 
+type Actividades struct {
+	IdActividad int    `bson:"idActividad"`
+	Usuario     string `bson:"usuario"`
+	Fecha       string `bson:"fecha"`
+	Hora        string `bson:"hora"`
+	Actividad   string `bson:"actividad"`
+}
+
+type Novedades struct {
+	IdSecuencial          int                 `bson:"idSecuencial"`
+	Tipo                  string              `bson:"tipo"`
+	Fecha                 string              `bson:"fecha"`
+	Hora                  string              `bson:"hora"`
+	Usuario               string              `bson:"usuario"`
+	Proveedor             string              `bson:"proveedor"`
+	Periodo               string              `bson:"periodo"`
+	ImporteTotal          float64             `bson:"importeTotal"`
+	ConceptoDeFacturacion string              `bson:"conceptoDeFacturacion"`
+	Adjuntos              []string            `bson:"adjuntos"`
+	Distribuciones        []Distribuciones    `bson:"distribuciones"`
+	Comentarios           string              `bson:"comentarios"`
+	Promovido             bool                `bson:"promovido"`
+	Cliente               string              `bson:"cliente"`
+	Estado                string              `bson:"estado"`
+	Motivo                string              `bson:"motivo"`
+	EnviarA               string              `bson:"enviarA"`
+	Contacto              string              `bson:"contacto"`
+	Plazo                 string              `bson:"plazo"`
+	Descripcion           string              `bson:"descripcion"`
+	Recursos              []RecursosNovedades `bson:"recursos"`
+	Cantidad              string              `bson:"cantidad"`
+	FechaDesde            string              `bson:"fechaDesde"`
+	FechaHasta            string              `bson:"fechaHasta"`
+}
+
+type TipoNovedad struct {
+	IdSecuencial int    `bson:"idSecuencial"`
+	Tipo         string `bson:"tipo"`
+	Descripcion  string `bson:"descripcion"`
+}
+
+type Cecos struct {
+	IdCecos          int    `bson:"idCecos"`
+	NCecos           string `bson:"nCecos"`
+	DescripcionCecos string `bson:"descripcionCecos"`
+	Cliente          string `bson:"cliente"`
+}
+
+type Distribuciones struct {
+	Porcentaje float64 `bson:"porcentaje"`
+	Cecos      Cecos   `bson:"cecos"`
+}
+
+type Proveedores struct {
+	IdProveedor int    `bson:"idProveedor"`
+	NumeroDoc   int    `bson:"numeroDoc"`
+	RazonSocial string `bson:"razonSocial"`
+}
+
+type RecursosNovedades struct {
+	Importe     int    `bson:"importe"`
+	Comentarios string `bson:"comentarios"`
+	Recurso     string `bson:"recurso"`
+	Periodo     string `bson:"periodo"`
+}
+
+type Recursos struct {
+	IdRecurso int    `bson:"idRecurso"`
+	Nombre    string `bson:"nombre"`
+	Apellido  string `bson:"apellido"`
+	Legajo    string `bson:"legajo"`
+	Mail      string `bson:"mail"`
+	Fecha     int    `bson:"date"`
+}
+
+type Files struct {
+	Nombre string `bson:"nombre"`
+}
+
 func main() {
 
 	goth.UseProviders(
 		google.New(os.Getenv("GOOGLEKEY"), os.Getenv("GOOGLESEC"), os.Getenv("GOOGLECALLBACK")),
 	)
-	engine := html.New("./servicios/user/template", ".html")
-	app := fiber.New(fiber.Config{
-		Views: engine,
-	})
+	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: os.Getenv("PUERTOCORS"),
-		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization, Access-Control-Allow-Headers",
 	}))
 
 	connectedWithMongo := createConnectionWithMongo()
@@ -66,6 +142,9 @@ func main() {
 		app.Get("/Novedad", novedades.GetNovedadesAll)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
+		//obtener adjuntos novedades
+		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
+
 		//Tipo Novedades
 		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
 
@@ -85,6 +164,13 @@ func main() {
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
+
+		//GoogleUser
+		app.Post("/user", userGoogle.InsertUserITP)
+		app.Get("/user", userGoogle.GetSelfUserITP)
+		app.Get("/user/:email", userGoogle.GetUserITP)
+		app.Delete("user/:email", userGoogle.DeleteUserITP)
+		app.Patch("/user", userGoogle.UpdateUserITP)
 
 	} else {
 		fmt.Println("Problema al conectarse con mongo")
@@ -133,7 +219,10 @@ func main() {
 	})
 
 	fmt.Println(os.Getenv("PUERTO"))
-	app.Listen(os.Getenv("PUERTO"))
+	err := app.Listen(os.Getenv("PUERTO"))
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func goDotEnvVariable(key string) string {
@@ -167,6 +256,7 @@ func createConnectionWithMongo() bool {
 		actividades.ConnectMongoDb(client)
 		proveedores.ConnectMongoDb(client)
 		recursos.ConnectMongoDb(client)
+		userGoogle.ConnectMongoDb(client)
 		return true
 	}
 	return false

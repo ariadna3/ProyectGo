@@ -27,12 +27,22 @@ type Recursos struct {
 	Fecha       time.Time `bson:"date"`
 	FechaString string    `bson:"fechaString"`
 	Sueldo      int       `bson:"sueldo"`
-	Porc        []P       `bson:"p"`
+	Rcc         []P       `bson:"p"`
 }
 
 type P struct {
-	Cc     string `bson:"cc"`
-	PorcCC string `bson:"porcCC"`
+	CcNum     string  `bson:"cc"`
+	CcPorc    float32 `bson:"porcCC"`
+	CcNombre  string  `bson:"ccNombre"`
+	CcCliente string  `bson:"ccCliente"`
+}
+
+type Cecos struct {
+	IdCecos     int    `bson:"idCecos"`
+	Descripcion string `bson:"descripcioncecos"`
+	Cliente     string `bson:"cliente"`
+	Proyecto    string `bson:"proyecto"`
+	Codigo      int    `bson:"codigo"`
 }
 
 // fecha de ingreso
@@ -55,9 +65,12 @@ func InsertRecurso(c *fiber.Ctx) error {
 	if err := c.BodyParser(recurso); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
+
+	//setea la fecha
 	recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaString)
 	fmt.Print(recurso.Fecha.Month())
 
+	//Obtiene el ultimo Id
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	filter := bson.D{}
 	opts := options.Find().SetSort(bson.D{{"idRecurso", -1}})
@@ -68,6 +81,22 @@ func InsertRecurso(c *fiber.Ctx) error {
 	cursor.All(context.TODO(), &results)
 
 	recurso.IdRecurso = results[0].IdRecurso + 1
+
+	//Obtiene los datos del ceco
+	collCeco := client.Database("portalDeNovedades").Collection("centroDeCostos")
+
+	for _, ceco := range recurso.Rcc {
+		codigoInt, _ := strconv.Atoi(ceco.CcNum)
+		filter := bson.D{{"codigo", codigoInt}}
+
+		var cecoEncontrado Cecos
+		collCeco.FindOne(context.TODO(), filter).Decode(&cecoEncontrado)
+
+		ceco.CcNombre = cecoEncontrado.Cliente
+		ceco.CcCliente = cecoEncontrado.Descripcion
+	}
+
+	//Ingresa el recurso
 	result, err := coll.InsertOne(context.TODO(), recurso)
 	if err != nil {
 		fmt.Print(err)
@@ -80,15 +109,14 @@ func InsertRecurso(c *fiber.Ctx) error {
 func GetRecurso(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
-	cursor, err := coll.Find(context.TODO(), bson.M{"idRecurso": idNumber})
+	var recurso Recursos
+	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
+		return c.SendString("No encontrado")
 	}
-	var recurso []Recursos
-	if err = cursor.All(context.Background(), &recurso); err != nil {
-		fmt.Print(err)
-	}
+
 	return c.JSON(recurso)
 }
 
@@ -97,13 +125,14 @@ func GetRecursoAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(err)
 	}
-	var recurso []Recursos
-	if err = cursor.All(context.Background(), &recurso); err != nil {
-		fmt.Print(err)
+	var recursos []Recursos
+	if err = cursor.All(context.Background(), &recursos); err != nil {
+		fmt.Println(err)
 	}
-	return c.JSON(recurso)
+
+	return c.JSON(recursos)
 }
 
 // borrar recurso por id
