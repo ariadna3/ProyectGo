@@ -176,14 +176,60 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
+
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+	fmt.Println(tokenString)
+
+	//valida el token
+	err, _ := validacionDeUsuario(true, "", tokenString)
+
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
-	email, _ := strconv.Atoi(c.Params("email"))
-	result, err := coll.DeleteOne(context.TODO(), bson.M{"email": email})
+	emailDelete, _ := strconv.Atoi(c.Params("email"))
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"email": emailDelete})
 	if err != nil {
 		return c.SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
 	return c.SendString("novedad eliminada")
+}
+
+func UpdateUser(c *fiber.Ctx) error {
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
+
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+	fmt.Println(tokenString)
+
+	//valida el token
+	err, _ := validacionDeUsuario(true, "", tokenString)
+
+	usuario := new(UserITP)
+	if err := c.BodyParser(usuario); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+
+	fmt.Println(usuario)
+
+	filter := bson.D{{"email", usuario.Email}}
+
+	update := bson.D{{"$set", bson.D{{"esAdministrador", usuario.EsAdministrador}, {"rol", usuario.Rol}}}}
+
+	result, err := coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		panic(err)
+	}
+	return c.JSON(result)
 }
 
 func ValidateGoogleJWT(tokenString string) (error, string) {
