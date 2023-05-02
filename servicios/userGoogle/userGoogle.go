@@ -161,7 +161,7 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	fmt.Println(tokenString)
 
 	//valida el token
-	err, email := validacionDeUsuario(true, "", tokenString)
+	err, email := validacionDeUsuario(false, "", tokenString)
 	if err != nil {
 		return c.Status(403).SendString(err.Error())
 	}
