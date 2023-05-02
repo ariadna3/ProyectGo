@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/smtp"
+	"os"
 	"strconv"
 	"strings"
 
@@ -139,6 +141,29 @@ func InsertNovedad(c *fiber.Ctx) error {
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
+	}
+	if novedad.EnviarA != "" {
+		// Configuración de SMTP
+		smtpHost := os.Getenv("USER_HOST")
+		smtpPort := os.Getenv("USER_PORT")
+		smtpUsername := os.Getenv("USER_EMAIL")
+		smtpPassword := os.Getenv("USER_PASSWORD")
+
+		// Mensaje de correo electrónico
+		to := []string{novedad.EnviarA}
+		msg := []byte("Para: " + novedad.EnviarA + "\r\n" +
+			"Asunto: Ingreso de novedad\r\n" +
+			"\r\n" +
+			"Hola, se ha subido la siguiente novedad \r\n" +
+			novedad.Descripcion + "\r\n")
+
+		// Autenticación y envío del correo electrónico
+		auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
+		err2 := smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUsername, to, msg)
+		if err != nil {
+			fmt.Println(err2)
+		}
+		fmt.Println("Correo electrónico enviado con éxito a " + novedad.EnviarA + " desde " + smtpUsername)
 	}
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
