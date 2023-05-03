@@ -1,8 +1,11 @@
 # Portal de novedades Backend
 
-Esta es una pequeña descripción de lo que hay que hacer previo a ejecutar el programa
+Esta es una pequeña descripción de lo que hay que hacer previo a ejecutar el programa y las herramientas para comprender el funcionamiento de la aplicación
 
-## Verificar archivos
+## Pasos previos
+
+Todos los pasos pasos aqui descritos solo son necesarios para que programa pueda empezar a ejecutarse al inicio. :-)
+
 ### Variables de ambiente
 Se deben crear el archivo .env que contenga las variables de ambiente. A continuacion se describe la utilidad de cada variable
 
