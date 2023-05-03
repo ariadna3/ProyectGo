@@ -114,11 +114,12 @@ func InsertUserITP(c *fiber.Ctx) error {
 	result, err := coll.InsertOne(context.TODO(), userITP)
 	if err != nil {
 
+		fmt.Print("fail")
 		return c.SendString(err.Error())
 	}
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.JSON(userITP)
+	return c.SendString("ok")
 }
 
 func GetUserITP(c *fiber.Ctx) error {
