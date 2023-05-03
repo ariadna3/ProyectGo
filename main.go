@@ -115,7 +115,7 @@ func main() {
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: os.Getenv("PUERTOCORS"),
-		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization, Access-Control-Allow-Headers",
 	}))
 
 	connectedWithMongo := createConnectionWithMongo()
@@ -166,7 +166,11 @@ func main() {
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 
 		//GoogleUser
-		app.Get("/user/:tokenString", userGoogle.ValidateGoogleJWT)
+		app.Post("/user", userGoogle.InsertUserITP)
+		app.Get("/user", userGoogle.GetSelfUserITP)
+		app.Get("/user/:email", userGoogle.GetUserITP)
+		app.Delete("user/:email", userGoogle.DeleteUserITP)
+		app.Patch("/user", userGoogle.UpdateUserITP)
 
 	} else {
 		fmt.Println("Problema al conectarse con mongo")
@@ -252,6 +256,7 @@ func createConnectionWithMongo() bool {
 		actividades.ConnectMongoDb(client)
 		proveedores.ConnectMongoDb(client)
 		recursos.ConnectMongoDb(client)
+		userGoogle.ConnectMongoDb(client)
 		return true
 	}
 	return false
