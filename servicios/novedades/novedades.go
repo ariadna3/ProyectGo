@@ -2,8 +2,14 @@ package novedades
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/mail"
+	"net/smtp"
+	"os"
 	"strconv"
 	"strings"
 
@@ -96,6 +102,10 @@ func InsertNovedad(c *fiber.Ctx) error {
 	novedad := new(Novedades)
 	if err := c.BodyParser(novedad); err != nil {
 		return c.Status(503).SendString(err.Error())
+	}
+
+	if novedad.EnviarA != "" {
+		enviarMail(*novedad)
 	}
 
 	// valida el estado
@@ -242,7 +252,7 @@ func DeleteNovedad(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Print(err)
 	}
-	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	fmt.Printf("Deleted %v documents in the trainers collection\n", result.DeletedCount)
 	return c.SendString("novedad eliminada")
 }
 
@@ -503,4 +513,79 @@ func findInStringArray(arrayString []string, palabra string) (bool, int) {
 		}
 	}
 	return false, len(arrayString)
+}
+
+func enviarMail(novedad Novedades) {
+	// Configuración de SMTP
+	smtpHost := os.Getenv("USER_HOST")
+	smtpPort := os.Getenv("USER_PORT")
+	smtpUsername := os.Getenv("USER_EMAIL")
+	smtpPassword := os.Getenv("USER_PASSWORD")
+
+	datosComoBytes, err := ioutil.ReadFile("email.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// convertir el arreglo a string
+	datosComoString := string(datosComoBytes)
+	// imprimir el string
+	mailMessage := strings.Split(strings.Replace(datosComoString, "\n", "", 1), "|")
+	mailMessage[1] = replaceStringWithData(mailMessage[1], novedad)
+
+	// Mensaje de correo electrónico
+	to := []string{novedad.EnviarA}
+	from := os.Getenv("USER_EMAIL")
+	toMsg := novedad.EnviarA
+	subject := mailMessage[0]
+	body := mailMessage[1]
+
+	msg := composeMimeMail(toMsg, from, subject, body)
+
+	// Autenticación y envío del correo electrónico
+	auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
+	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUsername, to, msg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Correo electrónico enviado con éxito.")
+}
+
+func replaceStringWithData(message string, novedad Novedades) string {
+	message = strings.ReplaceAll(message, "%D", novedad.Descripcion)
+	message = strings.ReplaceAll(message, "%S", novedad.Usuario)
+	message = strings.ReplaceAll(message, "%M", novedad.Motivo)
+	message = strings.ReplaceAll(message, "%C", novedad.Comentarios)
+	return message
+}
+
+func formatEmailAddress(addr string) string {
+	e, err := mail.ParseAddress(addr)
+	if err != nil {
+		return addr
+	}
+	return e.String()
+}
+
+func encodeRFC2047(str string) string {
+	// use mail's rfc2047 to encode any string
+	addr := mail.Address{Address: str}
+	return strings.Trim(addr.String(), " <>")
+}
+
+func composeMimeMail(to string, from string, subject string, body string) []byte {
+	header := make(map[string]string)
+	header["From"] = formatEmailAddress(from)
+	header["To"] = formatEmailAddress(to)
+	header["Subject"] = subject
+	header["MIME-Version"] = "1.0"
+	header["Content-Type"] = "text/plain; charset=\"utf-8\""
+	header["Content-Transfer-Encoding"] = "base64"
+
+	message := ""
+	for k, v := range header {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
+
+	return []byte(message)
 }
