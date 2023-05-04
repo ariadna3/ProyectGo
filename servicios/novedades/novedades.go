@@ -136,6 +136,7 @@ func InsertNovedad(c *fiber.Ctx) error {
 	//ingresa los archivos los archivos
 	form, err := c.MultipartForm()
 	if err != nil {
+		fmt.Println(err)
 		fmt.Println("No se subieron archivos")
 	} else {
 		for _, fileHeaders := range form.File {
@@ -160,7 +161,6 @@ func GetNovedades(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
-	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -260,7 +260,6 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	//se obtiene el id
 	idNumber, err := strconv.Atoi(c.Params("id"))
 	fmt.Println(idNumber)
-	fmt.Println(c.Params("id"))
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -349,13 +348,10 @@ func GetFiles(c *fiber.Ctx) error {
 func GetTipoNovedad(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
-	fmt.Println("tipos")
-	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}
 	var tipoNovedad []TipoNovedad
-	fmt.Println(tipoNovedad)
 
 	if err = cursor.All(context.Background(), &tipoNovedad); err != nil {
 		fmt.Print(err)
@@ -403,6 +399,7 @@ func GetCecosAll(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &cecos); err != nil {
 		fmt.Print(err)
 	}
+	fmt.Println("procesado cecos")
 	return c.JSON(cecos)
 }
 
@@ -411,7 +408,6 @@ func GetCecos(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"codigo": idNumber})
-	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -419,6 +415,8 @@ func GetCecos(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &cecos); err != nil {
 		fmt.Print(err)
 	}
+	fmt.Println("procesado cecos")
+	fmt.Println(cecos)
 	return c.JSON(cecos)
 }
 
@@ -436,7 +434,6 @@ func GetCecosFiltro(c *fiber.Ctx) error {
 	}
 
 	cursor, err := coll.Find(context.TODO(), busqueda)
-	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}
