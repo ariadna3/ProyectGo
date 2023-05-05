@@ -5,13 +5,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-<<<<<<< HEAD
-=======
 	"io/ioutil"
 	"log"
 	"net/mail"
 	"net/smtp"
->>>>>>> f6d8c02028e17c6e67c49bff29588b0aba60325f
 	"os"
 	"strconv"
 	"strings"
@@ -53,6 +50,7 @@ type Novedades struct {
 	Aprobador             string              `bson:"aprobador"`
 	Prioridad             string              `bson:"prioridad"`
 	Reclamo               bool                `bson:"reclamo"`
+	Freelance             bool                `bson:"freelance"`
 }
 
 const (
