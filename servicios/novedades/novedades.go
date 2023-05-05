@@ -2,8 +2,16 @@ package novedades
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+<<<<<<< HEAD
+=======
+	"io/ioutil"
+	"log"
+	"net/mail"
+	"net/smtp"
+>>>>>>> f6d8c02028e17c6e67c49bff29588b0aba60325f
 	"os"
 	"strconv"
 	"strings"
@@ -101,6 +109,10 @@ func InsertNovedad(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 
+	if novedad.EnviarA != "" {
+		enviarMail(*novedad)
+	}
+
 	// valida el estado
 	if novedad.Estado != Pendiente && novedad.Estado != Aceptada && novedad.Estado != Rechazada {
 		novedad.Estado = Pendiente
@@ -138,6 +150,7 @@ func InsertNovedad(c *fiber.Ctx) error {
 	//ingresa los archivos los archivos
 	form, err := c.MultipartForm()
 	if err != nil {
+		fmt.Println(err)
 		fmt.Println("No se subieron archivos")
 	} else {
 		for _, fileHeaders := range form.File {
@@ -163,7 +176,6 @@ func GetNovedades(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
-	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -255,7 +267,7 @@ func DeleteNovedad(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Print(err)
 	}
-	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	fmt.Printf("Deleted %v documents in the trainers collection\n", result.DeletedCount)
 	return c.SendString("novedad eliminada")
 }
 
@@ -263,7 +275,6 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	//se obtiene el id
 	idNumber, err := strconv.Atoi(c.Params("id"))
 	fmt.Println(idNumber)
-	fmt.Println(c.Params("id"))
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -352,13 +363,10 @@ func GetFiles(c *fiber.Ctx) error {
 func GetTipoNovedad(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
-	fmt.Println("tipos")
-	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}
 	var tipoNovedad []TipoNovedad
-	fmt.Println(tipoNovedad)
 
 	if err = cursor.All(context.Background(), &tipoNovedad); err != nil {
 		fmt.Print(err)
@@ -406,6 +414,7 @@ func GetCecosAll(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &cecos); err != nil {
 		fmt.Print(err)
 	}
+	fmt.Println("procesado cecos")
 	return c.JSON(cecos)
 }
 
@@ -414,7 +423,6 @@ func GetCecos(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"codigo": idNumber})
-	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -422,6 +430,8 @@ func GetCecos(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &cecos); err != nil {
 		fmt.Print(err)
 	}
+	fmt.Println("procesado cecos")
+	fmt.Println(cecos)
 	return c.JSON(cecos)
 }
 
@@ -439,7 +449,6 @@ func GetCecosFiltro(c *fiber.Ctx) error {
 	}
 
 	cursor, err := coll.Find(context.TODO(), busqueda)
-	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -521,4 +530,79 @@ func findInStringArray(arrayString []string, palabra string) (bool, int) {
 		}
 	}
 	return false, len(arrayString)
+}
+
+func enviarMail(novedad Novedades) {
+	// Configuración de SMTP
+	smtpHost := os.Getenv("USER_HOST")
+	smtpPort := os.Getenv("USER_PORT")
+	smtpUsername := os.Getenv("USER_EMAIL")
+	smtpPassword := os.Getenv("USER_PASSWORD")
+
+	datosComoBytes, err := ioutil.ReadFile("email.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// convertir el arreglo a string
+	datosComoString := string(datosComoBytes)
+	// imprimir el string
+	mailMessage := strings.Split(strings.Replace(datosComoString, "\n", "", 1), "|")
+	mailMessage[1] = replaceStringWithData(mailMessage[1], novedad)
+
+	// Mensaje de correo electrónico
+	to := []string{novedad.EnviarA}
+	from := os.Getenv("USER_EMAIL")
+	toMsg := novedad.EnviarA
+	subject := mailMessage[0]
+	body := mailMessage[1]
+
+	msg := composeMimeMail(toMsg, from, subject, body)
+
+	// Autenticación y envío del correo electrónico
+	auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
+	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUsername, to, msg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Correo electrónico enviado con éxito.")
+}
+
+func replaceStringWithData(message string, novedad Novedades) string {
+	message = strings.ReplaceAll(message, "%D", novedad.Descripcion)
+	message = strings.ReplaceAll(message, "%S", novedad.Usuario)
+	message = strings.ReplaceAll(message, "%M", novedad.Motivo)
+	message = strings.ReplaceAll(message, "%C", novedad.Comentarios)
+	return message
+}
+
+func formatEmailAddress(addr string) string {
+	e, err := mail.ParseAddress(addr)
+	if err != nil {
+		return addr
+	}
+	return e.String()
+}
+
+func encodeRFC2047(str string) string {
+	// use mail's rfc2047 to encode any string
+	addr := mail.Address{Address: str}
+	return strings.Trim(addr.String(), " <>")
+}
+
+func composeMimeMail(to string, from string, subject string, body string) []byte {
+	header := make(map[string]string)
+	header["From"] = formatEmailAddress(from)
+	header["To"] = formatEmailAddress(to)
+	header["Subject"] = subject
+	header["MIME-Version"] = "1.0"
+	header["Content-Type"] = "text/plain; charset=\"utf-8\""
+	header["Content-Transfer-Encoding"] = "base64"
+
+	message := ""
+	for k, v := range header {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
+
+	return []byte(message)
 }
