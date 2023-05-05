@@ -84,6 +84,8 @@ type RecursosNovedades struct {
 	Recurso     string `bson:"recurso"`
 	Periodo     string `bson:"periodo"`
 	Porc        []P    `bson:"p"`
+	SbActual    bool   `bson:"sbActual"`
+	Retroactivo bool   `bson:"retroactivo"`
 }
 
 type P struct {
