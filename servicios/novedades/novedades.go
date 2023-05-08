@@ -141,6 +141,10 @@ func InsertNovedad(c *fiber.Ctx) error {
 	} else {
 		for _, fileHeaders := range form.File {
 			for _, fileHeader := range fileHeaders {
+				existeEnAdjuntos, _ := findInStringArray(novedad.Adjuntos, fileHeader.Filename)
+				if !existeEnAdjuntos && novedad.AdjuntoMotivo != fileHeader.Filename {
+					novedad.Adjuntos = append(novedad.Adjuntos, fileHeader.Filename)
+				}
 				idName := strconv.Itoa(novedad.IdSecuencial)
 				c.SaveFile(fileHeader, fmt.Sprintf("./archivosSubidos/%s", idName+fileHeader.Filename))
 			}
@@ -329,10 +333,13 @@ func GetFiles(c *fiber.Ctx) error {
 	if c.Query("nombre") != "" {
 		nombre := c.Query("nombre")
 		idName := strconv.Itoa(novedad.IdSecuencial)
-		existeArchivo, _ := findInStringArray(novedad.Adjuntos, idName+nombre)
+		existeArchivo, _ := findInStringArray(novedad.Adjuntos, nombre)
+		fmt.Println("No contiene (/): " + strconv.FormatBool(!strings.Contains(nombre, "/")))
+		fmt.Println("No contiene mas de un punto: " + strconv.FormatBool(strings.Count(nombre, ".") == 1))
+		fmt.Println("Existe en los adjuntos de la novedad: " + strconv.FormatBool(existeArchivo))
+		fmt.Println("Existe en el adjunto motivo: " + strconv.FormatBool(novedad.AdjuntoMotivo == nombre))
 		if !strings.Contains(nombre, "/") && strings.Count(nombre, ".") == 1 && (existeArchivo || novedad.AdjuntoMotivo == nombre) {
-
-			return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", idName+c.Query("nombre")))
+			return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", idName+nombre))
 		} else {
 			return c.SendString("nombre invalido")
 		}
