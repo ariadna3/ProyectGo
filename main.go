@@ -60,6 +60,12 @@ type Novedades struct {
 	Cantidad              string              `bson:"cantidad"`
 	FechaDesde            string              `bson:"fechaDesde"`
 	FechaHasta            string              `bson:"fechaHasta"`
+	OrdenDeCompra         string              `bson:"ordenDeCompra"`
+	Resumen               string              `bson:"resumen"`
+	Aprobador             string              `bson:"aprobador"`
+	Prioridad             string              `bson:"prioridad"`
+	Reclamo               bool                `bson:"reclamo"`
+	Freelance             bool                `bson:"freelance"`
 }
 
 type TipoNovedad struct {
@@ -69,10 +75,11 @@ type TipoNovedad struct {
 }
 
 type Cecos struct {
-	IdCecos          int    `bson:"idCecos"`
-	NCecos           string `bson:"nCecos"`
-	DescripcionCecos string `bson:"descripcionCecos"`
-	Cliente          string `bson:"cliente"`
+	IdCecos     int    `bson:"idCecos"`
+	Descripcion string `bson:"descripcioncecos"`
+	Cliente     string `bson:"cliente"`
+	Proyecto    string `bson:"proyecto"`
+	Codigo      int    `bson:"codigo"`
 }
 
 type Distribuciones struct {
@@ -80,17 +87,26 @@ type Distribuciones struct {
 	Cecos      Cecos   `bson:"cecos"`
 }
 
-type Proveedores struct {
-	IdProveedor int    `bson:"idProveedor"`
-	NumeroDoc   int    `bson:"numeroDoc"`
-	RazonSocial string `bson:"razonSocial"`
-}
-
 type RecursosNovedades struct {
 	Importe     int    `bson:"importe"`
 	Comentarios string `bson:"comentarios"`
 	Recurso     string `bson:"recurso"`
 	Periodo     string `bson:"periodo"`
+	Porc        []P    `bson:"p"`
+	SbActual    bool   `bson:"sbActual"`
+	Retroactivo bool   `bson:"retroactivo"`
+}
+
+type P struct {
+	Cc       string  `bson:"cc"`
+	PorcCC   float32 `bson:"porcCC"`
+	Cantidad int     `bson:"cantidad"`
+}
+
+type Proveedores struct {
+	IdProveedor int    `bson:"idProveedor"`
+	NumeroDoc   int    `bson:"numeroDoc"`
+	RazonSocial string `bson:"razonSocial"`
 }
 
 type Recursos struct {
