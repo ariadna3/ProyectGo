@@ -523,32 +523,35 @@ func enviarMail(novedad Novedades) {
 	smtpUsername := os.Getenv("USER_EMAIL")
 	smtpPassword := os.Getenv("USER_PASSWORD")
 
-	datosComoBytes, err := ioutil.ReadFile("email.txt")
-	if err != nil {
-		log.Fatal(err)
+	if smtpUsername != "" {
+		datosComoBytes, err := ioutil.ReadFile("email.txt")
+		if err != nil {
+			log.Fatal(err)
+		}
+		// convertir el arreglo a string
+		datosComoString := string(datosComoBytes)
+		// imprimir el string
+		mailMessage := strings.Split(strings.Replace(datosComoString, "\n", "", 1), "|")
+		mailMessage[1] = replaceStringWithData(mailMessage[1], novedad)
+
+		// Mensaje de correo electrónico
+		to := []string{novedad.EnviarA}
+		from := os.Getenv("USER_EMAIL")
+		toMsg := novedad.EnviarA
+		subject := mailMessage[0]
+		body := mailMessage[1]
+
+		msg := composeMimeMail(toMsg, from, subject, body)
+
+		// Autenticación y envío del correo electrónico
+		auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
+		err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUsername, to, msg)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("Correo electrónico enviado con éxito.")
 	}
-	// convertir el arreglo a string
-	datosComoString := string(datosComoBytes)
-	// imprimir el string
-	mailMessage := strings.Split(strings.Replace(datosComoString, "\n", "", 1), "|")
-	mailMessage[1] = replaceStringWithData(mailMessage[1], novedad)
 
-	// Mensaje de correo electrónico
-	to := []string{novedad.EnviarA}
-	from := os.Getenv("USER_EMAIL")
-	toMsg := novedad.EnviarA
-	subject := mailMessage[0]
-	body := mailMessage[1]
-
-	msg := composeMimeMail(toMsg, from, subject, body)
-
-	// Autenticación y envío del correo electrónico
-	auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
-	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUsername, to, msg)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Correo electrónico enviado con éxito.")
 }
 
 func replaceStringWithData(message string, novedad Novedades) string {
