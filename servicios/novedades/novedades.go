@@ -328,9 +328,10 @@ func GetFiles(c *fiber.Ctx) error {
 
 	if c.Query("nombre") != "" {
 		nombre := c.Query("nombre")
-		existeArchivo, _ := findInStringArray(novedad.Adjuntos, nombre)
+		idName := strconv.Itoa(novedad.IdSecuencial)
+		existeArchivo, _ := findInStringArray(novedad.Adjuntos, idName+nombre)
 		if !strings.Contains(nombre, "/") && strings.Count(nombre, ".") == 1 && (existeArchivo || novedad.AdjuntoMotivo == nombre) {
-			idName := strconv.Itoa(novedad.IdSecuencial)
+
 			return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", idName+c.Query("nombre")))
 		} else {
 			return c.SendString("nombre invalido")

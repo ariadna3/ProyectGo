@@ -149,7 +149,7 @@ func main() {
 		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
 
 		//Centro de Costos
-		app.Post("Cecos", novedades.InsertCecos)
+		app.Post("/Cecos", novedades.InsertCecos)
 		app.Get("/Cecos/", novedades.GetCecosAll)
 		app.Get("/Cecos/:id", novedades.GetCecos)
 
