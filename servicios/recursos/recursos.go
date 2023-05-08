@@ -80,7 +80,11 @@ func InsertRecurso(c *fiber.Ctx) error {
 	var results []Recursos
 	cursor.All(context.TODO(), &results)
 
-	recurso.IdRecurso = results[0].IdRecurso + 1
+	if len(results) == 0 {
+		recurso.IdRecurso = 0
+	} else {
+		recurso.IdRecurso = results[0].IdRecurso + 1
+	}
 
 	//Obtiene los datos del ceco
 	collCeco := client.Database("portalDeNovedades").Collection("centroDeCostos")

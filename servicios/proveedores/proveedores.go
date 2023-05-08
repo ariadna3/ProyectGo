@@ -46,7 +46,11 @@ func InsertProveedor(c *fiber.Ctx) error {
 	var results []Proveedores
 	cursor.All(context.TODO(), &results)
 
-	proveedor.IdProveedor = results[0].IdProveedor + 1
+	if len(results) == 0 {
+		proveedor.IdProveedor = 0
+	} else {
+		proveedor.IdProveedor = results[0].IdProveedor + 1
+	}
 	result, err := coll.InsertOne(context.TODO(), proveedor)
 	if err != nil {
 		fmt.Print(err)
