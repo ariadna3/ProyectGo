@@ -68,7 +68,6 @@ func InsertRecurso(c *fiber.Ctx) error {
 
 	//setea la fecha
 	recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaString)
-	fmt.Print(recurso.Fecha.Month())
 
 	//Obtiene el ultimo Id
 	coll := client.Database("portalDeNovedades").Collection("recursos")
@@ -89,15 +88,21 @@ func InsertRecurso(c *fiber.Ctx) error {
 	//Obtiene los datos del ceco
 	collCeco := client.Database("portalDeNovedades").Collection("centroDeCostos")
 
-	for _, ceco := range recurso.Rcc {
-		codigoInt, _ := strconv.Atoi(ceco.CcNum)
-		filter := bson.D{{"codigo", codigoInt}}
+	for pos, ceco := range recurso.Rcc {
+		intVar, err := strconv.Atoi(ceco.CcNum)
+		if err != nil {
+			fmt.Println(err)
+		}
+		filter := bson.D{{"codigo", intVar}}
 
 		var cecoEncontrado Cecos
 		collCeco.FindOne(context.TODO(), filter).Decode(&cecoEncontrado)
 
-		ceco.CcNombre = cecoEncontrado.Cliente
-		ceco.CcCliente = cecoEncontrado.Descripcion
+		fmt.Print("Ceco encontrado: ")
+		fmt.Println(cecoEncontrado)
+
+		recurso.Rcc[pos].CcNombre = cecoEncontrado.Cliente
+		recurso.Rcc[pos].CcCliente = cecoEncontrado.Descripcion
 	}
 
 	//Ingresa el recurso
