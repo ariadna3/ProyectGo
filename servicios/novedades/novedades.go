@@ -146,7 +146,7 @@ func InsertNovedad(c *fiber.Ctx) error {
 					novedad.Adjuntos = append(novedad.Adjuntos, fileHeader.Filename)
 				}
 				idName := strconv.Itoa(novedad.IdSecuencial)
-				c.SaveFile(fileHeader, fmt.Sprintf("./archivosSubidos/%s", idName+fileHeader.Filename))
+				c.SaveFile(fileHeader, os.Getenv("FOLDER_FILE")+"/"+idName+fileHeader.Filename)
 			}
 		}
 	}
@@ -339,7 +339,7 @@ func GetFiles(c *fiber.Ctx) error {
 		fmt.Println("Existe en los adjuntos de la novedad: " + strconv.FormatBool(existeArchivo))
 		fmt.Println("Existe en el adjunto motivo: " + strconv.FormatBool(novedad.AdjuntoMotivo == nombre))
 		if !strings.Contains(nombre, "/") && strings.Count(nombre, ".") == 1 && (existeArchivo || novedad.AdjuntoMotivo == nombre) {
-			return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", idName+nombre))
+			return c.SendFile(os.Getenv("FOLDER_FILE") + "/" + idName + nombre)
 		} else {
 			return c.SendString("nombre invalido")
 		}
@@ -350,7 +350,7 @@ func GetFiles(c *fiber.Ctx) error {
 			return c.SendString("posicion inexistente")
 		}
 		idName := strconv.Itoa(novedad.IdSecuencial)
-		return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", idName+novedad.Adjuntos[posicion]))
+		return c.SendFile(os.Getenv("FOLDER_FILE") + "/" + idName + novedad.Adjuntos[posicion])
 	}
 	return c.SendString("debe especificar el archivo")
 }
