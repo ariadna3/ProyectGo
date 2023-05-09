@@ -48,7 +48,11 @@ func InsertActividad(c *fiber.Ctx) error {
 	var results []Actividades
 	cursor.All(context.TODO(), &results)
 
-	actividad.IdActividad = results[0].IdActividad + 1
+	if len(results) == 0 {
+		actividad.IdActividad = 0
+	} else {
+		actividad.IdActividad = results[0].IdActividad + 1
+	}
 	result, err := coll.InsertOne(context.TODO(), actividad)
 	if err != nil {
 		fmt.Print(err)

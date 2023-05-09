@@ -155,7 +155,12 @@ func InsertNovedad(c *fiber.Ctx) error {
 	} else {
 		for _, fileHeaders := range form.File {
 			for _, fileHeader := range fileHeaders {
-				c.SaveFile(fileHeader, fmt.Sprintf("./archivosSubidos/%s", fileHeader.Filename))
+				existeEnAdjuntos, _ := findInStringArray(novedad.Adjuntos, fileHeader.Filename)
+				if !existeEnAdjuntos && novedad.AdjuntoMotivo != fileHeader.Filename {
+					novedad.Adjuntos = append(novedad.Adjuntos, fileHeader.Filename)
+				}
+				idName := strconv.Itoa(novedad.IdSecuencial)
+				c.SaveFile(fileHeader, fmt.Sprintf("./archivosSubidos/%s", idName+fileHeader.Filename))
 			}
 		}
 	}
@@ -342,9 +347,14 @@ func GetFiles(c *fiber.Ctx) error {
 
 	if c.Query("nombre") != "" {
 		nombre := c.Query("nombre")
+		idName := strconv.Itoa(novedad.IdSecuencial)
 		existeArchivo, _ := findInStringArray(novedad.Adjuntos, nombre)
+		fmt.Println("No contiene (/): " + strconv.FormatBool(!strings.Contains(nombre, "/")))
+		fmt.Println("No contiene mas de un punto: " + strconv.FormatBool(strings.Count(nombre, ".") == 1))
+		fmt.Println("Existe en los adjuntos de la novedad: " + strconv.FormatBool(existeArchivo))
+		fmt.Println("Existe en el adjunto motivo: " + strconv.FormatBool(novedad.AdjuntoMotivo == nombre))
 		if !strings.Contains(nombre, "/") && strings.Count(nombre, ".") == 1 && (existeArchivo || novedad.AdjuntoMotivo == nombre) {
-			return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", c.Query("nombre")))
+			return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", idName+nombre))
 		} else {
 			return c.SendString("nombre invalido")
 		}
@@ -354,7 +364,8 @@ func GetFiles(c *fiber.Ctx) error {
 		if len(novedad.Adjuntos) <= posicion {
 			return c.SendString("posicion inexistente")
 		}
-		return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", novedad.Adjuntos[posicion]))
+		idName := strconv.Itoa(novedad.IdSecuencial)
+		return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", idName+novedad.Adjuntos[posicion]))
 	}
 	return c.SendString("debe especificar el archivo")
 }
@@ -539,32 +550,35 @@ func enviarMail(novedad Novedades) {
 	smtpUsername := os.Getenv("USER_EMAIL")
 	smtpPassword := os.Getenv("USER_PASSWORD")
 
-	datosComoBytes, err := ioutil.ReadFile("email.txt")
-	if err != nil {
-		log.Fatal(err)
+	if smtpUsername != "" {
+		datosComoBytes, err := ioutil.ReadFile("email.txt")
+		if err != nil {
+			log.Fatal(err)
+		}
+		// convertir el arreglo a string
+		datosComoString := string(datosComoBytes)
+		// imprimir el string
+		mailMessage := strings.Split(strings.Replace(datosComoString, "\n", "", 1), "|")
+		mailMessage[1] = replaceStringWithData(mailMessage[1], novedad)
+
+		// Mensaje de correo electrónico
+		to := []string{novedad.EnviarA}
+		from := os.Getenv("USER_EMAIL")
+		toMsg := novedad.EnviarA
+		subject := mailMessage[0]
+		body := mailMessage[1]
+
+		msg := composeMimeMail(toMsg, from, subject, body)
+
+		// Autenticación y envío del correo electrónico
+		auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
+		err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUsername, to, msg)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("Correo electrónico enviado con éxito.")
 	}
-	// convertir el arreglo a string
-	datosComoString := string(datosComoBytes)
-	// imprimir el string
-	mailMessage := strings.Split(strings.Replace(datosComoString, "\n", "", 1), "|")
-	mailMessage[1] = replaceStringWithData(mailMessage[1], novedad)
 
-	// Mensaje de correo electrónico
-	to := []string{novedad.EnviarA}
-	from := os.Getenv("USER_EMAIL")
-	toMsg := novedad.EnviarA
-	subject := mailMessage[0]
-	body := mailMessage[1]
-
-	msg := composeMimeMail(toMsg, from, subject, body)
-
-	// Autenticación y envío del correo electrónico
-	auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
-	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUsername, to, msg)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Correo electrónico enviado con éxito.")
 }
 
 func replaceStringWithData(message string, novedad Novedades) string {
