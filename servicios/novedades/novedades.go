@@ -48,6 +48,9 @@ type Novedades struct {
 	OrdenDeCompra         string              `bson:"ordenDeCompra"`
 	Resumen               string              `bson:"resumen"`
 	Aprobador             string              `bson:"aprobador"`
+	Prioridad             string              `bson:"prioridad"`
+	Reclamo               bool                `bson:"reclamo"`
+	Freelance             bool                `bson:"freelance"`
 }
 
 const (
@@ -81,6 +84,8 @@ type RecursosNovedades struct {
 	Recurso     string `bson:"recurso"`
 	Periodo     string `bson:"periodo"`
 	Porc        []P    `bson:"p"`
+	SbActual    bool   `bson:"sbActual"`
+	Retroactivo bool   `bson:"retroactivo"`
 }
 
 type P struct {
@@ -133,6 +138,15 @@ func InsertNovedad(c *fiber.Ctx) error {
 		novedad.IdSecuencial = results[0].IdSecuencial + 1
 	}
 
+	//crear carpeta para ingrear los archivos
+	_, err := os.Stat("archivosSubidos")
+	if os.IsNotExist(err) {
+		err := os.Mkdir("archivosSubidos", 0755)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	//ingresa los archivos los archivos
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -155,10 +169,11 @@ func InsertNovedad(c *fiber.Ctx) error {
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
+		fmt.Println("fail")
 	}
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.JSON(novedad)
+	return c.SendString("ok")
 }
 
 // obtener novedad por id
@@ -465,6 +480,7 @@ func resumenNovedad(novedad Novedades) string {
 			"ImporteTotal":   novedad.ImporteTotal,
 			"Adjuntos":       novedad.Adjuntos,
 			"Distribuciones": novedad.Distribuciones,
+			"Comentarios":    novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "HE" || novedad.Tipo == "IG" {
@@ -475,6 +491,7 @@ func resumenNovedad(novedad Novedades) string {
 			"ImporteTotal": novedad.ImporteTotal,
 			"Adjuntos":     novedad.Adjuntos,
 			"Recursos":     novedad.Recursos,
+			"Comentarios":  novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "FS" {
@@ -486,6 +503,7 @@ func resumenNovedad(novedad Novedades) string {
 			"Adjuntos":      novedad.Adjuntos,
 			"Recursos":      novedad.Recursos,
 			"OrdenDeCompra": novedad.OrdenDeCompra,
+			"Comentarios":   novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "RH" {
@@ -495,6 +513,7 @@ func resumenNovedad(novedad Novedades) string {
 			"Adjuntos":       novedad.Adjuntos,
 			"Recursos":       novedad.Recursos,
 			"Distribuciones": novedad.Distribuciones,
+			"Comentarios":    novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "NP" {
@@ -503,6 +522,7 @@ func resumenNovedad(novedad Novedades) string {
 			"Usuario":     novedad.Usuario,
 			"Adjuntos":    novedad.Adjuntos,
 			"Periodo":     novedad.Periodo,
+			"Comentarios": novedad.Comentarios,
 		}
 	}
 	resumenJson, err := json.Marshal(resumenDict)
