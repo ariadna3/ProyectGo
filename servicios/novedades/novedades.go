@@ -79,13 +79,13 @@ type Distribuciones struct {
 }
 
 type RecursosNovedades struct {
-	Importe     int    `bson:"importe"`
-	Comentarios string `bson:"comentarios"`
-	Recurso     string `bson:"recurso"`
-	Periodo     string `bson:"periodo"`
-	Porc        []P    `bson:"p"`
-	SbActual    bool   `bson:"sbActual"`
-	Retroactivo bool   `bson:"retroactivo"`
+	Importe     int     `bson:"importe"`
+	Comentarios string  `bson:"comentarios"`
+	Recurso     string  `bson:"recurso"`
+	Periodo     string  `bson:"periodo"`
+	Porc        []P     `bson:"p"`
+	SbActual    float64 `bson:"sbActual"`
+	Retroactivo bool    `bson:"retroactivo"`
 }
 
 type P struct {
