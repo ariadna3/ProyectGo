@@ -1,8 +1,8 @@
 # Servicios
 
-En esta sección se encuentra los distintos objetos y funciones que se encargan de manejar las diferentes collection de la base de datos. A su vez existen servicios que fueron descontinuados y que retiraran en proximas actualizanes y carpetas con servicios que deberan ponerse en producción en un futuro
+En esta sección se encuentra los distintos objetos y funciones que se encargan de manejar las diferentes collection de la base de datos. A su vez existen servicios que fueron descontinuados y que se retiraran en proximas actualizaciones y carpetas con servicios que deberan ponerse en producción en un futuro
 
-## Actuales y que contienen:
+## Actuales:
 
 - Actividades: actividades
 - Novedades: novedades y centros de costos (Cecos)

@@ -20,27 +20,29 @@ import (
 )
 
 type Novedades struct {
-	IdSecuencial          int                 `bson:"idSecuencial"`
-	Tipo                  string              `bson:"tipo"`
-	Fecha                 string              `bson:"fecha"`
-	Hora                  string              `bson:"hora"`
-	Usuario               string              `bson:"usuario"`
-	Proveedor             string              `bson:"proveedor"`
-	Periodo               string              `bson:"periodo"`
-	ImporteTotal          float64             `bson:"importeTotal"`
-	ConceptoDeFacturacion string              `bson:"conceptoDeFacturacion"`
-	Adjuntos              []string            `bson:"adjuntos"`
-	AdjuntoMotivo         string              `bson:"adjuntoMotivo"`
-	Distribuciones        []Distribuciones    `bson:"distribuciones"`
-	Comentarios           string              `bson:"comentarios"`
-	Promovido             bool                `bson:"promovido"`
-	Cliente               string              `bson:"cliente"`
-	Estado                string              `bson:"estado"`
-	Motivo                string              `bson:"motivo"`
-	EnviarA               string              `bson:"enviarA"`
-	Contacto              string              `bson:"contacto"`
-	Plazo                 string              `bson:"plazo"`
-	Descripcion           string              `bson:"descripcion"`
+	IdSecuencial          int      `bson:"idSecuencial"`
+	Tipo                  string   `bson:"tipo"`
+	Fecha                 string   `bson:"fecha"`
+	Hora                  string   `bson:"hora"`
+	Usuario               string   `bson:"usuario"`
+	Proveedor             string   `bson:"proveedor"`
+	Periodo               string   `bson:"periodo"`
+	ImporteTotal          float64  `bson:"importeTotal"`
+	ConceptoDeFacturacion string   `bson:"conceptoDeFacturacion"`
+	Adjuntos              []string `bson:"adjuntos"`
+	AdjuntoMotivo         string   `bson:"adjuntoMotivo"`
+	DistribucionesStr     string
+	Distribuciones        []Distribuciones `bson:"distribuciones"`
+	Comentarios           string           `bson:"comentarios"`
+	Promovido             bool             `bson:"promovido"`
+	Cliente               string           `bson:"cliente"`
+	Estado                string           `bson:"estado"`
+	Motivo                string           `bson:"motivo"`
+	EnviarA               string           `bson:"enviarA"`
+	Contacto              string           `bson:"contacto"`
+	Plazo                 string           `bson:"plazo"`
+	Descripcion           string           `bson:"descripcion"`
+	RecursosStr           string
 	Recursos              []RecursosNovedades `bson:"recursos"`
 	Cantidad              string              `bson:"cantidad"`
 	FechaDesde            string              `bson:"fechaDesde"`
@@ -165,15 +167,36 @@ func InsertNovedad(c *fiber.Ctx) error {
 		}
 	}
 
+	//paso de strings Distribuciones y Recursos a Jsons
+	if novedad.DistribucionesStr != "" {
+		err = json.Unmarshal([]byte(novedad.DistribucionesStr), &novedad.Distribuciones)
+		if err != nil {
+			fmt.Println("Error al transformar Distribucion a Json")
+			fmt.Println(novedad.DistribucionesStr)
+		}
+	}
+
+	if novedad.RecursosStr != "" {
+		err = json.Unmarshal([]byte(novedad.RecursosStr), &novedad.Recursos)
+		if err != nil {
+			fmt.Println("Error al transformar Recursos a Json")
+			fmt.Println(novedad.RecursosStr)
+		}
+	}
+
+	novedad.DistribucionesStr = ""
+	novedad.RecursosStr = ""
+
 	//inserta la novedad
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
 		fmt.Println("fail")
+		return c.SendString(err.Error())
 	}
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.SendString("ok")
+	return c.JSON(novedad)
 }
 
 // obtener novedad por id
