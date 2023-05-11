@@ -97,21 +97,22 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 	var usuario UserITP
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 	if err2 != nil {
-		//En caso de no querer admitir usuarios desde recursos borre el contenido de este if y deje solo lo que esta comentado debajo
-		//return errors.New("email no encontrado"), ""
-
-		collRecurso := client.Database("portalDeNovedades").Collection("recursos")
-		var recurso Recursos
-		err2 = collRecurso.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
-		if err2 != nil {
+		if os.Getenv("USE_RECURSOS_LIKE_USERS") == "1" {
+			collRecurso := client.Database("portalDeNovedades").Collection("recursos")
+			var recurso Recursos
+			err2 = collRecurso.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
+			if err2 != nil {
+				return errors.New("email no encontrado"), ""
+			}
+			usuario.Email = recurso.Mail
+			usuario.EsAdministrador = false
+			usuario.Rol = ""
+			_, err := coll.InsertOne(context.TODO(), usuario)
+			if err != nil {
+				return errors.New("error al ingresar usuario desde recursos"), ""
+			}
+		} else {
 			return errors.New("email no encontrado"), ""
-		}
-		usuario.Email = recurso.Mail
-		usuario.EsAdministrador = false
-		usuario.Rol = ""
-		_, err := coll.InsertOne(context.TODO(), usuario)
-		if err != nil {
-			return errors.New("error al ingresar usuario desde recursos"), ""
 		}
 	}
 
