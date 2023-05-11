@@ -37,6 +37,33 @@ type GoogleClaims struct {
 	jwt.StandardClaims
 }
 
+type Recursos struct {
+	IdRecurso   int       `bson:"idRecurso"`
+	Nombre      string    `bson:"nombre"`
+	Apellido    string    `bson:"apellido"`
+	Legajo      int       `bson:"legajo"`
+	Mail        string    `bson:"mail"`
+	Fecha       time.Time `bson:"date"`
+	FechaString string    `bson:"fechaString"`
+	Sueldo      int       `bson:"sueldo"`
+	Rcc         []P       `bson:"p"`
+}
+
+type P struct {
+	CcNum     string  `bson:"cc"`
+	CcPorc    float32 `bson:"porcCC"`
+	CcNombre  string  `bson:"ccNombre"`
+	CcCliente string  `bson:"ccCliente"`
+}
+
+type Cecos struct {
+	IdCecos     int    `bson:"idCecos"`
+	Descripcion string `bson:"descripcioncecos"`
+	Cliente     string `bson:"cliente"`
+	Proyecto    string `bson:"proyecto"`
+	Codigo      int    `bson:"codigo"`
+}
+
 func getGooglePublicKey(keyID string) (string, error) {
 	resp, err := http.Get("https://www.googleapis.com/oauth2/v1/certs")
 	if err != nil {
@@ -70,7 +97,22 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 	var usuario UserITP
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 	if err2 != nil {
-		return errors.New("email no encontrado"), ""
+		//En caso de no querer admitir usuarios desde recursos borre el contenido de este if y deje solo lo que esta comentado debajo
+		//return errors.New("email no encontrado"), ""
+
+		collRecurso := client.Database("portalDeNovedades").Collection("recursos")
+		var recurso Recursos
+		err2 = collRecurso.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
+		if err2 != nil {
+			return errors.New("email no encontrado"), ""
+		}
+		usuario.Email = recurso.Mail
+		usuario.EsAdministrador = false
+		usuario.Rol = ""
+		_, err := coll.InsertOne(context.TODO(), usuario)
+		if err != nil {
+			return errors.New("error al ingresar usuario desde recursos"), ""
+		}
 	}
 
 	if obligatorioAdministrador && usuario.EsAdministrador == false {
