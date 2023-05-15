@@ -20,27 +20,29 @@ import (
 )
 
 type Novedades struct {
-	IdSecuencial          int                 `bson:"idSecuencial"`
-	Tipo                  string              `bson:"tipo"`
-	Fecha                 string              `bson:"fecha"`
-	Hora                  string              `bson:"hora"`
-	Usuario               string              `bson:"usuario"`
-	Proveedor             string              `bson:"proveedor"`
-	Periodo               string              `bson:"periodo"`
-	ImporteTotal          float64             `bson:"importeTotal"`
-	ConceptoDeFacturacion string              `bson:"conceptoDeFacturacion"`
-	Adjuntos              []string            `bson:"adjuntos"`
-	AdjuntoMotivo         string              `bson:"adjuntoMotivo"`
-	Distribuciones        []Distribuciones    `bson:"distribuciones"`
-	Comentarios           string              `bson:"comentarios"`
-	Promovido             bool                `bson:"promovido"`
-	Cliente               string              `bson:"cliente"`
-	Estado                string              `bson:"estado"`
-	Motivo                string              `bson:"motivo"`
-	EnviarA               string              `bson:"enviarA"`
-	Contacto              string              `bson:"contacto"`
-	Plazo                 string              `bson:"plazo"`
-	Descripcion           string              `bson:"descripcion"`
+	IdSecuencial          int      `bson:"idSecuencial"`
+	Tipo                  string   `bson:"tipo"`
+	Fecha                 string   `bson:"fecha"`
+	Hora                  string   `bson:"hora"`
+	Usuario               string   `bson:"usuario"`
+	Proveedor             string   `bson:"proveedor"`
+	Periodo               string   `bson:"periodo"`
+	ImporteTotal          float64  `bson:"importeTotal"`
+	ConceptoDeFacturacion string   `bson:"conceptoDeFacturacion"`
+	Adjuntos              []string `bson:"adjuntos"`
+	AdjuntoMotivo         string   `bson:"adjuntoMotivo"`
+	DistribucionesStr     string
+	Distribuciones        []Distribuciones `bson:"distribuciones"`
+	Comentarios           string           `bson:"comentarios"`
+	Promovido             bool             `bson:"promovido"`
+	Cliente               string           `bson:"cliente"`
+	Estado                string           `bson:"estado"`
+	Motivo                string           `bson:"motivo"`
+	EnviarA               string           `bson:"enviarA"`
+	Contacto              string           `bson:"contacto"`
+	Plazo                 string           `bson:"plazo"`
+	Descripcion           string           `bson:"descripcion"`
+	RecursosStr           string
 	Recursos              []RecursosNovedades `bson:"recursos"`
 	Cantidad              string              `bson:"cantidad"`
 	FechaDesde            string              `bson:"fechaDesde"`
@@ -48,6 +50,9 @@ type Novedades struct {
 	OrdenDeCompra         string              `bson:"ordenDeCompra"`
 	Resumen               string              `bson:"resumen"`
 	Aprobador             string              `bson:"aprobador"`
+	Prioridad             string              `bson:"prioridad"`
+	Reclamo               bool                `bson:"reclamo"`
+	Freelance             bool                `bson:"freelance"`
 }
 
 const (
@@ -76,11 +81,13 @@ type Distribuciones struct {
 }
 
 type RecursosNovedades struct {
-	Importe     int    `bson:"importe"`
-	Comentarios string `bson:"comentarios"`
-	Recurso     string `bson:"recurso"`
-	Periodo     string `bson:"periodo"`
-	Porc        []P    `bson:"p"`
+	Importe     int     `bson:"importe"`
+	Comentarios string  `bson:"comentarios"`
+	Recurso     string  `bson:"recurso"`
+	Periodo     string  `bson:"periodo"`
+	Porc        []P     `bson:"p"`
+	SbActual    float64 `bson:"sbActual"`
+	Retroactivo bool    `bson:"retroactivo"`
 }
 
 type P struct {
@@ -119,13 +126,15 @@ func InsertNovedad(c *fiber.Ctx) error {
 	filter := bson.D{{}}
 	opts := options.Find().SetSort(bson.D{{"idSecuencial", -1}})
 
-	cursor, error := coll.Find(context.TODO(), filter, opts)
-	if error != nil {
-		fmt.Println(error)
+	cursor, err := coll.Find(context.TODO(), filter, opts)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
 	}
 
 	var results []Novedades
-	cursor.All(context.TODO(), &results)
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
 
 	if len(results) == 0 {
 		novedad.IdSecuencial = 1
@@ -141,20 +150,46 @@ func InsertNovedad(c *fiber.Ctx) error {
 	} else {
 		for _, fileHeaders := range form.File {
 			for _, fileHeader := range fileHeaders {
+				existeEnAdjuntos, _ := findInStringArray(novedad.Adjuntos, fileHeader.Filename)
+				if !existeEnAdjuntos && novedad.AdjuntoMotivo != fileHeader.Filename {
+					novedad.Adjuntos = append(novedad.Adjuntos, fileHeader.Filename)
+				}
 				idName := strconv.Itoa(novedad.IdSecuencial)
-				c.SaveFile(fileHeader, fmt.Sprintf("./archivosSubidos/%s", idName+fileHeader.Filename))
+				c.SaveFile(fileHeader, os.Getenv("FOLDER_FILE")+"/"+idName+fileHeader.Filename)
 			}
 		}
 	}
+
+	//paso de strings Distribuciones y Recursos a Jsons
+	if novedad.DistribucionesStr != "" {
+		err = json.Unmarshal([]byte(novedad.DistribucionesStr), &novedad.Distribuciones)
+		if err != nil {
+			fmt.Println("Error al transformar Distribucion a Json")
+			fmt.Println(novedad.DistribucionesStr)
+		}
+	}
+
+	if novedad.RecursosStr != "" {
+		err = json.Unmarshal([]byte(novedad.RecursosStr), &novedad.Recursos)
+		if err != nil {
+			fmt.Println("Error al transformar Recursos a Json")
+			fmt.Println(novedad.RecursosStr)
+		}
+	}
+
+	novedad.DistribucionesStr = ""
+	novedad.RecursosStr = ""
 
 	//inserta la novedad
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
 		fmt.Print(err)
+		fmt.Println("fail")
+		return c.Status(503).SendString(err.Error())
 	}
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.JSON(novedad)
+	return c.Status(200).JSON(novedad)
 }
 
 // obtener novedad por id
@@ -163,16 +198,16 @@ func GetNovedades(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var novedades []Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	for index, element := range novedades {
 		novedades[index].Resumen = resumenNovedad(element)
 	}
-	return c.JSON(novedades)
+	return c.Status(200).JSON(novedades)
 }
 
 // Busqueda con parametros Novedades
@@ -212,20 +247,19 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	if c.Query("aprobador") != "" {
 		busqueda["aprobador"] = bson.M{"$regex": c.Query("aprobador"), "$options": "im"}
 	}
-
+	fmt.Println(busqueda)
 	cursor, err := coll.Find(context.TODO(), busqueda)
-	fmt.Println(coll)
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var novedades []Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	for index, element := range novedades {
 		novedades[index].Resumen = resumenNovedad(element)
 	}
-	return c.JSON(novedades)
+	return c.Status(200).JSON(novedades)
 }
 
 // obtener todas las novedades
@@ -233,16 +267,16 @@ func GetNovedadesAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var novedades []Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	for index, element := range novedades {
 		novedades[index].Resumen = resumenNovedad(element)
 	}
-	return c.JSON(novedades)
+	return c.Status(200).JSON(novedades)
 }
 
 // borrar novedad por id
@@ -251,10 +285,10 @@ func DeleteNovedad(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection\n", result.DeletedCount)
-	return c.SendString("novedad eliminada")
+	return c.Status(200).SendString("novedad eliminada")
 }
 
 func UpdateEstadoNovedades(c *fiber.Ctx) error {
@@ -262,7 +296,7 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	idNumber, err := strconv.Atoi(c.Params("id"))
 	fmt.Println(idNumber)
 	if err != nil {
-		fmt.Println(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	//se obtiene el estado
 	estado := c.Params("estado")
@@ -293,10 +327,10 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	//hace la modificacion
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		panic(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	//devuelve el resultado
-	return c.JSON(result)
+	return c.Status(200).JSON(result)
 }
 
 func UpdateMotivoNovedades(c *fiber.Ctx) error {
@@ -312,9 +346,9 @@ func UpdateMotivoNovedades(c *fiber.Ctx) error {
 
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		panic(err)
+		return c.Status(404).SendString(err.Error())
 	}
-	return c.JSON(result)
+	return c.Status(200).JSON(result)
 }
 
 func GetFiles(c *fiber.Ctx) error {
@@ -323,29 +357,32 @@ func GetFiles(c *fiber.Ctx) error {
 	var novedad Novedades
 	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
 	if err != nil {
-		return c.SendString("novedad no encontrada")
+		return c.Status(404).SendString("novedad no encontrada")
 	}
 
 	if c.Query("nombre") != "" {
 		nombre := c.Query("nombre")
 		idName := strconv.Itoa(novedad.IdSecuencial)
-		existeArchivo, _ := findInStringArray(novedad.Adjuntos, idName+nombre)
+		existeArchivo, _ := findInStringArray(novedad.Adjuntos, nombre)
+		fmt.Println("No contiene (/): " + strconv.FormatBool(!strings.Contains(nombre, "/")))
+		fmt.Println("No contiene mas de un punto: " + strconv.FormatBool(strings.Count(nombre, ".") == 1))
+		fmt.Println("Existe en los adjuntos de la novedad: " + strconv.FormatBool(existeArchivo))
+		fmt.Println("Existe en el adjunto motivo: " + strconv.FormatBool(novedad.AdjuntoMotivo == nombre))
 		if !strings.Contains(nombre, "/") && strings.Count(nombre, ".") == 1 && (existeArchivo || novedad.AdjuntoMotivo == nombre) {
-
-			return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", idName+c.Query("nombre")))
+			return c.Status(200).SendFile(os.Getenv("FOLDER_FILE") + "/" + idName + nombre)
 		} else {
-			return c.SendString("nombre invalido")
+			return c.Status(400).SendString("nombre invalido")
 		}
 	}
 	if c.Query("pos") != "" {
 		posicion, _ := strconv.Atoi(c.Query("pos"))
 		if len(novedad.Adjuntos) <= posicion {
-			return c.SendString("posicion inexistente")
+			return c.Status(400).SendString("posicion inexistente")
 		}
 		idName := strconv.Itoa(novedad.IdSecuencial)
-		return c.SendFile(fmt.Sprintf("./archivosSubidos/%s", idName+novedad.Adjuntos[posicion]))
+		return c.Status(200).SendFile(os.Getenv("FOLDER_FILE") + "/" + idName + novedad.Adjuntos[posicion])
 	}
-	return c.SendString("debe especificar el archivo")
+	return c.Status(400).SendString("debe especificar el archivo")
 }
 
 // ----Tipo Novedades----
@@ -353,14 +390,14 @@ func GetTipoNovedad(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var tipoNovedad []TipoNovedad
 
 	if err = cursor.All(context.Background(), &tipoNovedad); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
-	return c.JSON(tipoNovedad)
+	return c.Status(200).JSON(tipoNovedad)
 }
 
 // ----Cecos----
@@ -374,10 +411,15 @@ func InsertCecos(c *fiber.Ctx) error {
 	filter := bson.D{}
 	opts := options.Find().SetSort(bson.D{{"idCecos", -1}})
 
-	cursor, _ := coll.Find(context.TODO(), filter, opts)
+	cursor, err := coll.Find(context.TODO(), filter, opts)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
 
 	var results []Cecos
-	cursor.All(context.TODO(), &results)
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
 
 	if len(results) == 0 {
 		cecos.IdCecos = 1
@@ -386,7 +428,7 @@ func InsertCecos(c *fiber.Ctx) error {
 	}
 	result, err := coll.InsertOne(context.TODO(), cecos)
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.JSON(cecos)
@@ -397,11 +439,11 @@ func GetCecosAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var cecos []Cecos
 	if err = cursor.All(context.Background(), &cecos); err != nil {
-		fmt.Print(err)
+		c.Status(503).SendString(err.Error())
 	}
 	fmt.Println("procesado cecos")
 	return c.JSON(cecos)
@@ -413,11 +455,11 @@ func GetCecos(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"codigo": idNumber})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var cecos []Cecos
 	if err = cursor.All(context.Background(), &cecos); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	fmt.Println("procesado cecos")
 	fmt.Println(cecos)
@@ -439,11 +481,11 @@ func GetCecosFiltro(c *fiber.Ctx) error {
 
 	cursor, err := coll.Find(context.TODO(), busqueda)
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var result []Cecos
 	if err = cursor.All(context.Background(), &result); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	return c.JSON(result)
 }
@@ -458,6 +500,7 @@ func resumenNovedad(novedad Novedades) string {
 			"ImporteTotal":   novedad.ImporteTotal,
 			"Adjuntos":       novedad.Adjuntos,
 			"Distribuciones": novedad.Distribuciones,
+			"Comentarios":    novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "HE" || novedad.Tipo == "IG" {
@@ -468,6 +511,7 @@ func resumenNovedad(novedad Novedades) string {
 			"ImporteTotal": novedad.ImporteTotal,
 			"Adjuntos":     novedad.Adjuntos,
 			"Recursos":     novedad.Recursos,
+			"Comentarios":  novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "FS" {
@@ -479,6 +523,7 @@ func resumenNovedad(novedad Novedades) string {
 			"Adjuntos":      novedad.Adjuntos,
 			"Recursos":      novedad.Recursos,
 			"OrdenDeCompra": novedad.OrdenDeCompra,
+			"Comentarios":   novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "RH" {
@@ -488,6 +533,7 @@ func resumenNovedad(novedad Novedades) string {
 			"Adjuntos":       novedad.Adjuntos,
 			"Recursos":       novedad.Recursos,
 			"Distribuciones": novedad.Distribuciones,
+			"Comentarios":    novedad.Comentarios,
 		}
 	}
 	if novedad.Tipo == "NP" {
@@ -496,6 +542,7 @@ func resumenNovedad(novedad Novedades) string {
 			"Usuario":     novedad.Usuario,
 			"Adjuntos":    novedad.Adjuntos,
 			"Periodo":     novedad.Periodo,
+			"Comentarios": novedad.Comentarios,
 		}
 	}
 	resumenJson, err := json.Marshal(resumenDict)

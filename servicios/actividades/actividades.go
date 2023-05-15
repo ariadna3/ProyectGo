@@ -43,10 +43,15 @@ func InsertActividad(c *fiber.Ctx) error {
 	filter := bson.D{}
 	opts := options.Find().SetSort(bson.D{{"idActividad", -1}})
 
-	cursor, _ := coll.Find(context.TODO(), filter, opts)
+	cursor, err := coll.Find(context.TODO(), filter, opts)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
 
 	var results []Actividades
-	cursor.All(context.TODO(), &results)
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
 
 	if len(results) == 0 {
 		actividad.IdActividad = 0
@@ -55,10 +60,10 @@ func InsertActividad(c *fiber.Ctx) error {
 	}
 	result, err := coll.InsertOne(context.TODO(), actividad)
 	if err != nil {
-		fmt.Print(err)
+		c.Status(404).SendString(err.Error())
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.JSON(actividad)
+	return c.Status(200).JSON(actividad)
 }
 
 // obtener actividad por id
@@ -68,13 +73,13 @@ func GetActividad(c *fiber.Ctx) error {
 	cursor, err := coll.Find(context.TODO(), bson.M{"idActividad": idNumber})
 	fmt.Println(coll)
 	if err != nil {
-		fmt.Print(err)
+		c.Status(404).SendString(err.Error())
 	}
 	var actividad []Actividades
 	if err = cursor.All(context.Background(), &actividad); err != nil {
-		fmt.Print(err)
+		c.Status(503).SendString(err.Error())
 	}
-	return c.JSON(actividad)
+	return c.Status(200).JSON(actividad)
 }
 
 // obtener todas las actividades
@@ -82,13 +87,13 @@ func GetActividadAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("actividades")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		fmt.Print(err)
+		c.Status(404).SendString(err.Error())
 	}
 	var actividad []Actividades
 	if err = cursor.All(context.Background(), &actividad); err != nil {
-		fmt.Print(err)
+		c.Status(503).SendString(err.Error())
 	}
-	return c.JSON(actividad)
+	return c.Status(200).JSON(actividad)
 }
 
 // borrar actividad por id
@@ -97,8 +102,8 @@ func DeleteActividad(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idActividad": idNumber})
 	if err != nil {
-		fmt.Print(err)
+		c.Status(404).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
-	return c.SendString("actividad eliminada")
+	return c.Status(200).SendString("actividad eliminada")
 }
