@@ -55,7 +55,7 @@ func GetFecha(c *fiber.Ctx) error {
 		fecha = append(fecha, mes+"-"+anio)
 		currentTime = currentTime.AddDate(0, -1, 0)
 	}
-	return c.JSON(fecha)
+	return c.Status(200).JSON(fecha)
 }
 
 // ----Recursos----
@@ -92,6 +92,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 		intVar, err := strconv.Atoi(ceco.CcNum)
 		if err != nil {
 			fmt.Println(err)
+			return c.Status(418).SendString(err.Error())
 		}
 		filter := bson.D{{"codigo", intVar}}
 
@@ -108,10 +109,10 @@ func InsertRecurso(c *fiber.Ctx) error {
 	//Ingresa el recurso
 	result, err := coll.InsertOne(context.TODO(), recurso)
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.JSON(recurso)
+	return c.Status(200).JSON(recurso)
 }
 
 // obtener recurso por id
@@ -123,10 +124,10 @@ func GetRecurso(c *fiber.Ctx) error {
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
-		return c.SendString("No encontrado")
+		return c.Status(404).SendString("No encontrado")
 	}
 
-	return c.JSON(recurso)
+	return c.Status(200).JSON(recurso)
 }
 
 // obtener todos los recursos
@@ -134,14 +135,14 @@ func GetRecursoAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		fmt.Println(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var recursos []Recursos
 	if err = cursor.All(context.Background(), &recursos); err != nil {
-		fmt.Println(err)
+		return c.Status(404).SendString(err.Error())
 	}
 
-	return c.JSON(recursos)
+	return c.Status(200).JSON(recursos)
 }
 
 // borrar recurso por id
@@ -150,8 +151,8 @@ func DeleteRecurso(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idRecurso": idNumber})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
-	return c.SendString("recurso eliminado")
+	return c.Status(200).SendString("recurso eliminado")
 }

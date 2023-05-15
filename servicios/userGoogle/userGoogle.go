@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -86,11 +87,29 @@ func getGooglePublicKey(keyID string) (string, error) {
 	return key, nil
 }
 
+func revokeToken(token string) error {
+	url := fmt.Sprintf("https://accounts.google.com/o/oauth2/revoke?token=%s", token)
+	resp, err := http.Post(url, "", nil)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	fmt.Print("Response revoke: ")
+	fmt.Println(resp)
+
+	// Comprobar si la respuesta HTTP indica éxito o fracaso
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("Error al revocar el token: %s", resp.Status)
+	}
+
+	return nil
+}
+
 func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, token string) (error, string) {
 	//valida el token
 	err, email := ValidateGoogleJWT(token)
 	if err != nil {
-		return err, ""
+		return err, email
 	}
 	//valida el mail
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
@@ -117,11 +136,11 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 	}
 
 	if obligatorioAdministrador && usuario.EsAdministrador == false {
-		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), ""
+		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), "403"
 	}
 
 	if rolEsperado != "" && rolEsperado == usuario.Rol {
-		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), ""
+		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), "403"
 	}
 
 	return nil, email
@@ -140,9 +159,13 @@ func InsertUserITP(c *fiber.Ctx) error {
 	fmt.Println(tokenString)
 
 	//valida el token
-	err2, _ := validacionDeUsuario(true, "", tokenString)
-	if err2 != nil {
-		return c.Status(403).SendString(err2.Error())
+	err, codigo := validacionDeUsuario(true, "", tokenString)
+	if err != nil {
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(404).SendString(err.Error())
 	}
 
 	//obtiene los datos
@@ -156,12 +179,11 @@ func InsertUserITP(c *fiber.Ctx) error {
 	//inserta el usuario
 	result, err := coll.InsertOne(context.TODO(), userITP)
 	if err != nil {
-
-		return c.SendString(err.Error())
+		return c.Status(404).SendString(err.Error())
 	}
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.JSON(userITP)
+	return c.Status(200).JSON(userITP)
 }
 
 func GetUserITP(c *fiber.Ctx) error {
@@ -176,9 +198,13 @@ func GetUserITP(c *fiber.Ctx) error {
 	fmt.Println(tokenString)
 
 	//valida el token
-	err, _ := validacionDeUsuario(true, "", tokenString)
+	err, codigo := validacionDeUsuario(true, "", tokenString)
 	if err != nil {
-		return c.Status(403).SendString(err.Error())
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(404).SendString(err.Error())
 	}
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
@@ -186,9 +212,9 @@ func GetUserITP(c *fiber.Ctx) error {
 	var usuario UserITP
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 	if err2 != nil {
-		return c.SendString("usuario no encontrada")
+		return c.Status(200).SendString("usuario no encontrada")
 	}
-	return c.JSON(usuario)
+	return c.Status(200).JSON(usuario)
 }
 
 func GetSelfUserITP(c *fiber.Ctx) error {
@@ -204,17 +230,21 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	fmt.Println(tokenString)
 
 	//valida el token
-	err, email := validacionDeUsuario(false, "", tokenString)
+	err, email := validacionDeUsuario(true, "", tokenString)
 	if err != nil {
-		return c.Status(403).SendString(err.Error())
+		if email != "" {
+			codigoError, _ := strconv.Atoi(email)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(404).SendString(err.Error())
 	}
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 	userITP := new(UserITP)
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
 	if err2 != nil {
-		return c.SendString("usuario no encontrado")
+		return c.Status(404).SendString("usuario no encontrado")
 	}
-	return c.JSON(userITP)
+	return c.Status(200).JSON(userITP)
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
@@ -229,16 +259,23 @@ func DeleteUserITP(c *fiber.Ctx) error {
 	fmt.Println(tokenString)
 
 	//valida el token
-	err, _ := validacionDeUsuario(true, "", tokenString)
+	err, codigo := validacionDeUsuario(true, "", tokenString)
+	if err != nil {
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(404).SendString(err.Error())
+	}
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 	emailDelete := c.Params("email")
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"email": emailDelete})
 	if err != nil {
-		return c.SendString(err.Error())
+		return c.Status(404).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
-	return c.SendString("usuario eliminado")
+	return c.Status(200).SendString("usuario eliminado")
 }
 
 func UpdateUserITP(c *fiber.Ctx) error {
@@ -253,7 +290,14 @@ func UpdateUserITP(c *fiber.Ctx) error {
 	fmt.Println(tokenString)
 
 	//valida el token
-	err, _ := validacionDeUsuario(true, "", tokenString)
+	err, codigo := validacionDeUsuario(true, "", tokenString)
+	if err != nil {
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(404).SendString(err.Error())
+	}
 
 	usuario := new(UserITP)
 	if err := c.BodyParser(usuario); err != nil {
@@ -271,7 +315,7 @@ func UpdateUserITP(c *fiber.Ctx) error {
 	if err != nil {
 		panic(err)
 	}
-	return c.JSON(result)
+	return c.Status(200).JSON(result)
 }
 
 func ValidateGoogleJWT(tokenString string) (error, string) {
@@ -297,6 +341,8 @@ func ValidateGoogleJWT(tokenString string) (error, string) {
 	}
 
 	claims, ok := token.Claims.(*GoogleClaims)
+	fmt.Print("Expiracion: ")
+	fmt.Println(time.Unix(claims.ExpiresAt, 0))
 	if !ok {
 		return errors.New("Invalid Google JWT"), ""
 	}
@@ -310,7 +356,8 @@ func ValidateGoogleJWT(tokenString string) (error, string) {
 	}
 
 	if claims.ExpiresAt < time.Now().UTC().Unix() {
-		return errors.New("JWT is expired"), ""
+		revokeToken(tokenString)
+		return errors.New("JWT is expired"), "401"
 	}
 
 	return nil, *&claims.Email

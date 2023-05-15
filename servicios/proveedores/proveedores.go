@@ -53,10 +53,10 @@ func InsertProveedor(c *fiber.Ctx) error {
 	}
 	result, err := coll.InsertOne(context.TODO(), proveedor)
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.JSON(proveedor)
+	return c.Status(200).JSON(proveedor)
 }
 
 // obtener proveedor por id
@@ -66,13 +66,13 @@ func GetProveedor(c *fiber.Ctx) error {
 	cursor, err := coll.Find(context.TODO(), bson.M{"idProveedor": idNumber})
 	fmt.Println(coll)
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var proveedor []Proveedores
 	if err = cursor.All(context.Background(), &proveedor); err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
-	return c.JSON(proveedor)
+	return c.Status(200).JSON(proveedor)
 }
 
 // obtener todos los proveedores
@@ -80,13 +80,13 @@ func GetProveedorAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("proveedores")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var proveedor []Proveedores
 	if err = cursor.All(context.Background(), &proveedor); err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
-	return c.JSON(proveedor)
+	return c.Status(200).JSON(proveedor)
 }
 
 // borrar proveedor por id
@@ -95,8 +95,8 @@ func DeleteProveedor(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idProveedor": idNumber})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
-	return c.SendString("proveedor eliminado")
+	return c.Status(200).SendString("proveedor eliminado")
 }

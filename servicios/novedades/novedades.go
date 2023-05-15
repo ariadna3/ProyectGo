@@ -126,27 +126,20 @@ func InsertNovedad(c *fiber.Ctx) error {
 	filter := bson.D{{}}
 	opts := options.Find().SetSort(bson.D{{"idSecuencial", -1}})
 
-	cursor, error := coll.Find(context.TODO(), filter, opts)
-	if error != nil {
-		fmt.Println(error)
+	cursor, err := coll.Find(context.TODO(), filter, opts)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
 	}
 
 	var results []Novedades
-	cursor.All(context.TODO(), &results)
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
 
 	if len(results) == 0 {
 		novedad.IdSecuencial = 1
 	} else {
 		novedad.IdSecuencial = results[0].IdSecuencial + 1
-	}
-
-	//crear carpeta para ingrear los archivos
-	_, err := os.Stat("archivosSubidos")
-	if os.IsNotExist(err) {
-		err := os.Mkdir("archivosSubidos", 0755)
-		if err != nil {
-			panic(err)
-		}
 	}
 
 	//ingresa los archivos los archivos
@@ -192,11 +185,11 @@ func InsertNovedad(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Print(err)
 		fmt.Println("fail")
-		return c.SendString(err.Error())
+		return c.Status(503).SendString(err.Error())
 	}
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.JSON(novedad)
+	return c.Status(200).JSON(novedad)
 }
 
 // obtener novedad por id
@@ -205,16 +198,16 @@ func GetNovedades(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var novedades []Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	for index, element := range novedades {
 		novedades[index].Resumen = resumenNovedad(element)
 	}
-	return c.JSON(novedades)
+	return c.Status(200).JSON(novedades)
 }
 
 // Busqueda con parametros Novedades
@@ -254,20 +247,19 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	if c.Query("aprobador") != "" {
 		busqueda["aprobador"] = bson.M{"$regex": c.Query("aprobador"), "$options": "im"}
 	}
-
+	fmt.Println(busqueda)
 	cursor, err := coll.Find(context.TODO(), busqueda)
-	fmt.Println(coll)
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var novedades []Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	for index, element := range novedades {
 		novedades[index].Resumen = resumenNovedad(element)
 	}
-	return c.JSON(novedades)
+	return c.Status(200).JSON(novedades)
 }
 
 // obtener todas las novedades
@@ -275,16 +267,16 @@ func GetNovedadesAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("novedades")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var novedades []Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	for index, element := range novedades {
 		novedades[index].Resumen = resumenNovedad(element)
 	}
-	return c.JSON(novedades)
+	return c.Status(200).JSON(novedades)
 }
 
 // borrar novedad por id
@@ -293,10 +285,10 @@ func DeleteNovedad(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection\n", result.DeletedCount)
-	return c.SendString("novedad eliminada")
+	return c.Status(200).SendString("novedad eliminada")
 }
 
 func UpdateEstadoNovedades(c *fiber.Ctx) error {
@@ -304,7 +296,7 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	idNumber, err := strconv.Atoi(c.Params("id"))
 	fmt.Println(idNumber)
 	if err != nil {
-		fmt.Println(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	//se obtiene el estado
 	estado := c.Params("estado")
@@ -335,10 +327,10 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	//hace la modificacion
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		panic(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	//devuelve el resultado
-	return c.JSON(result)
+	return c.Status(200).JSON(result)
 }
 
 func UpdateMotivoNovedades(c *fiber.Ctx) error {
@@ -354,9 +346,9 @@ func UpdateMotivoNovedades(c *fiber.Ctx) error {
 
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		panic(err)
+		return c.Status(404).SendString(err.Error())
 	}
-	return c.JSON(result)
+	return c.Status(200).JSON(result)
 }
 
 func GetFiles(c *fiber.Ctx) error {
@@ -365,7 +357,7 @@ func GetFiles(c *fiber.Ctx) error {
 	var novedad Novedades
 	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
 	if err != nil {
-		return c.SendString("novedad no encontrada")
+		return c.Status(404).SendString("novedad no encontrada")
 	}
 
 	if c.Query("nombre") != "" {
@@ -377,20 +369,20 @@ func GetFiles(c *fiber.Ctx) error {
 		fmt.Println("Existe en los adjuntos de la novedad: " + strconv.FormatBool(existeArchivo))
 		fmt.Println("Existe en el adjunto motivo: " + strconv.FormatBool(novedad.AdjuntoMotivo == nombre))
 		if !strings.Contains(nombre, "/") && strings.Count(nombre, ".") == 1 && (existeArchivo || novedad.AdjuntoMotivo == nombre) {
-			return c.SendFile(os.Getenv("FOLDER_FILE") + "/" + idName + nombre)
+			return c.Status(200).SendFile(os.Getenv("FOLDER_FILE") + "/" + idName + nombre)
 		} else {
-			return c.SendString("nombre invalido")
+			return c.Status(400).SendString("nombre invalido")
 		}
 	}
 	if c.Query("pos") != "" {
 		posicion, _ := strconv.Atoi(c.Query("pos"))
 		if len(novedad.Adjuntos) <= posicion {
-			return c.SendString("posicion inexistente")
+			return c.Status(400).SendString("posicion inexistente")
 		}
 		idName := strconv.Itoa(novedad.IdSecuencial)
-		return c.SendFile(os.Getenv("FOLDER_FILE") + "/" + idName + novedad.Adjuntos[posicion])
+		return c.Status(200).SendFile(os.Getenv("FOLDER_FILE") + "/" + idName + novedad.Adjuntos[posicion])
 	}
-	return c.SendString("debe especificar el archivo")
+	return c.Status(400).SendString("debe especificar el archivo")
 }
 
 // ----Tipo Novedades----
@@ -398,14 +390,14 @@ func GetTipoNovedad(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var tipoNovedad []TipoNovedad
 
 	if err = cursor.All(context.Background(), &tipoNovedad); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
-	return c.JSON(tipoNovedad)
+	return c.Status(200).JSON(tipoNovedad)
 }
 
 // ----Cecos----
@@ -419,10 +411,15 @@ func InsertCecos(c *fiber.Ctx) error {
 	filter := bson.D{}
 	opts := options.Find().SetSort(bson.D{{"idCecos", -1}})
 
-	cursor, _ := coll.Find(context.TODO(), filter, opts)
+	cursor, err := coll.Find(context.TODO(), filter, opts)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
 
 	var results []Cecos
-	cursor.All(context.TODO(), &results)
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
 
 	if len(results) == 0 {
 		cecos.IdCecos = 1
@@ -431,7 +428,7 @@ func InsertCecos(c *fiber.Ctx) error {
 	}
 	result, err := coll.InsertOne(context.TODO(), cecos)
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.JSON(cecos)
@@ -442,11 +439,11 @@ func GetCecosAll(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var cecos []Cecos
 	if err = cursor.All(context.Background(), &cecos); err != nil {
-		fmt.Print(err)
+		c.Status(503).SendString(err.Error())
 	}
 	fmt.Println("procesado cecos")
 	return c.JSON(cecos)
@@ -458,11 +455,11 @@ func GetCecos(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"codigo": idNumber})
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var cecos []Cecos
 	if err = cursor.All(context.Background(), &cecos); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	fmt.Println("procesado cecos")
 	fmt.Println(cecos)
@@ -484,11 +481,11 @@ func GetCecosFiltro(c *fiber.Ctx) error {
 
 	cursor, err := coll.Find(context.TODO(), busqueda)
 	if err != nil {
-		fmt.Print(err)
+		return c.Status(404).SendString(err.Error())
 	}
 	var result []Cecos
 	if err = cursor.All(context.Background(), &result); err != nil {
-		fmt.Print(err)
+		return c.Status(503).SendString(err.Error())
 	}
 	return c.JSON(result)
 }
