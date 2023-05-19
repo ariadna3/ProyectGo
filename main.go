@@ -12,8 +12,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"github.com/joho/godotenv"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -241,20 +239,8 @@ func main() {
 	}
 }
 
-func goDotEnvVariable(key string) string {
-
-	// load .env file
-	err := godotenv.Load(".env")
-
-	if err != nil {
-		panic("Error loading .env file")
-	}
-
-	return os.Getenv(key)
-}
-
 func createConnectionWithMongo() bool {
-	uri := goDotEnvVariable("MONGOURI")
+	uri := os.Getenv("MONGOURI")
 	if uri != "" {
 		client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 		if err != nil {
@@ -279,7 +265,7 @@ func createConnectionWithMongo() bool {
 }
 
 func createConnectionWithMysql() bool {
-	dsn := goDotEnvVariable("MYSQLURI")
+	dsn := os.Getenv("MYSQLURI")
 	if dsn != "" {
 		db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 		if err != nil {
