@@ -15,6 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
+	"github.com/joho/godotenv"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/google"
 
@@ -120,6 +121,11 @@ type Files struct {
 
 func main() {
 
+	err := godotenv.Load()
+	if err != nil {
+		panic("No se pudo cargar el archivo .env")
+	}
+
 	goth.UseProviders(
 		google.New(os.Getenv("GOOGLEKEY"), os.Getenv("GOOGLESEC"), os.Getenv("GOOGLECALLBACK")),
 	)
@@ -199,7 +205,7 @@ func main() {
 		return c.Status(200).SendString("Conexion exitosa")
 	})
 
-	err := app.Listen(os.Getenv("PUERTO"))
+	err = app.Listen(os.Getenv("PUERTO"))
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -232,7 +238,7 @@ func createConnectionWithMongo() bool {
 func createConnectionWithMysql() bool {
 	dsn := os.Getenv("MYSQLURI")
 	if dsn != "" {
-		db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		_, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 		if err != nil {
 			fmt.Println(err)
 			return false
