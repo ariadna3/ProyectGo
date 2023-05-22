@@ -87,24 +87,6 @@ func getGooglePublicKey(keyID string) (string, error) {
 	return key, nil
 }
 
-func revokeToken(token string) error {
-	url := fmt.Sprintf("https://accounts.google.com/o/oauth2/revoke?token=%s", token)
-	resp, err := http.Post(url, "", nil)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	fmt.Print("Response revoke: ")
-	fmt.Println(resp)
-
-	// Comprobar si la respuesta HTTP indica éxito o fracaso
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Error al revocar el token: %s", resp.Status)
-	}
-
-	return nil
-}
-
 func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, token string) (error, string) {
 	//valida el token
 	err, email := ValidateGoogleJWT(token)

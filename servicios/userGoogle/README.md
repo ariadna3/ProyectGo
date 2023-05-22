@@ -13,7 +13,3 @@ Las funciones principales de userGoogle es el CRUD de los usuarios mas algunas f
 - validateGoogleJWT: a esta funcion se le envia un token y devuelve el email de google de la misma
 - validacionDeUsuario: a esta funcion se le envia un bool "obligatorioAdministrador", un string "rolEsperado" y un token y devuelve un error y un string (un email si no hay error y el codigo de error si hubo algun problema) para validar que el usuario tiene o no los accesos solicitados (ser administrador y tener cierto rol)
 - getGooglePublicKey: obtiene la clave publica de google para utilizar sus servicios OpenID Provider
-
-## Deprecado
-
-- revokeToken: El token a dia de hoy se revoca automaticamente cuando detecta que se vencio
