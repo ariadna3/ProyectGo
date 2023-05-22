@@ -338,7 +338,6 @@ func ValidateGoogleJWT(tokenString string) (error, string) {
 	}
 
 	if claims.ExpiresAt < time.Now().UTC().Unix() {
-		revokeToken(tokenString)
 		return errors.New("JWT is expired"), "401"
 	}
 
