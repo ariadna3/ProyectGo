@@ -18,7 +18,6 @@ import (
 
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/google"
-	gf "github.com/shareed2k/goth_fiber"
 
 	"context"
 	"fmt"
@@ -192,47 +191,15 @@ func main() {
 
 	if connectedWithSql {
 		fmt.Println("Conectado con la base sql")
-
-		//User
-		app.Post("/User", user.CreateUser)
-		app.Get("/User/:item", user.GetUser)
-		app.Put("/User/:item", user.UpdateUser)
-		app.Delete("/User/:item", user.DeleteUser)
-
-		//Login
-		app.Post("/Login", user.Login)
 	} else {
 		fmt.Println("Problema al conectado con la base sql")
 	}
 
-	//----Google----
-	app.Get("/", user.ShowGoogleAuthentication)
-
-	app.Get("/auth/:provider/callback", func(ctx *fiber.Ctx) error {
-		user, err := gf.CompleteUserAuth(ctx)
-		if err != nil {
-			return err
-		}
-		ctx.JSON(user)
-		return nil
+	//----Prueba de conexion----
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Status(200).SendString("Conexion exitosa")
 	})
 
-	app.Get("/auth/:provider", func(ctx *fiber.Ctx) error {
-		if gothUser, err := gf.CompleteUserAuth(ctx); err == nil {
-			ctx.JSON(gothUser)
-		} else {
-			gf.BeginAuthHandler(ctx)
-		}
-		return nil
-	})
-
-	app.Get("/logout/:provider", func(ctx *fiber.Ctx) error {
-		gf.Logout(ctx)
-		ctx.Redirect("/")
-		return nil
-	})
-
-	fmt.Println(os.Getenv("PUERTO"))
 	err := app.Listen(os.Getenv("PUERTO"))
 	if err != nil {
 		fmt.Println(err)
