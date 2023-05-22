@@ -119,6 +119,8 @@ type Files struct {
 	Nombre string `bson:"nombre"`
 }
 
+var App *fiber.App
+
 func main() {
 
 	err := godotenv.Load()
@@ -129,9 +131,9 @@ func main() {
 	goth.UseProviders(
 		google.New(os.Getenv("GOOGLEKEY"), os.Getenv("GOOGLESEC"), os.Getenv("GOOGLECALLBACK")),
 	)
-	app := fiber.New()
+	App = fiber.New()
 
-	app.Use(cors.New(cors.Config{
+	App.Use(cors.New(cors.Config{
 		AllowOrigins: os.Getenv("PUERTOCORS"),
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization, Access-Control-Allow-Headers",
 	}))
@@ -144,51 +146,51 @@ func main() {
 		fmt.Println("Conectado con mongo")
 
 		//Actividades
-		app.Post("/Actividad", actividades.InsertActividad)
-		app.Get("/Actividad/:id", actividades.GetActividad)
-		app.Get("/Actividad", actividades.GetActividadAll)
-		app.Delete("/Actividad/:id", actividades.DeleteActividad)
+		App.Post("/Actividad", actividades.InsertActividad)
+		App.Get("/Actividad/:id", actividades.GetActividad)
+		App.Get("/Actividad", actividades.GetActividadAll)
+		App.Delete("/Actividad/:id", actividades.DeleteActividad)
 
 		//Update estado y motivo
-		app.Patch("/Novedad/:id/:estado", novedades.UpdateEstadoNovedades)
-		app.Patch("/Novedad/:id", novedades.UpdateMotivoNovedades)
+		App.Patch("/Novedad/:id/:estado", novedades.UpdateEstadoNovedades)
+		App.Patch("/Novedad/:id", novedades.UpdateMotivoNovedades)
 
 		//Novedades
-		app.Post("/Novedad", novedades.InsertNovedad)
-		app.Get("/Novedad/:id", novedades.GetNovedades)
-		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
-		app.Get("/Novedad", novedades.GetNovedadesAll)
-		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
+		App.Post("/Novedad", novedades.InsertNovedad)
+		App.Get("/Novedad/:id", novedades.GetNovedades)
+		App.Get("/Novedad/*", novedades.GetNovedadFiltro)
+		App.Get("/Novedad", novedades.GetNovedadesAll)
+		App.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
 		//obtener adjuntos novedades
-		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
+		App.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
 
 		//Tipo Novedades
-		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
+		App.Get("/TipoNovedades", novedades.GetTipoNovedad)
 
 		//Centro de Costos
-		app.Post("/Cecos", novedades.InsertCecos)
-		app.Get("/Cecos/", novedades.GetCecosAll)
-		app.Get("/Cecos/:id", novedades.GetCecos)
+		App.Post("/Cecos", novedades.InsertCecos)
+		App.Get("/Cecos/", novedades.GetCecosAll)
+		App.Get("/Cecos/:id", novedades.GetCecos)
 
 		//Proveedores
-		app.Post("/Proveedor", proveedores.InsertProveedor)
-		app.Get("/Proveedor/:id", proveedores.GetProveedor)
-		app.Get("/Proveedor", proveedores.GetProveedorAll)
-		app.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
+		App.Post("/Proveedor", proveedores.InsertProveedor)
+		App.Get("/Proveedor/:id", proveedores.GetProveedor)
+		App.Get("/Proveedor", proveedores.GetProveedorAll)
+		App.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
 
 		//Recursos
-		app.Post("/Recurso", recursos.InsertRecurso)
-		app.Get("/Recurso/:id", recursos.GetRecurso)
-		app.Get("/Recurso", recursos.GetRecursoAll)
-		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
+		App.Post("/Recurso", recursos.InsertRecurso)
+		App.Get("/Recurso/:id", recursos.GetRecurso)
+		App.Get("/Recurso", recursos.GetRecursoAll)
+		App.Delete("/Recurso/:id", recursos.DeleteRecurso)
 
 		//GoogleUser
-		app.Post("/user", userGoogle.InsertUserITP)
-		app.Get("/user", userGoogle.GetSelfUserITP)
-		app.Get("/user/:email", userGoogle.GetUserITP)
-		app.Delete("user/:email", userGoogle.DeleteUserITP)
-		app.Patch("/user", userGoogle.UpdateUserITP)
+		App.Post("/user", userGoogle.InsertUserITP)
+		App.Get("/user", userGoogle.GetSelfUserITP)
+		App.Get("/user/:email", userGoogle.GetUserITP)
+		App.Delete("user/:email", userGoogle.DeleteUserITP)
+		App.Patch("/user", userGoogle.UpdateUserITP)
 
 	} else {
 		fmt.Println("Problema al conectarse con mongo")
@@ -201,11 +203,11 @@ func main() {
 	}
 
 	//----Prueba de conexion----
-	app.Get("/", func(c *fiber.Ctx) error {
+	App.Get("/", func(c *fiber.Ctx) error {
 		return c.Status(200).SendString("Conexion exitosa")
 	})
 
-	err = app.Listen(os.Getenv("PUERTO"))
+	err = App.Listen(os.Getenv("PUERTO"))
 	if err != nil {
 		fmt.Println(err)
 	}
