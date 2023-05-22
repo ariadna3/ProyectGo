@@ -87,24 +87,6 @@ func getGooglePublicKey(keyID string) (string, error) {
 	return key, nil
 }
 
-func revokeToken(token string) error {
-	url := fmt.Sprintf("https://accounts.google.com/o/oauth2/revoke?token=%s", token)
-	resp, err := http.Post(url, "", nil)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	fmt.Print("Response revoke: ")
-	fmt.Println(resp)
-
-	// Comprobar si la respuesta HTTP indica éxito o fracaso
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Error al revocar el token: %s", resp.Status)
-	}
-
-	return nil
-}
-
 func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, token string) (error, string) {
 	//valida el token
 	err, email := ValidateGoogleJWT(token)
@@ -356,51 +338,8 @@ func ValidateGoogleJWT(tokenString string) (error, string) {
 	}
 
 	if claims.ExpiresAt < time.Now().UTC().Unix() {
-		revokeToken(tokenString)
 		return errors.New("JWT is expired"), "401"
 	}
 
 	return nil, *&claims.Email
 }
-
-/*
-func loginHandler(c *fiber.Ctx) {
-	defer r.Body.Close()
-
-	// parse the GoogleJWT that was POSTed from the front-end
-	type parameters struct {
-		GoogleJWT *string
-	}
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err := decoder.Decode(&params)
-	if err != nil {
-		respondWithError(w, 500, "Couldn't decode parameters")
-		return
-	}
-
-	// Validate the JWT is valid
-	claims, err := auth.ValidateGoogleJWT(*params.GoogleJWT)
-	if err != nil {
-		respondWithError(w, 403, "Invalid google auth")
-		return
-	}
-	if claims.Email != user.Email {
-		respondWithError(w, 403, "Emails don't match")
-		return
-	}
-
-	// create a JWT for OUR app and give it back to the client for future requests
-	tokenString, err := auth.MakeJWT(claims.Email, cfg.JWTSecret)
-	if err != nil {
-		respondWithError(w, 500, "Couldn't make authentication token")
-		return
-	}
-
-	respondWithJSON(w, 200, struct {
-		Token string `json:"token"`
-	}{
-		Token: tokenString,
-	})
-}
-*/

@@ -7,7 +7,6 @@ import (
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
-	"github.com/proyectoNovedades/servicios/user"
 	"github.com/proyectoNovedades/servicios/userGoogle"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -16,9 +15,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
+	"github.com/joho/godotenv"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/google"
-	gf "github.com/shareed2k/goth_fiber"
 
 	"context"
 	"fmt"
@@ -122,6 +121,11 @@ type Files struct {
 
 func main() {
 
+	err := godotenv.Load()
+	if err != nil {
+		panic("No se pudo cargar el archivo .env")
+	}
+
 	goth.UseProviders(
 		google.New(os.Getenv("GOOGLEKEY"), os.Getenv("GOOGLESEC"), os.Getenv("GOOGLECALLBACK")),
 	)
@@ -192,48 +196,16 @@ func main() {
 
 	if connectedWithSql {
 		fmt.Println("Conectado con la base sql")
-
-		//User
-		app.Post("/User", user.CreateUser)
-		app.Get("/User/:item", user.GetUser)
-		app.Put("/User/:item", user.UpdateUser)
-		app.Delete("/User/:item", user.DeleteUser)
-
-		//Login
-		app.Post("/Login", user.Login)
 	} else {
 		fmt.Println("Problema al conectado con la base sql")
 	}
 
-	//----Google----
-	app.Get("/", user.ShowGoogleAuthentication)
-
-	app.Get("/auth/:provider/callback", func(ctx *fiber.Ctx) error {
-		user, err := gf.CompleteUserAuth(ctx)
-		if err != nil {
-			return err
-		}
-		ctx.JSON(user)
-		return nil
+	//----Prueba de conexion----
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Status(200).SendString("Conexion exitosa")
 	})
 
-	app.Get("/auth/:provider", func(ctx *fiber.Ctx) error {
-		if gothUser, err := gf.CompleteUserAuth(ctx); err == nil {
-			ctx.JSON(gothUser)
-		} else {
-			gf.BeginAuthHandler(ctx)
-		}
-		return nil
-	})
-
-	app.Get("/logout/:provider", func(ctx *fiber.Ctx) error {
-		gf.Logout(ctx)
-		ctx.Redirect("/")
-		return nil
-	})
-
-	fmt.Println(os.Getenv("PUERTO"))
-	err := app.Listen(os.Getenv("PUERTO"))
+	err = app.Listen(os.Getenv("PUERTO"))
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -253,7 +225,6 @@ func createConnectionWithMongo() bool {
 			return false
 		}
 		fmt.Println("Successfully connected and pinged.")
-		user.ConnectMongoDb(client)
 		novedades.ConnectMongoDb(client)
 		actividades.ConnectMongoDb(client)
 		proveedores.ConnectMongoDb(client)
@@ -267,13 +238,12 @@ func createConnectionWithMongo() bool {
 func createConnectionWithMysql() bool {
 	dsn := os.Getenv("MYSQLURI")
 	if dsn != "" {
-		db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		_, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 		if err != nil {
 			fmt.Println(err)
 			return false
 		}
 		fmt.Println("Successfully connected to Sql.")
-		user.ConnectMariaDb(db)
 		return true
 	}
 	return false
