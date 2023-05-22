@@ -123,7 +123,8 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		panic("No se pudo cargar el archivo .env")
+		fmt.Println("No se pudo cargar el archivo .env")
+		fmt.Println(err.Error())
 	}
 
 	goth.UseProviders(
