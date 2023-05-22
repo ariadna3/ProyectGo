@@ -13,7 +13,3 @@ En esta sección se encuentra los distintos objetos y funciones que se encargan 
 ## Implementaciones a futuro
 
 - Log: prueba de loggueo para implementar archivos de log
-
-## Servicios descontinuados
-
-- Files: prueba de ingreso de datos (Actualmente en novedades)

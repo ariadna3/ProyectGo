@@ -7,7 +7,6 @@ import (
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
-	"github.com/proyectoNovedades/servicios/user"
 	"github.com/proyectoNovedades/servicios/userGoogle"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -220,7 +219,6 @@ func createConnectionWithMongo() bool {
 			return false
 		}
 		fmt.Println("Successfully connected and pinged.")
-		user.ConnectMongoDb(client)
 		novedades.ConnectMongoDb(client)
 		actividades.ConnectMongoDb(client)
 		proveedores.ConnectMongoDb(client)
@@ -240,7 +238,6 @@ func createConnectionWithMysql() bool {
 			return false
 		}
 		fmt.Println("Successfully connected to Sql.")
-		user.ConnectMariaDb(db)
 		return true
 	}
 	return false
