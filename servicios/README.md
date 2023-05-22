@@ -17,4 +17,3 @@ En esta sección se encuentra los distintos objetos y funciones que se encargan 
 ## Servicios descontinuados
 
 - Files: prueba de ingreso de datos (Actualmente en novedades)
-- User: antiguo sistema de control de usuarios
