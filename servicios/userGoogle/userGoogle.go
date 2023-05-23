@@ -15,6 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -28,6 +29,13 @@ type UserITP struct {
 	Email           string `bson:"email"`
 	EsAdministrador bool   `bson:"esAdministrador"`
 	Rol             string `bson:"rol"`
+}
+
+type UserITPWithID struct {
+	Email           string `bson:"email"`
+	EsAdministrador bool   `bson:"esAdministrador"`
+	Rol             string `bson:"rol"`
+	Id              string
 }
 
 type GoogleClaims struct {
@@ -48,6 +56,19 @@ type Recursos struct {
 	FechaString string    `bson:"fechaString"`
 	Sueldo      int       `bson:"sueldo"`
 	Rcc         []P       `bson:"p"`
+}
+
+type RecursosWithID struct {
+	IdObject    primitive.ObjectID `bson:"_id"`
+	IdRecurso   int                `bson:"idRecurso"`
+	Nombre      string             `bson:"nombre"`
+	Apellido    string             `bson:"apellido"`
+	Legajo      int                `bson:"legajo"`
+	Mail        string             `bson:"mail"`
+	Fecha       time.Time          `bson:"date"`
+	FechaString string             `bson:"fechaString"`
+	Sueldo      int                `bson:"sueldo"`
+	Rcc         []P                `bson:"p"`
 }
 
 type P struct {
@@ -212,7 +233,7 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	fmt.Println(tokenString)
 
 	//valida el token
-	err, email := validacionDeUsuario(true, "", tokenString)
+	err, email := validacionDeUsuario(false, "", tokenString)
 	if err != nil {
 		if email != "" {
 			codigoError, _ := strconv.Atoi(email)
@@ -221,12 +242,23 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 		return c.Status(404).SendString(err.Error())
 	}
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
+
 	userITP := new(UserITP)
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
 	if err2 != nil {
 		return c.Status(404).SendString("usuario no encontrado")
 	}
-	return c.Status(200).JSON(userITP)
+	collR := client.Database("portalDeNovedades").Collection("recursos")
+	recurso := new(RecursosWithID)
+	err2 = collR.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
+
+	userITPWithID := new(UserITPWithID)
+	userITPWithID.Email = email
+	userITPWithID.EsAdministrador = userITP.EsAdministrador
+	userITPWithID.Rol = userITP.Rol
+	userITPWithID.Id = recurso.IdObject.Hex()
+
+	return c.Status(200).JSON(userITPWithID)
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
