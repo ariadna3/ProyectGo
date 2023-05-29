@@ -17,6 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var client *mongo.Client
@@ -149,6 +150,11 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 	return nil, email
 }
 
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
 func InsertUserITP(c *fiber.Ctx) error {
 
 	authHeader := c.Get("Authorization")
@@ -256,7 +262,11 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	userITPWithID.Email = email
 	userITPWithID.EsAdministrador = userITP.EsAdministrador
 	userITPWithID.Rol = userITP.Rol
-	userITPWithID.Id = recurso.IdObject.Hex()
+	idObjectHash, err := hashPassword(recurso.IdObject.Hex())
+	if err != nil {
+		return c.Status(401).SendString(err.Error())
+	}
+	userITPWithID.Id = idObjectHash
 
 	return c.Status(200).JSON(userITPWithID)
 }

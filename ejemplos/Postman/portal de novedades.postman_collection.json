@@ -522,6 +522,106 @@
 					"response": []
 				},
 				{
+					"name": "GetRecursoAll",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Recurso",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Recurso"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetRecursoWithSameCecos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "$2a$14$hpA89O4Inc2R2sDTQBjI8eVn5CUMNz9eaK8KWjpGFt5WAKCou/yTG",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Recurso/filted/30",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Recurso",
+								"filted",
+								"30"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetRecursoHash",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/HashRecurso/30",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"HashRecurso",
+								"30"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "DeleteRecurso",
 					"request": {
 						"method": "DELETE",
