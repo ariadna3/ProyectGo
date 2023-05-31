@@ -32,11 +32,12 @@ type UserITP struct {
 	Rol             string `bson:"rol"`
 }
 
-type UserITPWithID struct {
+type UserITPWithRecursosData struct {
 	Email           string `bson:"email"`
 	EsAdministrador bool   `bson:"esAdministrador"`
 	Rol             string `bson:"rol"`
-	Id              string
+	IdEncripted     string
+	IdSecuencial    int
 }
 
 type GoogleClaims struct {
@@ -258,17 +259,18 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	recurso := new(RecursosWithID)
 	err2 = collR.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
 
-	userITPWithID := new(UserITPWithID)
-	userITPWithID.Email = email
-	userITPWithID.EsAdministrador = userITP.EsAdministrador
-	userITPWithID.Rol = userITP.Rol
+	userITPWithRecursosData := new(UserITPWithRecursosData)
+	userITPWithRecursosData.Email = email
+	userITPWithRecursosData.EsAdministrador = userITP.EsAdministrador
+	userITPWithRecursosData.Rol = userITP.Rol
 	idObjectHash, err := hashPassword(recurso.IdObject.Hex())
 	if err != nil {
 		return c.Status(401).SendString(err.Error())
 	}
-	userITPWithID.Id = idObjectHash
+	userITPWithRecursosData.IdEncripted = idObjectHash
+	userITPWithRecursosData.IdSecuencial = recurso.IdRecurso
 
-	return c.Status(200).JSON(userITPWithID)
+	return c.Status(200).JSON(userITPWithRecursosData)
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
