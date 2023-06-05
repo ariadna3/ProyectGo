@@ -167,7 +167,7 @@ func main() {
 		//Tipo Novedades
 		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
 		//Periodos
-		app.Get("/Pediodos", recursos.GetFecha)
+		app.Get("/Periodos", recursos.GetFecha)
 
 		//Centro de Costos
 		app.Post("/Cecos", novedades.InsertCecos)
