@@ -13,12 +13,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/proyectoNovedades/servicios/userGoogle"
 )
 
 var client *mongo.Client
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
 	client = clientMongo
+	userGoogle.ConnectMongoDb(client)
 }
 
 type Recursos struct {
@@ -77,6 +80,27 @@ func GetFecha(c *fiber.Ctx) error {
 // ----Recursos----
 // insertar recurso
 func InsertRecurso(c *fiber.Ctx) error {
+
+	//Obtencion de token
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
+
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+
+	err, codigo := userGoogle.ValidacionDeUsuarioPropio(true, "", tokenString)
+	if err != nil {
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+
+	//obtencion de datos
 	recurso := new(Recursos)
 	if err := c.BodyParser(recurso); err != nil {
 		return c.Status(503).SendString(err.Error())

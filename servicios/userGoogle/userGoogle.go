@@ -30,6 +30,7 @@ type UserITP struct {
 	Email           string `bson:"email"`
 	EsAdministrador bool   `bson:"esAdministrador"`
 	Rol             string `bson:"rol"`
+	Token           string `bson:"token"`
 }
 
 type UserITPWithRecursosData struct {
@@ -151,6 +152,26 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 	return nil, email
 }
 
+func ValidacionDeUsuarioPropio(obligatorioAdministrador bool, rolEsperado string, token string) (error, string) {
+	//valida el mail
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	var usuario UserITP
+	err2 := coll.FindOne(context.TODO(), bson.M{"token": token}).Decode(&usuario)
+	if err2 != nil {
+		return errors.New("el usuario o token inexistente"), "401"
+	}
+
+	if obligatorioAdministrador && usuario.EsAdministrador == false {
+		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), "403"
+	}
+
+	if rolEsperado != "" && rolEsperado == usuario.Rol {
+		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), "403"
+	}
+
+	return nil, usuario.Email
+}
+
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
@@ -183,6 +204,7 @@ func InsertUserITP(c *fiber.Ctx) error {
 	if err := c.BodyParser(&userITP); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
+	userITP.Token = tokenString
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 
