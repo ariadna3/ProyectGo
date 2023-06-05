@@ -4,12 +4,15 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var client *mongo.Client
@@ -28,6 +31,19 @@ type Recursos struct {
 	FechaString string    `bson:"fechaString"`
 	Sueldo      int       `bson:"sueldo"`
 	Rcc         []P       `bson:"p"`
+}
+
+type RecursosWithID struct {
+	IdObject    primitive.ObjectID `bson:"_id"`
+	IdRecurso   int                `bson:"idRecurso"`
+	Nombre      string             `bson:"nombre"`
+	Apellido    string             `bson:"apellido"`
+	Legajo      int                `bson:"legajo"`
+	Mail        string             `bson:"mail"`
+	Fecha       time.Time          `bson:"date"`
+	FechaString string             `bson:"fechaString"`
+	Sueldo      int                `bson:"sueldo"`
+	Rcc         []P                `bson:"p"`
 }
 
 type P struct {
@@ -145,6 +161,49 @@ func GetRecursoAll(c *fiber.Ctx) error {
 	return c.Status(200).JSON(recursos)
 }
 
+// obtener todos los recursos del mismo centro de costos
+func GetRecursoSameCecos(c *fiber.Ctx) error {
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
+
+	// Parsea el token
+	idObject := strings.Replace(authHeader, "Bearer ", "", 1)
+	fmt.Println(idObject)
+
+	coll := client.Database("portalDeNovedades").Collection("recursos")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	var recurso RecursosWithID
+	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
+	fmt.Println(coll)
+	if err != nil {
+		fmt.Print(err)
+		return c.Status(404).SendString("No encontrado")
+	}
+
+	if !checkPasswordHash(recurso.IdObject.Hex(), idObject) {
+		return c.Status(403).SendString("usuario no correspondiente a este recurso")
+	}
+
+	var listadoCentrosDeCostos []bson.M
+	for _, ceco := range recurso.Rcc {
+		listadoCentrosDeCostos = append(listadoCentrosDeCostos, bson.M{"p.cc": ceco.CcNum})
+	}
+
+	cursor, err := coll.Find(context.TODO(), bson.M{"$or": listadoCentrosDeCostos})
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
+	var recursos []Recursos
+	if err = cursor.All(context.Background(), &recursos); err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
+
+	return c.Status(200).JSON(recursos)
+}
+
 // borrar recurso por id
 func DeleteRecurso(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("recursos")
@@ -155,4 +214,33 @@ func DeleteRecurso(c *fiber.Ctx) error {
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
 	return c.Status(200).SendString("recurso eliminado")
+}
+
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func GetRecursoHash(c *fiber.Ctx) error {
+	coll := client.Database("portalDeNovedades").Collection("recursos")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	var recurso RecursosWithID
+	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
+	fmt.Println(coll)
+	if err != nil {
+		fmt.Print(err)
+		return c.Status(404).SendString("No encontrado")
+	}
+
+	hash, err := hashPassword(recurso.IdObject.Hex())
+	if err != nil {
+		return c.Status(400).SendString(err.Error())
+	}
+
+	return c.Status(200).SendString(hash)
 }

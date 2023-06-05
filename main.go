@@ -166,6 +166,8 @@ func main() {
 
 		//Tipo Novedades
 		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
+		//Periodos
+		app.Get("/Periodos", recursos.GetFecha)
 
 		//Centro de Costos
 		app.Post("/Cecos", novedades.InsertCecos)
@@ -182,7 +184,9 @@ func main() {
 		app.Post("/Recurso", recursos.InsertRecurso)
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
+		app.Get("/Recurso/filted/:id", recursos.GetRecursoSameCecos)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
+		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser
 		app.Post("/user", userGoogle.InsertUserITP)

@@ -15,7 +15,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var client *mongo.Client
@@ -28,6 +30,14 @@ type UserITP struct {
 	Email           string `bson:"email"`
 	EsAdministrador bool   `bson:"esAdministrador"`
 	Rol             string `bson:"rol"`
+}
+
+type UserITPWithRecursosData struct {
+	Email           string `bson:"email"`
+	EsAdministrador bool   `bson:"esAdministrador"`
+	Rol             string `bson:"rol"`
+	IdEncripted     string
+	IdSecuencial    int
 }
 
 type GoogleClaims struct {
@@ -48,6 +58,19 @@ type Recursos struct {
 	FechaString string    `bson:"fechaString"`
 	Sueldo      int       `bson:"sueldo"`
 	Rcc         []P       `bson:"p"`
+}
+
+type RecursosWithID struct {
+	IdObject    primitive.ObjectID `bson:"_id"`
+	IdRecurso   int                `bson:"idRecurso"`
+	Nombre      string             `bson:"nombre"`
+	Apellido    string             `bson:"apellido"`
+	Legajo      int                `bson:"legajo"`
+	Mail        string             `bson:"mail"`
+	Fecha       time.Time          `bson:"date"`
+	FechaString string             `bson:"fechaString"`
+	Sueldo      int                `bson:"sueldo"`
+	Rcc         []P                `bson:"p"`
 }
 
 type P struct {
@@ -126,6 +149,11 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 	}
 
 	return nil, email
+}
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
 }
 
 func InsertUserITP(c *fiber.Ctx) error {
@@ -212,7 +240,7 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	fmt.Println(tokenString)
 
 	//valida el token
-	err, email := validacionDeUsuario(true, "", tokenString)
+	err, email := validacionDeUsuario(false, "", tokenString)
 	if err != nil {
 		if email != "" {
 			codigoError, _ := strconv.Atoi(email)
@@ -221,12 +249,28 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 		return c.Status(404).SendString(err.Error())
 	}
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
+
 	userITP := new(UserITP)
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
 	if err2 != nil {
 		return c.Status(404).SendString("usuario no encontrado")
 	}
-	return c.Status(200).JSON(userITP)
+	collR := client.Database("portalDeNovedades").Collection("recursos")
+	recurso := new(RecursosWithID)
+	err2 = collR.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
+
+	userITPWithRecursosData := new(UserITPWithRecursosData)
+	userITPWithRecursosData.Email = email
+	userITPWithRecursosData.EsAdministrador = userITP.EsAdministrador
+	userITPWithRecursosData.Rol = userITP.Rol
+	idObjectHash, err := hashPassword(recurso.IdObject.Hex())
+	if err != nil {
+		return c.Status(401).SendString(err.Error())
+	}
+	userITPWithRecursosData.IdEncripted = idObjectHash
+	userITPWithRecursosData.IdSecuencial = recurso.IdRecurso
+
+	return c.Status(200).JSON(userITPWithRecursosData)
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
