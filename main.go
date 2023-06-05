@@ -186,7 +186,7 @@ func main() {
 		app.Get("/Recurso", recursos.GetRecursoAll)
 		app.Get("/Recurso/filted/:id", recursos.GetRecursoSameCecos)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
-		app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
+		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser
 		app.Post("/user", userGoogle.InsertUserITP)
