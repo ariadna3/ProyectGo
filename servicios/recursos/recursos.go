@@ -17,6 +17,10 @@ import (
 	"github.com/proyectoNovedades/servicios/userGoogle"
 )
 
+const adminRequired = true
+const adminNotRequired = false
+const anyRol = ""
+
 var client *mongo.Client
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
@@ -91,7 +95,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 	// Parsea el token
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
 
-	err, codigo := userGoogle.ValidacionDeUsuarioPropio(true, "", tokenString)
+	err, codigo := userGoogle.ValidacionDeUsuarioPropio(adminNotRequired, anyRol, tokenString)
 	if err != nil {
 		if codigo != "" {
 			codigoError, _ := strconv.Atoi(codigo)
