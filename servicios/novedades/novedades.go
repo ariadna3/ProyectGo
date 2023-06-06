@@ -17,7 +17,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/proyectoNovedades/servicios/userGoogle"
 )
+
+const adminRequired = true
+const adminNotRequired = false
+const anyRol = ""
 
 type Novedades struct {
 	IdSecuencial          int      `bson:"idSecuencial"`
@@ -107,11 +113,32 @@ var client *mongo.Client
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
 	client = clientMongo
+	userGoogle.ConnectMongoDb(client)
 }
 
 // ----Novedades----
 // insertar novedad
 func InsertNovedad(c *fiber.Ctx) error {
+
+	//Obtencion de token
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
+
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+
+	err, codigo := userGoogle.ValidacionDeUsuarioPropio(adminNotRequired, anyRol, tokenString)
+	if err != nil {
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+
 	//obtiene los datos
 	novedad := new(Novedades)
 	if err := c.BodyParser(novedad); err != nil {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
@@ -11,7 +12,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
+
+	"github.com/proyectoNovedades/servicios/userGoogle"
 )
+
+const adminRequired = true
+const adminNotRequired = false
+const anyRol = ""
 
 type Actividades struct {
 	IdActividad int    `bson:"idActividad"`
@@ -30,15 +37,39 @@ var isProd bool = false       // Set to true when serving over https
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
 	client = clientMongo
+	userGoogle.ConnectMongoDb(client)
 }
 
 // ----Actividades----
 // insertar actividad
 func InsertActividad(c *fiber.Ctx) error {
+
+	//Obtencion de token
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
+
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+
+	err, codigo := userGoogle.ValidacionDeUsuarioPropio(adminNotRequired, anyRol, tokenString)
+	if err != nil {
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+
+	// obtencion de datos
 	actividad := new(Actividades)
 	if err := c.BodyParser(actividad); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
+
+	// obtiene el ultimo id
 	coll := client.Database("portalDeNovedades").Collection("actividades")
 	filter := bson.D{}
 	opts := options.Find().SetSort(bson.D{{"idActividad", -1}})
@@ -58,6 +89,8 @@ func InsertActividad(c *fiber.Ctx) error {
 	} else {
 		actividad.IdActividad = results[0].IdActividad + 1
 	}
+
+	// inserta la actividad
 	result, err := coll.InsertOne(context.TODO(), actividad)
 	if err != nil {
 		c.Status(404).SendString(err.Error())
