@@ -194,6 +194,7 @@ func main() {
 		app.Get("/user/:email", userGoogle.GetUserITP)
 		app.Delete("user/:email", userGoogle.DeleteUserITP)
 		app.Patch("/user", userGoogle.UpdateUserITP)
+		app.Get("/users", userGoogle.GetUserITPAll)
 
 	} else {
 		fmt.Println("Problema al conectarse con mongo")

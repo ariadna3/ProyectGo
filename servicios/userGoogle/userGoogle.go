@@ -27,12 +27,16 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 }
 
 type UserITP struct {
+	Nombre          string `bson:"nombre"`
+	Apellido        string `bson:"apellido"`
 	Email           string `bson:"email"`
 	EsAdministrador bool   `bson:"esAdministrador"`
 	Rol             string `bson:"rol"`
 }
 
 type UserITPWithRecursosData struct {
+	Nombre          string `bson:"nombre"`
+	Apellido        string `bson:"apellido"`
 	Email           string `bson:"email"`
 	EsAdministrador bool   `bson:"esAdministrador"`
 	Rol             string `bson:"rol"`
@@ -144,8 +148,17 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), "403"
 	}
 
-	if rolEsperado != "" && rolEsperado == usuario.Rol {
-		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), "403"
+	if rolEsperado != "" {
+		result := strings.Split(rolEsperado, ",")
+		var encontradoElRol bool
+		for _, rol := range result {
+			if rol == usuario.Rol {
+				encontradoElRol = true
+			}
+		}
+		if !encontradoElRol {
+			return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), "403"
+		}
 	}
 
 	return nil, email
@@ -166,7 +179,6 @@ func InsertUserITP(c *fiber.Ctx) error {
 
 	// Parsea el token
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(tokenString)
 
 	//valida el token
 	err, codigo := validacionDeUsuario(true, "", tokenString)
@@ -182,6 +194,17 @@ func InsertUserITP(c *fiber.Ctx) error {
 	var userITP UserITP
 	if err := c.BodyParser(&userITP); err != nil {
 		return c.Status(503).SendString(err.Error())
+	}
+
+	if userITP.Nombre == "" || userITP.Apellido == "" {
+		coll := client.Database("portalDeNovedades").Collection("recursos")
+		email := userITP.Email
+		var recurso Recursos
+		err2 := coll.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
+		if err2 == nil {
+			userITP.Nombre = recurso.Nombre
+			userITP.Apellido = recurso.Apellido
+		}
 	}
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
@@ -205,7 +228,6 @@ func GetUserITP(c *fiber.Ctx) error {
 
 	// Parsea el token
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(tokenString)
 
 	//valida el token
 	err, codigo := validacionDeUsuario(true, "", tokenString)
@@ -237,7 +259,6 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 
 	// Parsea el token
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(tokenString)
 
 	//valida el token
 	err, email := validacionDeUsuario(false, "", tokenString)
@@ -273,6 +294,40 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	return c.Status(200).JSON(userITPWithRecursosData)
 }
 
+// obtener todos los usuarios
+func GetUserITPAll(c *fiber.Ctx) error {
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
+
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+
+	//valida el token
+	err, codigo := validacionDeUsuario(true, "admin,servicios", tokenString)
+	if err != nil {
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(404).SendString(err.Error())
+	}
+
+	//obtener los usuarios
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
+	var usuarios []UserITP
+	if err = cursor.All(context.Background(), &usuarios); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	return c.Status(200).JSON(usuarios)
+}
+
 func DeleteUserITP(c *fiber.Ctx) error {
 	authHeader := c.Get("Authorization")
 	if authHeader == "" {
@@ -282,7 +337,6 @@ func DeleteUserITP(c *fiber.Ctx) error {
 
 	// Parsea el token
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(tokenString)
 
 	//valida el token
 	err, codigo := validacionDeUsuario(true, "", tokenString)
@@ -313,7 +367,6 @@ func UpdateUserITP(c *fiber.Ctx) error {
 
 	// Parsea el token
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(tokenString)
 
 	//valida el token
 	err, codigo := validacionDeUsuario(true, "", tokenString)
