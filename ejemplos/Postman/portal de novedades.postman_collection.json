@@ -102,7 +102,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Comentarios\": \"\",\r\n    \"DistribucionesStr\": \"[{\\\"Cecos\\\": {\\\"Cliente\\\": \\\"NNNNN\\\",\\\"Codigo\\\": 100,\\\"IdCecos\\\": 38,\\\"Proyecto\\\": \\\"undefined\\\"},\\\"Porcentaje\\\":100}]\",\r\n    \"Fecha\": \"2023-05-10\",\r\n    \"Freelance\": false,\r\n    \"Hora\": \"13:57:54\",\r\n    \"ImporteTotal\": 66,\r\n    \"Periodo\": \"04-2023\",\r\n    \"Plazo\": \"undefined\",\r\n    \"Proveedor\": \"ABAXDECO S.R.L (000772)\",\r\n    \"Tipo\": \"PP\",\r\n    \"Usuario\": \"aturne\",\r\n    \"Recurso\": {\r\n        \"HorasExtras\":[{\r\n            \"TipoDia\": \"Feriado\",\r\n            \"TipoHora\": \"Diurno\",\r\n            \"Cantidad\": 100\r\n        }],\r\n        \"Rcc\":[\r\n            {\r\n                \"ccNombre\": \"ICBC\",\r\n                \"ccPorc\": 100.0\r\n            }\r\n        ]\r\n    }\r\n}",
+							"raw": "{\r\n    \"Comentarios\": \"\",\r\n    \"DistribucionesStr\": \"[{\\\"Cecos\\\": {\\\"Cliente\\\": \\\"NNNNN\\\",\\\"Codigo\\\": 100,\\\"IdCecos\\\": 38,\\\"Proyecto\\\": \\\"undefined\\\"},\\\"Porcentaje\\\":100}]\",\r\n    \"Fecha\": \"2023-05-10\",\r\n    \"Freelance\": false,\r\n    \"Hora\": \"13:57:54\",\r\n    \"ImporteTotal\": 66,\r\n    \"Periodo\": \"04-2023\",\r\n    \"Plazo\": \"undefined\",\r\n    \"Proveedor\": \"ABAXDECO S.R.L (000772)\",\r\n    \"Departamento\":\"Departamento de ejemplo\",\r\n    \"Tipo\": \"NP\",\r\n    \"Usuario\": \"aturne\",\r\n    \"Recurso\": {\r\n        \"HorasExtras\":[{\r\n            \"TipoDia\": \"Feriado\",\r\n            \"TipoHora\": \"Diurno\",\r\n            \"Cantidad\": 100\r\n        }],\r\n        \"Rcc\":[\r\n            {\r\n                \"ccNombre\": \"ICBC\",\r\n                \"ccPorc\": 100.0\r\n            }\r\n        ]\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -204,7 +204,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Novedad/?tipo=PP&fecha=&hora&usuario&proveedor&periodo&conceptoDeFacturacion&comentarios&cliente&estados&adjunto=algo",
+							"raw": "{{url}}/Novedad/?tipo=NP&fecha=&hora&usuario&proveedor&periodo&conceptoDeFacturacion&comentarios&cliente&estados&adjunto=algo&departamento=Departamento",
 							"host": [
 								"{{url}}"
 							],
@@ -215,7 +215,7 @@
 							"query": [
 								{
 									"key": "tipo",
-									"value": "PP"
+									"value": "NP"
 								},
 								{
 									"key": "fecha",
@@ -256,6 +256,10 @@
 								{
 									"key": "adjunto",
 									"value": "algo"
+								},
+								{
+									"key": "departamento",
+									"value": "Departamento"
 								}
 							]
 						}
@@ -916,13 +920,40 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/user/lgonzalez@itpatagonia.com",
+							"raw": "{{url}}/user/aturne@itpatagonia.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"user",
-								"lgonzalez@itpatagonia.com"
+								"aturne@itpatagonia.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserAll",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI1MTg4NTgsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNTE5MTU4LCJleHAiOjE2ODI1MjI3NTgsImp0aSI6Ijk2ZmFkMzg3YmFhMDg1ZGQzZDdhMjNjMGJkMGQ2ODZkMmEzMWQ0NjEifQ.oS2vwGmB8OVfLPvkO5mc44BGeJcIOrLTeYui-kv-7EZE_QpBZR8p62Nqh8I_tYJQqbOYqvZclJrcfUTe2GYdUhpR_el-H2u6aGLqsjEN1Ss8sZZfv0WXnesL2uQKSwja-V2G_kEJnJs8btd8JjHJp3-9eBRKJmtO3KQPIDgWOcSArMRWNY7-W9kKLQ6WNAYsXsgfReSK-1mtXoMOubcaJ7uQkNGCMNzgEEqTuON5gP6n6tA2TfvOu5SBvIQXW4Hg5WNQfHOaEJsVYd6hpTy_ECqQeGEpzApxt1OSjm561aHKNre_PTx3Un4woy2SJEPgzYGOl01Gkqy6dX1yAeci_w",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
 							]
 						}
 					},
