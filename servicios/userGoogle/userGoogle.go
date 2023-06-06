@@ -15,7 +15,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var client *mongo.Client
@@ -28,6 +30,15 @@ type UserITP struct {
 	Email           string `bson:"email"`
 	EsAdministrador bool   `bson:"esAdministrador"`
 	Rol             string `bson:"rol"`
+	Token           string `bson:"token"`
+}
+
+type UserITPWithRecursosData struct {
+	Email           string `bson:"email"`
+	EsAdministrador bool   `bson:"esAdministrador"`
+	Rol             string `bson:"rol"`
+	IdEncripted     string
+	IdSecuencial    int
 }
 
 type GoogleClaims struct {
@@ -48,6 +59,19 @@ type Recursos struct {
 	FechaString string    `bson:"fechaString"`
 	Sueldo      int       `bson:"sueldo"`
 	Rcc         []P       `bson:"p"`
+}
+
+type RecursosWithID struct {
+	IdObject    primitive.ObjectID `bson:"_id"`
+	IdRecurso   int                `bson:"idRecurso"`
+	Nombre      string             `bson:"nombre"`
+	Apellido    string             `bson:"apellido"`
+	Legajo      int                `bson:"legajo"`
+	Mail        string             `bson:"mail"`
+	Fecha       time.Time          `bson:"date"`
+	FechaString string             `bson:"fechaString"`
+	Sueldo      int                `bson:"sueldo"`
+	Rcc         []P                `bson:"p"`
 }
 
 type P struct {
@@ -85,24 +109,6 @@ func getGooglePublicKey(keyID string) (string, error) {
 		return "", errors.New("key not found")
 	}
 	return key, nil
-}
-
-func revokeToken(token string) error {
-	url := fmt.Sprintf("https://accounts.google.com/o/oauth2/revoke?token=%s", token)
-	resp, err := http.Post(url, "", nil)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	fmt.Print("Response revoke: ")
-	fmt.Println(resp)
-
-	// Comprobar si la respuesta HTTP indica éxito o fracaso
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Error al revocar el token: %s", resp.Status)
-	}
-
-	return nil
 }
 
 func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, token string) (error, string) {
@@ -146,6 +152,31 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 	return nil, email
 }
 
+func ValidacionDeUsuarioPropio(obligatorioAdministrador bool, rolEsperado string, token string) (error, string) {
+	//valida el mail
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	var usuario UserITP
+	err2 := coll.FindOne(context.TODO(), bson.M{"token": token}).Decode(&usuario)
+	if err2 != nil {
+		return errors.New("el usuario o token inexistente"), "401"
+	}
+
+	if obligatorioAdministrador && usuario.EsAdministrador == false {
+		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), "403"
+	}
+
+	if rolEsperado != "" && rolEsperado == usuario.Rol {
+		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), "403"
+	}
+
+	return nil, usuario.Email
+}
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
 func InsertUserITP(c *fiber.Ctx) error {
 
 	authHeader := c.Get("Authorization")
@@ -173,6 +204,7 @@ func InsertUserITP(c *fiber.Ctx) error {
 	if err := c.BodyParser(&userITP); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
+	userITP.Token = tokenString
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 
@@ -240,7 +272,7 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	fmt.Println(tokenString)
 
 	//valida el token
-	err, email := validacionDeUsuario(true, "", tokenString)
+	err, email := validacionDeUsuario(false, "", tokenString)
 	if err != nil {
 		if email != "" {
 			codigoError, _ := strconv.Atoi(email)
@@ -249,12 +281,28 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 		return c.Status(404).SendString(err.Error())
 	}
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
+
 	userITP := new(UserITP)
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
 	if err2 != nil {
 		return c.Status(404).SendString("usuario no encontrado")
 	}
-	return c.Status(200).JSON(userITP)
+	collR := client.Database("portalDeNovedades").Collection("recursos")
+	recurso := new(RecursosWithID)
+	err2 = collR.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
+
+	userITPWithRecursosData := new(UserITPWithRecursosData)
+	userITPWithRecursosData.Email = email
+	userITPWithRecursosData.EsAdministrador = userITP.EsAdministrador
+	userITPWithRecursosData.Rol = userITP.Rol
+	idObjectHash, err := hashPassword(recurso.IdObject.Hex())
+	if err != nil {
+		return c.Status(401).SendString(err.Error())
+	}
+	userITPWithRecursosData.IdEncripted = idObjectHash
+	userITPWithRecursosData.IdSecuencial = recurso.IdRecurso
+
+	return c.Status(200).JSON(userITPWithRecursosData)
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
@@ -366,51 +414,8 @@ func ValidateGoogleJWT(tokenString string) (error, string) {
 	}
 
 	if claims.ExpiresAt < time.Now().UTC().Unix() {
-		revokeToken(tokenString)
 		return errors.New("JWT is expired"), "401"
 	}
 
 	return nil, *&claims.Email
 }
-
-/*
-func loginHandler(c *fiber.Ctx) {
-	defer r.Body.Close()
-
-	// parse the GoogleJWT that was POSTed from the front-end
-	type parameters struct {
-		GoogleJWT *string
-	}
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err := decoder.Decode(&params)
-	if err != nil {
-		respondWithError(w, 500, "Couldn't decode parameters")
-		return
-	}
-
-	// Validate the JWT is valid
-	claims, err := auth.ValidateGoogleJWT(*params.GoogleJWT)
-	if err != nil {
-		respondWithError(w, 403, "Invalid google auth")
-		return
-	}
-	if claims.Email != user.Email {
-		respondWithError(w, 403, "Emails don't match")
-		return
-	}
-
-	// create a JWT for OUR app and give it back to the client for future requests
-	tokenString, err := auth.MakeJWT(claims.Email, cfg.JWTSecret)
-	if err != nil {
-		respondWithError(w, 500, "Couldn't make authentication token")
-		return
-	}
-
-	respondWithJSON(w, 200, struct {
-		Token string `json:"token"`
-	}{
-		Token: tokenString,
-	})
-}
-*/
