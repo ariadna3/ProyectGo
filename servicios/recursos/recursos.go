@@ -200,6 +200,7 @@ func GetRecursoSameCecos(c *fiber.Ctx) error {
 	}
 
 	// Parsea el token
+	authHeader := c.Get("Authorization")
 	idObject := strings.Replace(authHeader, "Bearer ", "", 1)
 	fmt.Println(idObject)
 
