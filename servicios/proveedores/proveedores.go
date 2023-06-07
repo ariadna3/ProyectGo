@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
@@ -42,23 +41,10 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 // insertar proveedor
 func InsertProveedor(c *fiber.Ctx) error {
 
-	//Obtencion de token
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		// El token no está presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
-	}
-
-	// Parsea el token
-	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-
-	err, codigo := userGoogle.ValidacionDeUsuarioPropio(adminNotRequired, anyRol, tokenString)
-	if err != nil {
-		if codigo != "" {
-			codigoError, _ := strconv.Atoi(codigo)
-			return c.Status(codigoError).SendString(err.Error())
-		}
-		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
 	}
 
 	// obtencion de datos
@@ -94,6 +80,13 @@ func InsertProveedor(c *fiber.Ctx) error {
 
 // obtener proveedor por id
 func GetProveedor(c *fiber.Ctx) error {
+
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
 	coll := client.Database("portalDeNovedades").Collection("proveedores")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idProveedor": idNumber})
@@ -110,6 +103,13 @@ func GetProveedor(c *fiber.Ctx) error {
 
 // obtener todos los proveedores
 func GetProveedorAll(c *fiber.Ctx) error {
+
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
 	coll := client.Database("portalDeNovedades").Collection("proveedores")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
@@ -125,6 +125,13 @@ func GetProveedorAll(c *fiber.Ctx) error {
 
 // borrar proveedor por id
 func DeleteProveedor(c *fiber.Ctx) error {
+
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
 	coll := client.Database("portalDeNovedades").Collection("proveedores")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idProveedor": idNumber})

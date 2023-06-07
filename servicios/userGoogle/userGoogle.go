@@ -20,6 +20,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const adminRequired = true
+const adminNotRequired = false
+const anyRol = ""
+
 var client *mongo.Client
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
@@ -177,34 +181,36 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func InsertUserITP(c *fiber.Ctx) error {
-
-	authHeader := c.Get("Authorization")
+func Authorization(authHeader string, administrationRequired bool, rolRequired string) (error, int, bool) {
 	if authHeader == "" {
-		// El token no está presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+
+		// el token no esta presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación"), fiber.StatusBadRequest, false
 	}
 
-	// Parsea el token
-	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+	// parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer", "", 1)
 	fmt.Println(tokenString)
 
-	//valida el token
-	err, codigo := validacionDeUsuario(true, "", tokenString)
+	// valida el token
+	err, codigo := ValidacionDeUsuarioPropio(administrationRequired, rolRequired, tokenString)
 	if err != nil {
 		if codigo != "" {
 			codigoError, _ := strconv.Atoi(codigo)
-			return c.Status(codigoError).SendString(err.Error())
+			return err, codigoError, false
 		}
-		return c.Status(404).SendString(err.Error())
+		return err, fiber.StatusBadRequest, false
 	}
+	return nil, fiber.StatusAccepted, true
+}
+
+func InsertUserITP(c *fiber.Ctx) error {
 
 	//obtiene los datos
 	var userITP UserITP
 	if err := c.BodyParser(&userITP); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
-	userITP.Token = tokenString
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 
@@ -221,25 +227,6 @@ func InsertUserITP(c *fiber.Ctx) error {
 }
 
 func GetUserITP(c *fiber.Ctx) error {
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		// El token no está presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
-	}
-
-	// Parsea el token
-	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(tokenString)
-
-	//valida el token
-	err, codigo := validacionDeUsuario(true, "", tokenString)
-	if err != nil {
-		if codigo != "" {
-			codigoError, _ := strconv.Atoi(codigo)
-			return c.Status(codigoError).SendString(err.Error())
-		}
-		return c.Status(404).SendString(err.Error())
-	}
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 	email := c.Params("email")
@@ -298,26 +285,6 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		// El token no está presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
-	}
-
-	// Parsea el token
-	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(tokenString)
-
-	//valida el token
-	err, codigo := validacionDeUsuario(true, "", tokenString)
-	if err != nil {
-		if codigo != "" {
-			codigoError, _ := strconv.Atoi(codigo)
-			return c.Status(codigoError).SendString(err.Error())
-		}
-		return c.Status(404).SendString(err.Error())
-	}
-
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 	emailDelete := c.Params("email")
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"email": emailDelete})
@@ -329,26 +296,6 @@ func DeleteUserITP(c *fiber.Ctx) error {
 }
 
 func UpdateUserITP(c *fiber.Ctx) error {
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		// El token no está presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
-	}
-
-	// Parsea el token
-	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(tokenString)
-
-	//valida el token
-	err, codigo := validacionDeUsuario(true, "", tokenString)
-	if err != nil {
-		if codigo != "" {
-			codigoError, _ := strconv.Atoi(codigo)
-			return c.Status(codigoError).SendString(err.Error())
-		}
-		return c.Status(404).SendString(err.Error())
-	}
-
 	usuario := new(UserITP)
 	if err := c.BodyParser(usuario); err != nil {
 		return c.Status(503).SendString(err.Error())
