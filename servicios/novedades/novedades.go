@@ -57,6 +57,7 @@ type Novedades struct {
 	Resumen               string              `bson:"resumen"`
 	Aprobador             string              `bson:"aprobador"`
 	Prioridad             string              `bson:"prioridad"`
+	Departamento          string              `bson:"departamento"`
 	Reclamo               bool                `bson:"reclamo"`
 	Freelance             bool                `bson:"freelance"`
 }
@@ -281,6 +282,9 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	}
 	if c.Query("aprobador") != "" {
 		busqueda["aprobador"] = bson.M{"$regex": c.Query("aprobador"), "$options": "im"}
+	}
+	if c.Query("departamento") != "" {
+		busqueda["departamento"] = bson.M{"$regex": c.Query("departamento"), "$options": "im"}
 	}
 	fmt.Println(busqueda)
 	cursor, err := coll.Find(context.TODO(), busqueda)
@@ -643,11 +647,12 @@ func resumenNovedad(novedad Novedades) string {
 	}
 	if novedad.Tipo == "NP" {
 		resumenDict = map[string]interface{}{
-			"Descripcion": novedad.Descripcion,
-			"Usuario":     novedad.Usuario,
-			"Adjuntos":    novedad.Adjuntos,
-			"Periodo":     novedad.Periodo,
-			"Comentarios": novedad.Comentarios,
+			"Descripcion":  novedad.Descripcion,
+			"Usuario":      novedad.Usuario,
+			"Adjuntos":     novedad.Adjuntos,
+			"Periodo":      novedad.Periodo,
+			"Comentarios":  novedad.Comentarios,
+			"Departamento": novedad.Departamento,
 		}
 	}
 	resumenJson, err := json.Marshal(resumenDict)
