@@ -164,7 +164,7 @@ func InsertNovedad(c *fiber.Ctx) error {
 		novedad.IdSecuencial = results[0].IdSecuencial + 1
 	}
 
-	//ingresa los archivos los archivos
+	//ingresa los archivos
 	form, err := c.MultipartForm()
 	if err != nil {
 		fmt.Println(err)

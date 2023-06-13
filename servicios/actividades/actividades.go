@@ -89,10 +89,10 @@ func InsertActividad(c *fiber.Ctx) error {
 func GetActividad(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
-	if error != nil {
-		return c.Status(codigo).SendString(error.Error())
-	}
+	//	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	//	if error != nil {
+	//		return c.Status(codigo).SendString(error.Error())
+	//	}
 
 	coll := client.Database("portalDeNovedades").Collection("actividades")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
