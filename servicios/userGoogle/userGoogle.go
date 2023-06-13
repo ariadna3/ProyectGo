@@ -194,10 +194,10 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func Authorization(authHeader string, administrationRequired bool, rolRequired string) (error, int, bool) {
+func Authorization(authHeader string, administrationRequired bool, rolRequired string) (error, int, string) {
 	if authHeader == "" {
 		// el token no esta presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación"), fiber.StatusBadRequest, false
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación"), fiber.StatusBadRequest, ""
 	}
 
 	// parsea el token
@@ -209,11 +209,11 @@ func Authorization(authHeader string, administrationRequired bool, rolRequired s
 	if err != nil {
 		if codigo != "" {
 			codigoError, _ := strconv.Atoi(codigo)
-			return err, codigoError, false
+			return err, codigoError, ""
 		}
-		return err, fiber.StatusBadRequest, false
+		return err, fiber.StatusBadRequest, ""
 	}
-	return nil, fiber.StatusAccepted, true
+	return nil, fiber.StatusAccepted, codigo
 }
 
 func InsertUserITP(c *fiber.Ctx) error {
