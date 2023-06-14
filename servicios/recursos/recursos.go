@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,12 +12,19 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/proyectoNovedades/servicios/userGoogle"
 )
+
+const adminRequired = true
+const adminNotRequired = false
+const anyRol = ""
 
 var client *mongo.Client
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
 	client = clientMongo
+	userGoogle.ConnectMongoDb(client)
 }
 
 type Recursos struct {
@@ -77,6 +83,14 @@ func GetFecha(c *fiber.Ctx) error {
 // ----Recursos----
 // insertar recurso
 func InsertRecurso(c *fiber.Ctx) error {
+
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	//obtencion de datos
 	recurso := new(Recursos)
 	if err := c.BodyParser(recurso); err != nil {
 		return c.Status(503).SendString(err.Error())
@@ -133,6 +147,13 @@ func InsertRecurso(c *fiber.Ctx) error {
 
 // obtener recurso por id
 func GetRecurso(c *fiber.Ctx) error {
+
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	var recurso Recursos
@@ -148,6 +169,13 @@ func GetRecurso(c *fiber.Ctx) error {
 
 // obtener todos los recursos
 func GetRecursoAll(c *fiber.Ctx) error {
+
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
@@ -163,28 +191,20 @@ func GetRecursoAll(c *fiber.Ctx) error {
 
 // obtener todos los recursos del mismo centro de costos
 func GetRecursoSameCecos(c *fiber.Ctx) error {
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		// El token no está presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+
+	// validar el token
+	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
 	}
 
-	// Parsea el token
-	idObject := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(idObject)
-
 	coll := client.Database("portalDeNovedades").Collection("recursos")
-	idNumber, _ := strconv.Atoi(c.Params("id"))
 	var recurso RecursosWithID
-	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
+	err := coll.FindOne(context.TODO(), bson.D{{"mail", email}}).Decode(&recurso)
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 		return c.Status(404).SendString("No encontrado")
-	}
-
-	if !checkPasswordHash(recurso.IdObject.Hex(), idObject) {
-		return c.Status(403).SendString("usuario no correspondiente a este recurso")
 	}
 
 	var listadoCentrosDeCostos []bson.M
@@ -206,6 +226,13 @@ func GetRecursoSameCecos(c *fiber.Ctx) error {
 
 // borrar recurso por id
 func DeleteRecurso(c *fiber.Ctx) error {
+
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
 	coll := client.Database("portalDeNovedades").Collection("recursos")
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idRecurso": idNumber})

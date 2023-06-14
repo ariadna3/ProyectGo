@@ -20,6 +20,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const adminRequired = true
+const adminNotRequired = false
+const anyRol = ""
+
 var client *mongo.Client
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
@@ -32,6 +36,7 @@ type UserITP struct {
 	Email           string `bson:"email"`
 	EsAdministrador bool   `bson:"esAdministrador"`
 	Rol             string `bson:"rol"`
+	Token           string `bson:"token"`
 }
 
 type UserITPWithRecursosData struct {
@@ -164,31 +169,54 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 	return nil, email
 }
 
+func ValidacionDeUsuarioPropio(obligatorioAdministrador bool, rolEsperado string, token string) (error, string) {
+	//valida el mail
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	var usuario UserITP
+	err2 := coll.FindOne(context.TODO(), bson.M{"token": token}).Decode(&usuario)
+	if err2 != nil {
+		return errors.New("el usuario o token inexistente"), "401"
+	}
+
+	if obligatorioAdministrador && usuario.EsAdministrador == false {
+		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), "403"
+	}
+
+	if rolEsperado != "" && rolEsperado == usuario.Rol {
+		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), "403"
+	}
+
+	return nil, usuario.Email
+}
+
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
 
-func InsertUserITP(c *fiber.Ctx) error {
-
-	authHeader := c.Get("Authorization")
+func Authorization(authHeader string, administrationRequired bool, rolRequired string) (error, int, string) {
 	if authHeader == "" {
-		// El token no está presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+		// el token no esta presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación"), fiber.StatusBadRequest, ""
 	}
 
-	// Parsea el token
+	// parsea el token
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+	fmt.Println(tokenString)
 
-	//valida el token
-	err, codigo := validacionDeUsuario(true, "", tokenString)
+	// valida el token
+	err, codigo := ValidacionDeUsuarioPropio(administrationRequired, rolRequired, tokenString)
 	if err != nil {
 		if codigo != "" {
 			codigoError, _ := strconv.Atoi(codigo)
-			return c.Status(codigoError).SendString(err.Error())
+			return err, codigoError, ""
 		}
-		return c.Status(404).SendString(err.Error())
+		return err, fiber.StatusBadRequest, ""
 	}
+	return nil, fiber.StatusAccepted, codigo
+}
+
+func InsertUserITP(c *fiber.Ctx) error {
 
 	//obtiene los datos
 	var userITP UserITP
@@ -212,32 +240,16 @@ func InsertUserITP(c *fiber.Ctx) error {
 	//inserta el usuario
 	result, err := coll.InsertOne(context.TODO(), userITP)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+
+		fmt.Print("fail")
+		return c.SendString(err.Error())
 	}
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-	return c.Status(200).JSON(userITP)
+	return c.SendString("ok")
 }
 
 func GetUserITP(c *fiber.Ctx) error {
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		// El token no está presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
-	}
-
-	// Parsea el token
-	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-
-	//valida el token
-	err, codigo := validacionDeUsuario(true, "", tokenString)
-	if err != nil {
-		if codigo != "" {
-			codigoError, _ := strconv.Atoi(codigo)
-			return c.Status(codigoError).SendString(err.Error())
-		}
-		return c.Status(404).SendString(err.Error())
-	}
 
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 	email := c.Params("email")
@@ -275,6 +287,12 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
 	if err2 != nil {
 		return c.Status(404).SendString("usuario no encontrado")
+	}
+	filter := bson.D{{"email", email}}
+	update := bson.D{{"$set", bson.D{{"token", tokenString}}}}
+	_, err = coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		fmt.Println(err)
 	}
 	collR := client.Database("portalDeNovedades").Collection("recursos")
 	recurso := new(RecursosWithID)
@@ -329,25 +347,6 @@ func GetUserITPAll(c *fiber.Ctx) error {
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		// El token no está presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
-	}
-
-	// Parsea el token
-	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-
-	//valida el token
-	err, codigo := validacionDeUsuario(true, "", tokenString)
-	if err != nil {
-		if codigo != "" {
-			codigoError, _ := strconv.Atoi(codigo)
-			return c.Status(codigoError).SendString(err.Error())
-		}
-		return c.Status(404).SendString(err.Error())
-	}
-
 	coll := client.Database("portalDeNovedades").Collection("usersITP")
 	emailDelete := c.Params("email")
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"email": emailDelete})
@@ -359,25 +358,6 @@ func DeleteUserITP(c *fiber.Ctx) error {
 }
 
 func UpdateUserITP(c *fiber.Ctx) error {
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		// El token no está presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
-	}
-
-	// Parsea el token
-	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-
-	//valida el token
-	err, codigo := validacionDeUsuario(true, "", tokenString)
-	if err != nil {
-		if codigo != "" {
-			codigoError, _ := strconv.Atoi(codigo)
-			return c.Status(codigoError).SendString(err.Error())
-		}
-		return c.Status(404).SendString(err.Error())
-	}
-
 	usuario := new(UserITP)
 	if err := c.BodyParser(usuario); err != nil {
 		return c.Status(503).SendString(err.Error())
