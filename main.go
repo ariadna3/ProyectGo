@@ -134,7 +134,7 @@ func main() {
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: os.Getenv("PUERTOCORS"),
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization, Access-Control-Allow-Headers",
+		AllowHeaders: "*",
 	}))
 
 	connectedWithMongo := createConnectionWithMongo()
