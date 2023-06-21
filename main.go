@@ -123,7 +123,7 @@ type Files struct {
 	Nombre string `bson:"nombre"`
 }
 
-var App *fiber.App
+var app *fiber.App
 
 func main() {
 
@@ -141,9 +141,9 @@ func main() {
 	goth.UseProviders(
 		google.New(os.Getenv("GOOGLEKEY"), os.Getenv("GOOGLESEC"), os.Getenv("GOOGLECALLBACK")),
 	)
-	App = fiber.New()
+	app = fiber.New()
 
-	App.Use(cors.New(cors.Config{
+	app.Use(cors.New(cors.Config{
 		AllowOrigins: os.Getenv("PUERTOCORS"),
 		AllowHeaders: "*",
 	}))
@@ -156,53 +156,53 @@ func main() {
 		fmt.Println("Conectado con mongo")
 
 		//Actividades
-		App.Post("/Actividad", actividades.InsertActividad)
-		App.Get("/Actividad/:id", actividades.GetActividad)
-		App.Get("/Actividad", actividades.GetActividadAll)
-		App.Delete("/Actividad/:id", actividades.DeleteActividad)
+		app.Post("/Actividad", actividades.InsertActividad)
+		app.Get("/Actividad/:id", actividades.GetActividad)
+		app.Get("/Actividad", actividades.GetActividadAll)
+		app.Delete("/Actividad/:id", actividades.DeleteActividad)
 
 		//Update estado y motivo
-		App.Patch("/Novedad/:id/:estado", novedades.UpdateEstadoNovedades)
-		App.Patch("/Novedad/:id", novedades.UpdateMotivoNovedades)
+		app.Patch("/Novedad/:id/:estado", novedades.UpdateEstadoNovedades)
+		app.Patch("/Novedad/:id", novedades.UpdateMotivoNovedades)
 
 		//Novedades
-		App.Post("/Novedad", novedades.InsertNovedad)
-		App.Get("/Novedad/:id", novedades.GetNovedades)
-		App.Get("/Novedad/*", novedades.GetNovedadFiltro)
-		App.Get("/Novedad", novedades.GetNovedadesAll)
-		App.Delete("/Novedad/:id", novedades.DeleteNovedad)
+		app.Post("/Novedad", novedades.InsertNovedad)
+		app.Get("/Novedad/:id", novedades.GetNovedades)
+		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
+		app.Get("/Novedad", novedades.GetNovedadesAll)
+		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
 		//obtener adjuntos novedades
-		App.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
+		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
 
 		//Tipo Novedades
-		App.Get("/TipoNovedades", novedades.GetTipoNovedad)
+		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
 		//Periodos
 		app.Get("/Periodos", recursos.GetFecha)
 
 		//Centro de Costos
-		App.Post("/Cecos", novedades.InsertCecos)
-		App.Get("/Cecos/", novedades.GetCecosAll)
-		App.Get("/Cecos/:id", novedades.GetCecos)
+		app.Post("/Cecos", novedades.InsertCecos)
+		app.Get("/Cecos/", novedades.GetCecosAll)
+		app.Get("/Cecos/:id", novedades.GetCecos)
 
 		//Proveedores
-		App.Post("/Proveedor", proveedores.InsertProveedor)
-		App.Get("/Proveedor/:id", proveedores.GetProveedor)
-		App.Get("/Proveedor", proveedores.GetProveedorAll)
-		App.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
+		app.Post("/Proveedor", proveedores.InsertProveedor)
+		app.Get("/Proveedor/:id", proveedores.GetProveedor)
+		app.Get("/Proveedor", proveedores.GetProveedorAll)
+		app.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
 
 		//Recursos
-		App.Post("/Recurso", recursos.InsertRecurso)
-		App.Get("/Recurso/:id", recursos.GetRecurso)
-		App.Get("/Recurso", recursos.GetRecursoAll)
+		app.Post("/Recurso", recursos.InsertRecurso)
+		app.Get("/Recurso/:id", recursos.GetRecurso)
+		app.Get("/Recurso", recursos.GetRecursoAll)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser
-		App.Post("/user", userGoogle.InsertUserITP)
-		App.Get("/user", userGoogle.GetSelfUserITP)
-		App.Get("/user/:email", userGoogle.GetUserITP)
-		App.Delete("user/:email", userGoogle.DeleteUserITP)
-		App.Patch("/user", userGoogle.UpdateUserITP)
+		app.Post("/user", userGoogle.InsertUserITP)
+		app.Get("/user", userGoogle.GetSelfUserITP)
+		app.Get("/user/:email", userGoogle.GetUserITP)
+		app.Delete("user/:email", userGoogle.DeleteUserITP)
+		app.Patch("/user", userGoogle.UpdateUserITP)
 		app.Get("/users", userGoogle.GetUserITPAll)
 
 	} else {
@@ -216,11 +216,11 @@ func main() {
 	}
 
 	//----Prueba de conexion----
-	App.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Status(200).SendString("Conexion exitosa")
 	})
 
-	err = App.Listen(os.Getenv("PUERTO"))
+	err = app.Listen(os.Getenv("PUERTO"))
 	if err != nil {
 		fmt.Println(err)
 	}
