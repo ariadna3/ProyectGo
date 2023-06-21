@@ -176,9 +176,13 @@ func main() {
 		App.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
 
 		//Tipo Novedades
-		App.Get("/TipoNovedades", novedades.GetTipoNovedad)
+<<<<<<< HEAD
+		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
 		//Periodos
 		app.Get("/Periodos", recursos.GetFecha)
+=======
+		App.Get("/TipoNovedades", novedades.GetTipoNovedad)
+>>>>>>> feature/agregado_testing
 
 		//Centro de Costos
 		App.Post("/Cecos", novedades.InsertCecos)
@@ -192,10 +196,26 @@ func main() {
 		App.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
 
 		//Recursos
+<<<<<<< HEAD
+		app.Post("/Recurso", recursos.InsertRecurso)
+		app.Get("/Recurso/:id", recursos.GetRecurso)
+		app.Get("/Recurso", recursos.GetRecursoAll)
+		app.Get("/Recurso/filted/:id", recursos.GetRecursoSameCecos)
+		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
+		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
+
+		//GoogleUser
+		app.Post("/user", userGoogle.InsertUserITP)
+		app.Get("/user", userGoogle.GetSelfUserITP)
+		app.Get("/user/:email", userGoogle.GetUserITP)
+		app.Delete("user/:email", userGoogle.DeleteUserITP)
+		app.Patch("/user", userGoogle.UpdateUserITP)
+		app.Get("/users", userGoogle.GetUserITPAll)
+=======
 		App.Post("/Recurso", recursos.InsertRecurso)
 		App.Get("/Recurso/:id", recursos.GetRecurso)
 		App.Get("/Recurso", recursos.GetRecursoAll)
-		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
+		App.Delete("/Recurso/:id", recursos.DeleteRecurso)
 
 		//GoogleUser
 		App.Post("/user", userGoogle.InsertUserITP)
@@ -203,7 +223,7 @@ func main() {
 		App.Get("/user/:email", userGoogle.GetUserITP)
 		App.Delete("user/:email", userGoogle.DeleteUserITP)
 		App.Patch("/user", userGoogle.UpdateUserITP)
-		app.Get("/users", userGoogle.GetUserITPAll)
+>>>>>>> feature/agregado_testing
 
 	} else {
 		fmt.Println("Problema al conectarse con mongo")
