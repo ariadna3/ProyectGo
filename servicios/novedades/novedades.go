@@ -679,9 +679,10 @@ func enviarMail(novedad Novedades) {
 	smtpPort := os.Getenv("USER_PORT")
 	smtpUsername := os.Getenv("USER_EMAIL")
 	smtpPassword := os.Getenv("USER_PASSWORD")
+	emailFile := os.Getenv("USER_EMAIL_FILE")
 
-	if smtpUsername != "" {
-		datosComoBytes, err := ioutil.ReadFile("email.txt")
+	if emailFile != "" {
+		datosComoBytes, err := ioutil.ReadFile(emailFile)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -698,7 +699,7 @@ func enviarMail(novedad Novedades) {
 		subject := mailMessage[0]
 		body := mailMessage[1]
 
-		msg := composeMimeMail(toMsg, from, subject, body)
+		msg := ComposeMimeMail(toMsg, from, subject, body)
 
 		// Autenticación y envío del correo electrónico
 		auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
@@ -708,7 +709,6 @@ func enviarMail(novedad Novedades) {
 		}
 		log.Println("Correo electrónico enviado con éxito.")
 	}
-
 }
 
 func replaceStringWithData(message string, novedad Novedades) string {
@@ -733,7 +733,7 @@ func encodeRFC2047(str string) string {
 	return strings.Trim(addr.String(), " <>")
 }
 
-func composeMimeMail(to string, from string, subject string, body string) []byte {
+func ComposeMimeMail(to string, from string, subject string, body string) []byte {
 	header := make(map[string]string)
 	header["From"] = formatEmailAddress(from)
 	header["To"] = formatEmailAddress(to)
