@@ -194,15 +194,14 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func Authorization(authHeader string, administrationRequired bool, rolRequired string) (error, int, bool) {
+func Authorization(authHeader string, administrationRequired bool, rolRequired string) (error, int, string) {
 	if authHeader == "" {
-
 		// el token no esta presente
-		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación"), fiber.StatusBadRequest, false
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación"), fiber.StatusBadRequest, ""
 	}
 
 	// parsea el token
-	tokenString := strings.Replace(authHeader, "Bearer", "", 1)
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
 	fmt.Println(tokenString)
 
 	// valida el token
@@ -210,11 +209,11 @@ func Authorization(authHeader string, administrationRequired bool, rolRequired s
 	if err != nil {
 		if codigo != "" {
 			codigoError, _ := strconv.Atoi(codigo)
-			return err, codigoError, false
+			return err, codigoError, ""
 		}
-		return err, fiber.StatusBadRequest, false
+		return err, fiber.StatusBadRequest, ""
 	}
-	return nil, fiber.StatusAccepted, true
+	return nil, fiber.StatusAccepted, codigo
 }
 
 func InsertUserITP(c *fiber.Ctx) error {
@@ -288,6 +287,12 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
 	if err2 != nil {
 		return c.Status(404).SendString("usuario no encontrado")
+	}
+	filter := bson.D{{"email", email}}
+	update := bson.D{{"$set", bson.D{{"token", tokenString}}}}
+	_, err = coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		fmt.Println(err)
 	}
 	collR := client.Database("portalDeNovedades").Collection("recursos")
 	recurso := new(RecursosWithID)

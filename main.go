@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/proyectoNovedades/servicios/actividades"
@@ -21,6 +23,8 @@ import (
 
 	"context"
 	"fmt"
+	"io/ioutil"
+	"net/smtp"
 	"os"
 )
 
@@ -119,22 +123,29 @@ type Files struct {
 	Nombre string `bson:"nombre"`
 }
 
+var app *fiber.App
+
 func main() {
 
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("No se pudo cargar el archivo .env")
-		fmt.Println(err.Error())
+		log.Fatal(err)
+	}
+	err = pruebaConexionEmail()
+	if err != nil {
+		fmt.Println("Error en el envio de mail")
+		log.Fatal(err)
 	}
 
 	goth.UseProviders(
 		google.New(os.Getenv("GOOGLEKEY"), os.Getenv("GOOGLESEC"), os.Getenv("GOOGLECALLBACK")),
 	)
-	app := fiber.New()
+	app = fiber.New()
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: os.Getenv("PUERTOCORS"),
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization, Access-Control-Allow-Headers",
+		AllowHeaders: "*",
 	}))
 
 	connectedWithMongo := createConnectionWithMongo()
@@ -184,8 +195,6 @@ func main() {
 		app.Post("/Recurso", recursos.InsertRecurso)
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
-		app.Get("/Recurso/filted/:id", recursos.GetRecursoSameCecos)
-		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser
@@ -253,4 +262,40 @@ func createConnectionWithMysql() bool {
 		return true
 	}
 	return false
+}
+
+func pruebaConexionEmail() error {
+	// Configuración de SMTP
+	smtpHost := os.Getenv("USER_HOST")
+	smtpPort := os.Getenv("USER_PORT")
+	smtpUsername := os.Getenv("USER_EMAIL")
+	smtpPassword := os.Getenv("USER_PASSWORD")
+	emailFile := os.Getenv("USER_EMAIL_FILE")
+
+	if emailFile != "" && smtpUsername != "" {
+
+		//lectura de archivo
+		_, err := ioutil.ReadFile(emailFile)
+		if err != nil {
+			return err
+		}
+
+		// Mensaje de correo electrónico
+		to := []string{smtpUsername}
+		from := smtpUsername
+		toMsg := smtpUsername
+		subject := "Prueba de email exitosa"
+		body := "El email pudo leerse y enviarse correctamente"
+
+		msg := novedades.ComposeMimeMail(toMsg, from, subject, body)
+
+		// Autenticación y envío del correo electrónico
+		auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
+		err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUsername, to, msg)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	return nil
 }

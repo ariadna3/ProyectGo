@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -295,10 +296,36 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &novedades); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
-	for index, element := range novedades {
-		novedades[index].Resumen = resumenNovedad(element)
+	var nuevaListaNovedades []Novedades
+	for _, element := range novedades {
+
+		if c.Query("diferenciaFechas") != "" {
+			if element.FechaDesde != "" && element.FechaDesde != "null" && len(element.FechaDesde) == 10 {
+				dias, err := difDatesInDays(element)
+				if err != nil {
+					fmt.Println(element)
+					fmt.Println(err)
+				} else {
+					diasMaximo, err := strconv.Atoi(c.Query("diferenciaFechas"))
+					if err != nil {
+						fmt.Println(element)
+						fmt.Println("Error during conversion")
+					} else {
+						if dias <= diasMaximo {
+							element.Resumen = resumenNovedad(element)
+							nuevaListaNovedades = append(nuevaListaNovedades, element)
+						}
+					}
+
+				}
+			}
+		} else {
+			element.Resumen = resumenNovedad(element)
+			nuevaListaNovedades = append(nuevaListaNovedades, element)
+		}
+
 	}
-	return c.Status(200).JSON(novedades)
+	return c.Status(200).JSON(nuevaListaNovedades)
 }
 
 // obtener todas las novedades
@@ -664,6 +691,21 @@ func resumenNovedad(novedad Novedades) string {
 	return resumen
 }
 
+func difDatesInDays(novedad Novedades) (int, error) {
+	fechaDesde, err := time.Parse("2006-01-02", novedad.FechaDesde)
+	if err != nil {
+		return 0, err
+	}
+	fechaHasta, err := time.Parse("2006-01-02", novedad.FechaHasta)
+	if err != nil {
+		return 0, err
+	}
+	fmt.Print(fechaHasta)
+	fmt.Print(fechaDesde)
+	fmt.Println(int(fechaHasta.Sub(fechaDesde).Hours() / 24))
+	return int(fechaHasta.Sub(fechaDesde).Hours() / 24), nil
+}
+
 func findInStringArray(arrayString []string, palabra string) (bool, int) {
 	for posicion, dato := range arrayString {
 		if dato == palabra {
@@ -679,9 +721,10 @@ func enviarMail(novedad Novedades) {
 	smtpPort := os.Getenv("USER_PORT")
 	smtpUsername := os.Getenv("USER_EMAIL")
 	smtpPassword := os.Getenv("USER_PASSWORD")
+	emailFile := os.Getenv("USER_EMAIL_FILE")
 
-	if smtpUsername != "" {
-		datosComoBytes, err := ioutil.ReadFile("email.txt")
+	if emailFile != "" {
+		datosComoBytes, err := ioutil.ReadFile(emailFile)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -698,7 +741,7 @@ func enviarMail(novedad Novedades) {
 		subject := mailMessage[0]
 		body := mailMessage[1]
 
-		msg := composeMimeMail(toMsg, from, subject, body)
+		msg := ComposeMimeMail(toMsg, from, subject, body)
 
 		// Autenticación y envío del correo electrónico
 		auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
@@ -708,7 +751,6 @@ func enviarMail(novedad Novedades) {
 		}
 		log.Println("Correo electrónico enviado con éxito.")
 	}
-
 }
 
 func replaceStringWithData(message string, novedad Novedades) string {
@@ -733,7 +775,7 @@ func encodeRFC2047(str string) string {
 	return strings.Trim(addr.String(), " <>")
 }
 
-func composeMimeMail(to string, from string, subject string, body string) []byte {
+func ComposeMimeMail(to string, from string, subject string, body string) []byte {
 	header := make(map[string]string)
 	header["From"] = formatEmailAddress(from)
 	header["To"] = formatEmailAddress(to)

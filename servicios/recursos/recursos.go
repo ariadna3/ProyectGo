@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -194,28 +193,18 @@ func GetRecursoAll(c *fiber.Ctx) error {
 func GetRecursoSameCecos(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	// Parsea el token
-	authHeader := c.Get("Authorization")
-	idObject := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(idObject)
-
 	coll := client.Database("portalDeNovedades").Collection("recursos")
-	idNumber, _ := strconv.Atoi(c.Params("id"))
 	var recurso RecursosWithID
-	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
+	err := coll.FindOne(context.TODO(), bson.D{{"mail", email}}).Decode(&recurso)
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 		return c.Status(404).SendString("No encontrado")
-	}
-
-	if !checkPasswordHash(recurso.IdObject.Hex(), idObject) {
-		return c.Status(403).SendString("usuario no correspondiente a este recurso")
 	}
 
 	var listadoCentrosDeCostos []bson.M
