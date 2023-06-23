@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "c26f90a5-2fe5-4973-b0d3-490cfeb11d7d",
+		"_postman_id": "f10d190f-259d-4689-8079-c3ff71380759",
 		"name": "portal de novedades",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
 		{
@@ -22,15 +22,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Actividad",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Actividad"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Actividad"
 					},
 					"response": []
 				},
@@ -51,15 +43,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Actividad",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Actividad"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Actividad"
 					},
 					"response": []
 				},
@@ -77,16 +61,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Actividad/0",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Actividad",
-								"0"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Actividad/0"
 					},
 					"response": []
 				}
@@ -101,23 +76,160 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"Comentarios\": \"\",\r\n    \"DistribucionesStr\": \"[{\\\"Cecos\\\": {\\\"Cliente\\\": \\\"NNNNN\\\",\\\"Codigo\\\": 100,\\\"IdCecos\\\": 38,\\\"Proyecto\\\": \\\"undefined\\\"},\\\"Porcentaje\\\":100}]\",\r\n    \"Fecha\": \"2023-05-10\",\r\n    \"Freelance\": false,\r\n    \"Hora\": \"13:57:54\",\r\n    \"ImporteTotal\": 66,\r\n    \"Periodo\": \"04-2023\",\r\n    \"Plazo\": \"undefined\",\r\n    \"Proveedor\": \"ABAXDECO S.R.L (000772)\",\r\n    \"Departamento\":\"Departamento de ejemplo\",\r\n    \"Tipo\": \"NP\",\r\n    \"Usuario\": \"aturne\",\r\n    \"Recurso\": {\r\n        \"HorasExtras\":[{\r\n            \"TipoDia\": \"Feriado\",\r\n            \"TipoHora\": \"Diurno\",\r\n            \"Cantidad\": 100\r\n        }],\r\n        \"Rcc\":[\r\n            {\r\n                \"ccNombre\": \"ICBC\",\r\n                \"ccPorc\": 100.0\r\n            }\r\n        ]\r\n    }\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tipo",
+									"value": "PP",
+									"type": "default"
+								},
+								{
+									"key": "fecha",
+									"value": "2023-02-27",
+									"type": "default"
+								},
+								{
+									"key": "hora",
+									"value": "16:00",
+									"type": "default"
+								},
+								{
+									"key": "usuario",
+									"value": "agonzalez",
+									"type": "default"
+								},
+								{
+									"key": "proveedor",
+									"value": "julio lanzani",
+									"type": "default"
+								},
+								{
+									"key": "periodo",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "importeTotal",
+									"value": "50000",
+									"type": "default"
+								},
+								{
+									"key": "conceptoDeFacturacion",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "comentarios",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "promovido",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "cliente",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "estado",
+									"value": "pendiente",
+									"type": "default"
+								},
+								{
+									"key": "motivo",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "enviarA",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "contacto",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "plazo",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "adjuntos",
+									"value": "Novedades.json",
+									"type": "default"
+								},
+								{
+									"key": "adjuntos",
+									"value": "Proveedores.json",
+									"type": "default"
+								},
+								{
+									"key": "distribuciones",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "recurso",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "descripcion",
+									"value": "pago a proveedores",
+									"type": "default"
+								},
+								{
+									"key": "recursos",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "documentos",
+									"type": "file",
+									"src": [
+										"/C:/Users/Lgonzalez/Documents/ProyectGo/ejemplos/Novedades.json",
+										"/C:/Users/Lgonzalez/Documents/ProyectGo/ejemplos/Proveedores.json",
+										"/C:/Users/Lgonzalez/Documents/ProyectGo/ejemplos/Recursos.json"
+									]
+								},
+								{
+									"key": "adjuntoMotivo",
+									"value": "Recursos.json",
+									"type": "default"
+								},
+								{
+									"key": "prioridad",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "freelance",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "clienteNuevo",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "provNuevo",
+									"value": "",
+									"type": "default"
+								},
+								{
+									"key": "cecosNuevo",
+									"value": "",
+									"type": "default"
 								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/Novedad",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Novedad"
 							]
-						}
+						},
+						"url": "http://127.0.0.1:5000/Novedad"
 					},
 					"response": []
 				},
@@ -130,30 +242,15 @@
 						"method": "GET",
 						"header": [],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "Dis",
-									"value": "",
-									"type": "default"
-								}
-							],
+							"mode": "raw",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Novedad/421",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Novedad",
-								"421"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Novedad/100"
 					},
 					"response": []
 				},
@@ -174,15 +271,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Novedad",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Novedad"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Novedad"
 					},
 					"response": []
 				},
@@ -204,10 +293,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Novedad/?tipo=NP&fecha=&hora&usuario&proveedor&periodo&conceptoDeFacturacion&comentarios&cliente&estados&adjunto=algo&departamento=Departamento",
+							"raw": "http://localhost:5000/Novedad/?tipo=&fecha=&hora&usuario&proveedor&periodo&conceptoDeFacturacion&comentarios&cliente&estados",
+							"protocol": "http",
 							"host": [
-								"{{url}}"
+								"localhost"
 							],
+							"port": "5000",
 							"path": [
 								"Novedad",
 								""
@@ -215,7 +306,7 @@
 							"query": [
 								{
 									"key": "tipo",
-									"value": "NP"
+									"value": ""
 								},
 								{
 									"key": "fecha",
@@ -252,14 +343,6 @@
 								{
 									"key": "estados",
 									"value": null
-								},
-								{
-									"key": "adjunto",
-									"value": "algo"
-								},
-								{
-									"key": "departamento",
-									"value": "Departamento"
 								}
 							]
 						}
@@ -271,16 +354,7 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "{{url}}/Novedad/401",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Novedad",
-								"401"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Novedad/161"
 					},
 					"response": []
 				},
@@ -298,17 +372,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Novedad/101/aceptada",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Novedad",
-								"101",
-								"aceptada"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Novedad/100/aceptada"
 					},
 					"response": []
 				},
@@ -326,16 +390,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Novedad/100",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Novedad",
-								"100"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Novedad/100"
 					},
 					"response": []
 				},
@@ -356,15 +411,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/TipoNovedades",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"TipoNovedades"
-							]
-						}
+						"url": "http://127.0.0.1:5000/TipoNovedades"
 					},
 					"response": []
 				},
@@ -385,15 +432,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Cecos",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Cecos"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Cecos"
 					},
 					"response": []
 				}
@@ -408,23 +447,21 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"Cuit\": \"1020\",\r\n    \"RazonSocial\": \"algo SRL\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "numeroDoc",
+									"value": "123456789",
+									"type": "default"
+								},
+								{
+									"key": "razonSocial",
+									"value": "ari srl",
+									"type": "default"
 								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/Proveedor",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Proveedor"
 							]
-						}
+						},
+						"url": "http://127.0.0.1:5000/Proveedor"
 					},
 					"response": []
 				},
@@ -433,16 +470,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{url}}/Proveedor/2",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Proveedor",
-								"2"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Proveedor/2"
 					},
 					"response": []
 				},
@@ -451,16 +479,7 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "{{url}}/Proveedor/1",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Proveedor",
-								"1"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Proveedor/1"
 					},
 					"response": []
 				}
@@ -475,23 +494,42 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"legajo\": 1500,\r\n    \"apellido\": \"REY\",\r\n    \"nombre\": \"PALOMA\",\r\n    \"fechaString\": \"11/04/2022\",\r\n    \"mail\": \"prey@itpatagonia.com\",\r\n    \"sueldo\": 150000,\r\n    \"Rcc\": [\r\n        {\r\n            \"CcNum\": \"20\",\r\n            \"CcPorc\": 100.0\r\n        }\r\n    ]\r\n}",
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nombre",
+									"value": "lautaro",
+									"type": "default"
+								},
+								{
+									"key": "apellido",
+									"value": "gonzalez",
+									"type": "default"
+								},
+								{
+									"key": "legajo",
+									"value": "1020",
+									"type": "default"
+								},
+								{
+									"key": "mail",
+									"value": "lgonzalez",
+									"type": "default"
+								},
+								{
+									"key": "fecha",
+									"value": "03-03",
+									"type": "default",
+									"disabled": true
+								}
+							],
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Recurso",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Recurso"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Recurso"
 					},
 					"response": []
 				},
@@ -512,116 +550,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Recurso/425",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Recurso",
-								"425"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GetRecursoAll",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/Recurso",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Recurso"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GetRecursoWithSameCecos",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "$2a$14$hpA89O4Inc2R2sDTQBjI8eVn5CUMNz9eaK8KWjpGFt5WAKCou/yTG",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/Recurso/filted/30",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Recurso",
-								"filted",
-								"30"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GetRecursoHash",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/HashRecurso/30",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"HashRecurso",
-								"30"
-							]
-						}
+						"url": "http://127.0.0.1:5000/Recurso"
 					},
 					"response": []
 				},
@@ -630,16 +559,119 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "{{url}}/Recurso/425",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Recurso",
-								"425"
+						"url": "http://127.0.0.1:5000/Recurso/2"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "LoginUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Email",
+									"value": "jperez@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "Password",
+									"value": "perez1234",
+									"type": "text"
+								},
+								{
+									"key": "User",
+									"value": "lgonzalez2020",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "Nombre",
+									"value": "Juan Manuel",
+									"type": "text"
+								},
+								{
+									"key": "Apellido",
+									"value": "Perez",
+									"type": "text"
+								}
 							]
-						}
+						},
+						"url": "http://127.0.0.1:4000/User"
+					},
+					"response": []
+				},
+				{
+					"name": "createUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Email",
+									"value": "jperez@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "Password",
+									"value": "perez1234",
+									"type": "text"
+								},
+								{
+									"key": "User",
+									"value": "lgonzalez2020",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "Nombre",
+									"value": "Juan Manuel",
+									"type": "text"
+								},
+								{
+									"key": "Apellido",
+									"value": "Perez",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://127.0.0.1:4000/User"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:4000/User/jperez"
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUser",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://127.0.0.1:4000/User/jperez"
+					},
+					"response": []
+				},
+				{
+					"name": "updateUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:4000/User/jperez"
 					},
 					"response": []
 				}
@@ -665,15 +697,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Cecos",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Cecos"
-							]
-						}
+						"url": "http://127.0.0.1:3000/Cecos"
 					},
 					"response": []
 				},
@@ -694,16 +718,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Cecos/101",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Cecos",
-								"101"
-							]
-						}
+						"url": "http://127.0.0.1:3000/Cecos"
 					},
 					"response": []
 				},
@@ -713,23 +728,36 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"Descripcion\": \"(9601) - OPEN PASS S.A. - OPEN PASS S.A. (30716794748)\",\r\n    \"Codigo\": 100000,\r\n    \"Cliente\": \"OPEN PASS S.A.\",\r\n    \"Proyecto\": \"OPEN PASS S.A.\"\r\n}",
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "descripcionCecos",
+									"value": "prueba",
+									"type": "text"
+								},
+								{
+									"key": "cliente",
+									"value": "clienteprueba",
+									"type": "default"
+								},
+								{
+									"key": "proyecto",
+									"value": "proyectoprueba",
+									"type": "default"
+								},
+								{
+									"key": "cuit",
+									"value": "222222",
+									"type": "default"
+								}
+							],
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": {
-							"raw": "{{url}}/Cecos",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Cecos"
-							]
-						}
+						"url": "http://127.0.0.1:3000/Cecos"
 					},
 					"response": []
 				}
@@ -739,251 +767,20 @@
 			"name": "google",
 			"item": [
 				{
+					"name": "GetUserGoogle",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://127.0.0.1:5000/user/400"
+					},
+					"response": []
+				},
+				{
 					"name": "InsertEmail",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI1MTg4NTgsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNTE5MTU4LCJleHAiOjE2ODI1MjI3NTgsImp0aSI6Ijk2ZmFkMzg3YmFhMDg1ZGQzZDdhMjNjMGJkMGQ2ODZkMmEzMWQ0NjEifQ.oS2vwGmB8OVfLPvkO5mc44BGeJcIOrLTeYui-kv-7EZE_QpBZR8p62Nqh8I_tYJQqbOYqvZclJrcfUTe2GYdUhpR_el-H2u6aGLqsjEN1Ss8sZZfv0WXnesL2uQKSwja-V2G_kEJnJs8btd8JjHJp3-9eBRKJmtO3KQPIDgWOcSArMRWNY7-W9kKLQ6WNAYsXsgfReSK-1mtXoMOubcaJ7uQkNGCMNzgEEqTuON5gP6n6tA2TfvOu5SBvIQXW4Hg5WNQfHOaEJsVYd6hpTy_ECqQeGEpzApxt1OSjm561aHKNre_PTx3Un4woy2SJEPgzYGOl01Gkqy6dX1yAeci_w",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "Email",
-									"value": "lgonzalez@itpatagonia.com",
-									"type": "default"
-								},
-								{
-									"key": "EsAdministrador",
-									"value": "false",
-									"type": "default"
-								},
-								{
-									"key": "Rol",
-									"value": "admin",
-									"type": "default"
-								},
-								{
-									"key": "Token",
-									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI0NDY4OTAsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNDQ3MTkwLCJleHAiOjE2ODI0NTA3OTAsImp0aSI6ImQ0ZTliODQyYTE1YTlkYTliNDg0NWRhODExYzg4YTlhZjI0YzA2ZDMifQ.GiQnuE2kedJFoOR7A9ZHOtU9_zDdqpwQGqGwE7SrYVP3ULzbEar2TmOCCBOOwpfC2QvoA5z2KHRINQglCaHwatUVZboBm51FnCfsYM3UkXAMSmnzvrS7rLwgGdBWtdC_HaAnlS3SQZP9NCFgRnBkffi_TaxoWqLTUsY0VSoWg6Dd5X7GOLN3PVuWxSvwCZH7aMdPfDv8Zx2QOGevprHrLz8XcnMlHJf8uSam56aki94pvo9RanK5VMG7mYHe9pQZGqnOQlZ680-qkjSzkQS8DZ83JXI3fpZ_Ixt4UwedjVBew8nEH896F8NlarZP-4woZEoyteD2UNxUg1coIeY9rw",
-									"type": "default",
-									"disabled": true
-								}
-							]
-						},
-						"url": {
-							"raw": "{{url}}/user",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"user"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "UpdateUser",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI1MTg4NTgsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNTE5MTU4LCJleHAiOjE2ODI1MjI3NTgsImp0aSI6Ijk2ZmFkMzg3YmFhMDg1ZGQzZDdhMjNjMGJkMGQ2ODZkMmEzMWQ0NjEifQ.oS2vwGmB8OVfLPvkO5mc44BGeJcIOrLTeYui-kv-7EZE_QpBZR8p62Nqh8I_tYJQqbOYqvZclJrcfUTe2GYdUhpR_el-H2u6aGLqsjEN1Ss8sZZfv0WXnesL2uQKSwja-V2G_kEJnJs8btd8JjHJp3-9eBRKJmtO3KQPIDgWOcSArMRWNY7-W9kKLQ6WNAYsXsgfReSK-1mtXoMOubcaJ7uQkNGCMNzgEEqTuON5gP6n6tA2TfvOu5SBvIQXW4Hg5WNQfHOaEJsVYd6hpTy_ECqQeGEpzApxt1OSjm561aHKNre_PTx3Un4woy2SJEPgzYGOl01Gkqy6dX1yAeci_w",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "Email",
-									"value": "lgonzalez@itpatagonia.com",
-									"type": "default"
-								},
-								{
-									"key": "Rol",
-									"value": "admin",
-									"type": "default"
-								},
-								{
-									"key": "EsAdministrador",
-									"value": "true",
-									"type": "default"
-								}
-							],
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/user",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"user"
-							],
-							"query": [
-								{
-									"key": "Email",
-									"value": "lgonzalez@itpatagonia.com",
-									"disabled": true
-								},
-								{
-									"key": "EsAdministrador",
-									"value": "true",
-									"disabled": true
-								},
-								{
-									"key": "Rol",
-									"value": "admin",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GetSelfUser",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3NzBiMDg1YmY2NDliNzI2YjM1NzQ3NjQwMzBlMWJkZTlhMTBhZTYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODQxNjAxNDMsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjg0MTYwNDQzLCJleHAiOjE2ODQxNjQwNDMsImp0aSI6IjQ4ZGVhNjBlNjZhNmMxOTMxNDUxODE0MDZjNzg2ZWNlNzcyZDExZjAifQ.gpKQZwyoM8uQVEZ_IMgVg7nRtoTaMn8LX5ZvTLW5UpepdR03JRmmGltjQ01d0EGVAO2OJ06egGXjoHqtYegoO_UgcwNpwC553VQHWaOBxyyT9kJ1ctOKRBOimkT-eiBtuXg0744RvLQXDueSYxGc3xndi9z4g8ylHLEAdoEWw4lTD_PLkf6rxL8Bzfo8fgqCvzr6uqWoQ37ElCgaFb5ycg3Q7QELbdPGa0_i64x4otYlg9Xvx6Ferg7tN2nM3oweFV9ZChOugymkuCfnvVESfJDHNtmf-c6ii52Hc2yjS9Wpiow-H7JaBHmGGGoBFo-03dZOp_CZYIQ1v6GFfkBmMw",
-									"type": "string"
-								}
-							]
-						},
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{url}}/user",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"user"
-							],
-							"query": [
-								{
-									"key": "Email",
-									"value": null,
-									"disabled": true
-								},
-								{
-									"key": "esAdministrador",
-									"value": null,
-									"disabled": true
-								},
-								{
-									"key": "",
-									"value": null,
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GetUser",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI1MTg4NTgsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNTE5MTU4LCJleHAiOjE2ODI1MjI3NTgsImp0aSI6Ijk2ZmFkMzg3YmFhMDg1ZGQzZDdhMjNjMGJkMGQ2ODZkMmEzMWQ0NjEifQ.oS2vwGmB8OVfLPvkO5mc44BGeJcIOrLTeYui-kv-7EZE_QpBZR8p62Nqh8I_tYJQqbOYqvZclJrcfUTe2GYdUhpR_el-H2u6aGLqsjEN1Ss8sZZfv0WXnesL2uQKSwja-V2G_kEJnJs8btd8JjHJp3-9eBRKJmtO3KQPIDgWOcSArMRWNY7-W9kKLQ6WNAYsXsgfReSK-1mtXoMOubcaJ7uQkNGCMNzgEEqTuON5gP6n6tA2TfvOu5SBvIQXW4Hg5WNQfHOaEJsVYd6hpTy_ECqQeGEpzApxt1OSjm561aHKNre_PTx3Un4woy2SJEPgzYGOl01Gkqy6dX1yAeci_w",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/user/aturne@itpatagonia.com",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"user",
-								"aturne@itpatagonia.com"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GetUserAll",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI1MTg4NTgsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNTE5MTU4LCJleHAiOjE2ODI1MjI3NTgsImp0aSI6Ijk2ZmFkMzg3YmFhMDg1ZGQzZDdhMjNjMGJkMGQ2ODZkMmEzMWQ0NjEifQ.oS2vwGmB8OVfLPvkO5mc44BGeJcIOrLTeYui-kv-7EZE_QpBZR8p62Nqh8I_tYJQqbOYqvZclJrcfUTe2GYdUhpR_el-H2u6aGLqsjEN1Ss8sZZfv0WXnesL2uQKSwja-V2G_kEJnJs8btd8JjHJp3-9eBRKJmtO3KQPIDgWOcSArMRWNY7-W9kKLQ6WNAYsXsgfReSK-1mtXoMOubcaJ7uQkNGCMNzgEEqTuON5gP6n6tA2TfvOu5SBvIQXW4Hg5WNQfHOaEJsVYd6hpTy_ECqQeGEpzApxt1OSjm561aHKNre_PTx3Un4woy2SJEPgzYGOl01Gkqy6dX1yAeci_w",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/users",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "DeleteUser",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2OTY5YWVjMzdhNzc4MGYxODgwNzg3NzU5M2JiYmY4Y2Y1ZGU1Y2UiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODI1MTg4NTgsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgyNTE5MTU4LCJleHAiOjE2ODI1MjI3NTgsImp0aSI6Ijk2ZmFkMzg3YmFhMDg1ZGQzZDdhMjNjMGJkMGQ2ODZkMmEzMWQ0NjEifQ.oS2vwGmB8OVfLPvkO5mc44BGeJcIOrLTeYui-kv-7EZE_QpBZR8p62Nqh8I_tYJQqbOYqvZclJrcfUTe2GYdUhpR_el-H2u6aGLqsjEN1Ss8sZZfv0WXnesL2uQKSwja-V2G_kEJnJs8btd8JjHJp3-9eBRKJmtO3KQPIDgWOcSArMRWNY7-W9kKLQ6WNAYsXsgfReSK-1mtXoMOubcaJ7uQkNGCMNzgEEqTuON5gP6n6tA2TfvOu5SBvIQXW4Hg5WNQfHOaEJsVYd6hpTy_ECqQeGEpzApxt1OSjm561aHKNre_PTx3Un4woy2SJEPgzYGOl01Gkqy6dX1yAeci_w",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/user/lgonzalez@itpatagonia.com",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"user",
-								"lgonzalez@itpatagonia.com"
-							]
-						}
+						"url": "http://127.0.0.1:3000/user/eyJhbGciOiJSUzI1NiIsImtpZCI6IjFhYWU4ZDdjOTIwNThiNWVlYTQ1Njg5NWJmODkwODQ1NzFlMzA2ZjMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODAwOTc0OTYsImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMjI5MzMzMzE3NTEyNzA1ODIzOSIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJhdHVybmVAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJBbmdlbGV0dGUgVHVybmUgQWd1ZXJvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FHTm15eGJCbTAxYXJjdVRXN05WLWVRcTNmbzNkeXNPOGd5TkpZZEhQU0t2PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFuZ2VsZXR0ZSIsImZhbWlseV9uYW1lIjoiVHVybmUgQWd1ZXJvIiwiaWF0IjoxNjgwMDk3Nzk2LCJleHAiOjE2ODAxMDEzOTYsImp0aSI6ImM5Yzg4MDEwMmI2ZDI4NzYyODYyNmM3MzllYWMxMjNkZGQ4MmQ2ZTEifQ.iuMgE3rY3Hs86jg1TCK_WnG7EgmqZYCBY52PAV2hXr3AO4vN3xxQ00bxn54eukrgWOAJnEj1giMrpMWb9b3jkDwhXU58IdqzXh9OdsK3j5-vGIFde8tYQzNHZgPS4kmodi9KmuS3iUfdZrWRlPgkZxyaEvQDlT031vNwxhf7JBhzUrx3XKXi7Q2NLhJFzeHqLsbjHnAoq8Skt36ie4IAOGoIGcfcy9iU-pEJYXdxGuNSO8m0nwnrC6PodQp4gd1mLOQNXPsYjaPK_GPKlkLSemPyQww-IFmiriNwFkTVN8cVx88L0e0xHUtaqYFNfhzOkHsS9mA9bU9KqJZvP-G1bA"
 					},
 					"response": []
 				}
@@ -998,26 +795,26 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/Archivos/Novedad/Adjuntos/401/?pos=0",
+							"raw": "http://127.0.0.1:3000/Archivos/Novedad/Adjuntos/255/?nombre=Recursos.json",
+							"protocol": "http",
 							"host": [
-								"{{url}}"
+								"127",
+								"0",
+								"0",
+								"1"
 							],
+							"port": "3000",
 							"path": [
 								"Archivos",
 								"Novedad",
 								"Adjuntos",
-								"401",
+								"255",
 								""
 							],
 							"query": [
 								{
 									"key": "nombre",
-									"value": "8j49rdpjarr51.webp",
-									"disabled": true
-								},
-								{
-									"key": "pos",
-									"value": "0"
+									"value": "Recursos.json"
 								}
 							]
 						}
