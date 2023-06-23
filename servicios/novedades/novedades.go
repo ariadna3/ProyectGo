@@ -61,6 +61,9 @@ type Novedades struct {
 	Departamento          string              `bson:"departamento"`
 	Reclamo               bool                `bson:"reclamo"`
 	Freelance             bool                `bson:"freelance"`
+	ClienteNuevo          string              `bson:"clienteNuevo"`
+	ProvNuevo             string              `bson:"provNuevo"`
+	CecosNuevo            string              `bson:"cecosNuevo"`
 }
 
 const (
