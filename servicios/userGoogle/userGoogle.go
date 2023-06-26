@@ -324,7 +324,7 @@ func GetUserITPAll(c *fiber.Ctx) error {
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
 
 	//valida el token
-	err, codigo := validacionDeUsuario(true, "admin,servicios", tokenString)
+	err, codigo := validacionDeUsuario(adminRequired, anyRol, tokenString)
 	if err != nil {
 		if codigo != "" {
 			codigoError, _ := strconv.Atoi(codigo)
