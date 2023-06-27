@@ -27,43 +27,43 @@ const adminNotRequired = false
 const anyRol = ""
 
 type Novedades struct {
-	IdSecuencial          int      `bson:"idSecuencial"`
-	Tipo                  string   `bson:"tipo"`
-	Fecha                 string   `bson:"fecha"`
-	Hora                  string   `bson:"hora"`
-	Usuario               string   `bson:"usuario"`
-	Proveedor             string   `bson:"proveedor"`
-	Periodo               string   `bson:"periodo"`
-	ImporteTotal          float64  `bson:"importeTotal"`
-	ConceptoDeFacturacion string   `bson:"conceptoDeFacturacion"`
-	Adjuntos              []string `bson:"adjuntos"`
-	AdjuntoMotivo         string   `bson:"adjuntoMotivo"`
-	DistribucionesStr     string
-	Distribuciones        []Distribuciones `bson:"distribuciones"`
-	Comentarios           string           `bson:"comentarios"`
-	Promovido             bool             `bson:"promovido"`
+	AdjuntoMotivo         string           `bson:"adjuntoMotivo"`
+	Adjuntos              []string         `bson:"adjuntos"`
+	Cantidad              string           `bson:"cantidad"`
+	CecosNuevo            string           `bson:"cecosNuevo"`
 	Cliente               string           `bson:"cliente"`
-	Estado                string           `bson:"estado"`
-	Motivo                string           `bson:"motivo"`
-	EnviarA               string           `bson:"enviarA"`
+	ClienteNuevo          bool             `bson:"clienteNuevo"`
+	Comentarios           string           `bson:"comentarios"`
+	ConceptoDeFacturacion string           `bson:"conceptoDeFacturacion"`
 	Contacto              string           `bson:"contacto"`
-	Plazo                 string           `bson:"plazo"`
+	Departamento          string           `bson:"departamento"`
 	Descripcion           string           `bson:"descripcion"`
-	RecursosStr           string
-	Recursos              []RecursosNovedades `bson:"recursos"`
-	Cantidad              string              `bson:"cantidad"`
+	Distribuciones        []Distribuciones `bson:"distribuciones"`
+	DistribucionesStr     string
+	EnviarA               string              `bson:"enviarA"`
+	Estado                string              `bson:"estado"`
+	Fecha                 string              `bson:"fecha"`
 	FechaDesde            string              `bson:"fechaDesde"`
 	FechaHasta            string              `bson:"fechaHasta"`
-	OrdenDeCompra         string              `bson:"ordenDeCompra"`
-	Resumen               string              `bson:"resumen"`
-	Prioridad             string              `bson:"prioridad"`
-	Departamento          string              `bson:"departamento"`
-	Reclamo               bool                `bson:"reclamo"`
 	Freelance             bool                `bson:"freelance"`
-	ClienteNuevo          bool                `bson:"clienteNuevo"`
+	Hora                  string              `bson:"hora"`
+	IdSecuencial          int                 `bson:"idSecuencial"`
+	ImporteTotal          float64             `bson:"importeTotal"`
+	Motivo                string              `bson:"motivo"`
+	OrdenDeCompra         string              `bson:"ordenDeCompra"`
+	Periodo               string              `bson:"periodo"`
+	Plazo                 string              `bson:"plazo"`
+	Prioridad             string              `bson:"prioridad"`
+	Promovido             bool                `bson:"promovido"`
+	Proveedor             string              `bson:"proveedor"`
 	ProvNuevo             bool                `bson:"provNuevo"`
-	CecosNuevo            string              `bson:"cecosNuevo"`
-	Workflow              []Workflow          `bson:"workflow"`
+	Reclamo               bool                `bson:"reclamo"`
+	Recursos              []RecursosNovedades `bson:"recursos"`
+	RecursosStr           string
+	Resumen               string     `bson:"resumen"`
+	Tipo                  string     `bson:"tipo"`
+	Usuario               string     `bson:"usuario"`
+	Workflow              []Workflow `bson:"workflow"`
 }
 
 const (
@@ -115,10 +115,11 @@ type P struct {
 }
 
 type Workflow struct {
-	Aprobador   string `bson:"aprobador"`
-	Estado      string `bson:"estado"`
-	Autorizador string `bson:"autorizador"`
-	Fecha       string `bson:"fecha"`
+	Aprobador   string    `bson:"aprobador"`
+	Estado      string    `bson:"estado"`
+	Autorizador string    `bson:"autorizador"`
+	Fecha       time.Time `bson:"fecha"`
+	FechaStr    string
 }
 
 var client *mongo.Client
