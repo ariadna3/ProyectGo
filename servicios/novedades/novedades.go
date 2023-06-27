@@ -776,6 +776,26 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 	return c.JSON(novedad)
 }
 
+func InsertWorkflow(c *fiber.Ctx) error {
+
+	//obtiene los datos
+	var pasos PasosWorkflow
+	if err := c.BodyParser(&pasos); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	coll := client.Database("portalDeNovedades").Collection("pasosWorkflow")
+
+	//inserta el paso
+	result, err := coll.InsertOne(context.TODO(), pasos)
+	if err != nil {
+		return c.SendString(err.Error())
+	}
+
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return c.JSON(pasos)
+}
+
 func resumenNovedad(novedad Novedades) string {
 	var resumen string
 	var resumenDict map[string]interface{}

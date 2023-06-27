@@ -175,6 +175,7 @@ func main() {
 		//Workflow novedad
 		app.Get("/Aprobar/Novedad/:id", novedades.AprobarWorkflow)
 		app.Get("/Rechazar/Novedad/:id", novedades.RechazarWorkflow)
+		app.Post("/Workflow", novedades.InsertWorkflow)
 
 		//obtener adjuntos novedades
 		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
