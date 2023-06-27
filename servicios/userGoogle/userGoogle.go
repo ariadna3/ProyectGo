@@ -182,7 +182,7 @@ func ValidacionDeUsuarioPropio(obligatorioAdministrador bool, rolEsperado string
 		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), "403"
 	}
 
-	if rolEsperado != "" && rolEsperado == usuario.Rol {
+	if rolEsperado != "" && rolEsperado != usuario.Rol {
 		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), "403"
 	}
 
@@ -202,7 +202,6 @@ func Authorization(authHeader string, administrationRequired bool, rolRequired s
 
 	// parsea el token
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(tokenString)
 
 	// valida el token
 	err, codigo := ValidacionDeUsuarioPropio(administrationRequired, rolRequired, tokenString)

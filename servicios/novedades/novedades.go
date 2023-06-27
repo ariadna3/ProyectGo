@@ -234,6 +234,12 @@ func InsertNovedad(c *fiber.Ctx) error {
 	novedad.DistribucionesStr = ""
 	novedad.RecursosStr = ""
 
+	//valida los pasos del workflow
+	err = validarPasos(novedad)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	//inserta la novedad
 	result, err := coll.InsertOne(context.TODO(), novedad)
 	if err != nil {
@@ -673,15 +679,45 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
 	}
+
+	//Comprueba que la novedad no este aceptada o rechazada
+	if novedad.Estado != Pendiente {
+		return c.Status(fiber.ErrForbidden.Code).SendString("La novedad ya fue modificada")
+	}
+
+	//comprueba que el usuario sea el autorizado
+	aprobador := novedad.Workflow[len(novedad.Workflow)-1].Aprobador
+	if strings.Contains(aprobador, "@") {
+		if email != aprobador {
+			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
+		}
+	} else {
+		err, _, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, aprobador)
+		if err != nil {
+			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
+		}
+	}
+
 	novedad.Workflow[len(novedad.Workflow)-1].Estado = Aceptada
 	novedad.Workflow[len(novedad.Workflow)-1].Autorizador = email
 	novedad.Workflow[len(novedad.Workflow)-1].Fecha = time.Now()
-	novedad.Workflow[len(novedad.Workflow)-1].Estado = time.Now().Format(FormatoFecha)
-	err = validarPasos(novedad)
+	novedad.Workflow[len(novedad.Workflow)-1].FechaStr = time.Now().Format(FormatoFecha)
+	err = validarPasos(&novedad)
 	if err != nil {
 		if err.Error() == FinalDeLosPasos {
 			novedad.Estado = Aceptada
 		}
+	}
+	//crea el filtro
+	filter := bson.D{{"idSecuencial", idNumber}}
+
+	//le dice que es lo que hay que modificar y con que
+	update := bson.D{{"$set", bson.D{{"workflow", novedad.Workflow}, {"estado", novedad.Estado}}}}
+
+	//hace la modificacion
+	_, err = coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return c.Status(fiber.ErrBadRequest.Code).SendString(err.Error())
 	}
 	return c.JSON(novedad)
 }
@@ -702,10 +738,41 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
 	}
+
+	//Comprueba que la novedad no este aceptada o rechazada
+	if novedad.Estado != Pendiente {
+		return c.Status(fiber.ErrForbidden.Code).SendString("La novedad ya fue modificada")
+	}
+
+	//comprueba que el usuario sea el autorizado
+	aprobador := novedad.Workflow[len(novedad.Workflow)-1].Aprobador
+	if strings.Contains(aprobador, "@") {
+		if email != aprobador {
+			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
+		}
+	} else {
+		err, _, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, aprobador)
+		if err != nil {
+			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
+		}
+	}
+
 	novedad.Workflow[len(novedad.Workflow)-1].Estado = Rechazada
 	novedad.Workflow[len(novedad.Workflow)-1].Autorizador = email
 	novedad.Workflow[len(novedad.Workflow)-1].Fecha = time.Now()
-	novedad.Workflow[len(novedad.Workflow)-1].Estado = time.Now().Format(FormatoFecha)
+	novedad.Workflow[len(novedad.Workflow)-1].FechaStr = time.Now().Format(FormatoFecha)
+	novedad.Estado = Rechazada
+	//crea el filtro
+	filter := bson.D{{"idSecuencial", idNumber}}
+
+	//le dice que es lo que hay que modificar y con que
+	update := bson.D{{"$set", bson.D{{"workflow", novedad.Workflow}, {"estado", novedad.Estado}}}}
+
+	//hace la modificacion
+	_, err = coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return c.Status(fiber.ErrBadRequest.Code).SendString(err.Error())
+	}
 	return c.JSON(novedad)
 }
 
@@ -876,14 +943,14 @@ func ComposeMimeMail(to string, from string, subject string, body string) []byte
 	return []byte(message)
 }
 
-func validarPasos(novedad Novedades) error {
+func validarPasos(novedad *Novedades) error {
 	posicionActual := len(novedad.Workflow)
 
 	var pasosWorkflow PasosWorkflow
 	coll := client.Database("portalDeNovedades").Collection("pasosWorkflow")
 	err := coll.FindOne(context.TODO(), bson.M{"tipo": novedad.Descripcion}).Decode(&pasosWorkflow)
 	if err != nil {
-		return nil
+		return err
 	}
 	listaDePasos := pasosWorkflow.Pasos
 	if posicionActual == len(listaDePasos) {
