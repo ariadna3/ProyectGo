@@ -686,6 +686,29 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 	return c.JSON(novedad)
 }
 
+// rechazar un workflow
+func RechazarWorkflow(c *fiber.Ctx) error {
+
+	// validar el token
+	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	var novedad Novedades
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
+	novedad.Workflow[len(novedad.Workflow)-1].Estado = Rechazada
+	novedad.Workflow[len(novedad.Workflow)-1].Autorizador = email
+	novedad.Workflow[len(novedad.Workflow)-1].Fecha = time.Now()
+	novedad.Workflow[len(novedad.Workflow)-1].Estado = time.Now().Format(FormatoFecha)
+	return c.JSON(novedad)
+}
+
 func resumenNovedad(novedad Novedades) string {
 	var resumen string
 	var resumenDict map[string]interface{}
