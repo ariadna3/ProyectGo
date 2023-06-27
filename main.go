@@ -172,6 +172,10 @@ func main() {
 		app.Get("/Novedad", novedades.GetNovedadesAll)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
+		//Workflow novedad
+		app.Get("/Aprobar/Novedad/:id", novedades.AprobarWorkflow)
+		app.Get("/Rechazar/Novedad/:id", novedades.RechazarWorkflow)
+
 		//obtener adjuntos novedades
 		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
 
