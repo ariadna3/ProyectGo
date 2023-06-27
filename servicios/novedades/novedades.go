@@ -56,7 +56,6 @@ type Novedades struct {
 	FechaHasta            string              `bson:"fechaHasta"`
 	OrdenDeCompra         string              `bson:"ordenDeCompra"`
 	Resumen               string              `bson:"resumen"`
-	Aprobador             string              `bson:"aprobador"`
 	Prioridad             string              `bson:"prioridad"`
 	Departamento          string              `bson:"departamento"`
 	Reclamo               bool                `bson:"reclamo"`
@@ -64,6 +63,7 @@ type Novedades struct {
 	ClienteNuevo          bool                `bson:"clienteNuevo"`
 	ProvNuevo             bool                `bson:"provNuevo"`
 	CecosNuevo            string              `bson:"cecosNuevo"`
+	Workflow              []Workflow          `bson:"workflow"`
 }
 
 const (
@@ -112,6 +112,13 @@ type P struct {
 	Cc       string  `bson:"cc"`
 	PorcCC   float32 `bson:"porcCC"`
 	Cantidad int     `bson:"cantidad"`
+}
+
+type Workflow struct {
+	Aprobador   string `bson:"aprobador"`
+	Estado      string `bson:"estado"`
+	Autorizador string `bson:"autorizador"`
+	Fecha       string `bson:"fecha"`
 }
 
 var client *mongo.Client
