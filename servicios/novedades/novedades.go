@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -19,12 +20,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/userGoogle"
 )
 
 const adminRequired = true
 const adminNotRequired = false
 const anyRol = ""
+
+const FinalDeLosPasos = "fin de los pasos"
+const FormatoFecha = "2006-02-01"
 
 type Novedades struct {
 	AdjuntoMotivo         string           `bson:"adjuntoMotivo"`
@@ -70,6 +75,11 @@ const (
 	Pendiente = "pendiente"
 	Aceptada  = "aceptada"
 	Rechazada = "rechazada"
+)
+
+const (
+	TipoGerente = "manager"
+	TipoGrupo   = "grupo"
 )
 
 type TipoNovedad struct {
@@ -120,6 +130,16 @@ type Workflow struct {
 	Autorizador string    `bson:"autorizador"`
 	Fecha       time.Time `bson:"fecha"`
 	FechaStr    string
+}
+
+type PasosWorkflow struct {
+	Tipo  string `bson:"tipo"`
+	Pasos []Paso `bson:"pasos"`
+}
+
+type Paso struct {
+	Aprobador   string `bson:"aprobador"`
+	Responsable string `bson:"responsable"`
 }
 
 var client *mongo.Client
@@ -637,6 +657,35 @@ func GetCecosFiltro(c *fiber.Ctx) error {
 	return c.JSON(result)
 }
 
+// aprobar un workflow
+func AprobarWorkflow(c *fiber.Ctx) error {
+
+	// validar el token
+	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	var novedad Novedades
+	coll := client.Database("portalDeNovedades").Collection("novedades")
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
+	novedad.Workflow[len(novedad.Workflow)-1].Estado = Aceptada
+	novedad.Workflow[len(novedad.Workflow)-1].Autorizador = email
+	novedad.Workflow[len(novedad.Workflow)-1].Fecha = time.Now()
+	novedad.Workflow[len(novedad.Workflow)-1].Estado = time.Now().Format(FormatoFecha)
+	err = validarPasos(novedad)
+	if err != nil {
+		if err.Error() == FinalDeLosPasos {
+			novedad.Estado = Aceptada
+		}
+	}
+	return c.JSON(novedad)
+}
+
 func resumenNovedad(novedad Novedades) string {
 	var resumen string
 	var resumenDict map[string]interface{}
@@ -802,4 +851,39 @@ func ComposeMimeMail(to string, from string, subject string, body string) []byte
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
 
 	return []byte(message)
+}
+
+func validarPasos(novedad Novedades) error {
+	posicionActual := len(novedad.Workflow)
+
+	var pasosWorkflow PasosWorkflow
+	coll := client.Database("portalDeNovedades").Collection("pasosWorkflow")
+	err := coll.FindOne(context.TODO(), bson.M{"tipo": novedad.Descripcion}).Decode(&pasosWorkflow)
+	if err != nil {
+		return nil
+	}
+	listaDePasos := pasosWorkflow.Pasos
+	if posicionActual == len(listaDePasos) {
+		return errors.New(FinalDeLosPasos)
+	}
+
+	pasoActual := listaDePasos[posicionActual]
+	var nuevoWorkflow Workflow
+	if pasoActual.Aprobador == TipoGerente {
+		err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
+		if err != nil {
+			return err
+		}
+		nuevoWorkflow.Aprobador = recurso.Gerente
+	} else if pasoActual.Aprobador == TipoGrupo {
+		nuevoWorkflow.Aprobador = pasoActual.Responsable
+	} else {
+		return errors.New("Paso invalido detectado")
+	}
+	nuevoWorkflow.Estado = Pendiente
+	nuevoWorkflow.Autorizador = ""
+	nuevoWorkflow.FechaStr = ""
+	nuevoWorkflow.Fecha = time.Now()
+	novedad.Workflow = append(novedad.Workflow, nuevoWorkflow)
+	return nil
 }

@@ -2,6 +2,7 @@ package recursos
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -29,12 +30,14 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 
 type Recursos struct {
 	IdRecurso   int       `bson:"idRecurso"`
+	Gerente     string    `bson:"gerente"`
 	Nombre      string    `bson:"nombre"`
 	Apellido    string    `bson:"apellido"`
 	Legajo      int       `bson:"legajo"`
 	Mail        string    `bson:"mail"`
 	Fecha       time.Time `bson:"date"`
 	FechaString string    `bson:"fechaString"`
+	FechaIng    string    `bson:"fechaIng"`
 	Sueldo      int       `bson:"sueldo"`
 	Rcc         []P       `bson:"p"`
 }
@@ -42,12 +45,14 @@ type Recursos struct {
 type RecursosWithID struct {
 	IdObject    primitive.ObjectID `bson:"_id"`
 	IdRecurso   int                `bson:"idRecurso"`
+	Gerente     string             `bson:"gerente"`
 	Nombre      string             `bson:"nombre"`
 	Apellido    string             `bson:"apellido"`
 	Legajo      int                `bson:"legajo"`
 	Mail        string             `bson:"mail"`
 	Fecha       time.Time          `bson:"date"`
 	FechaString string             `bson:"fechaString"`
+	FechaIng    string             `bson:"fechaIng"`
 	Sueldo      int                `bson:"sueldo"`
 	Rcc         []P                `bson:"p"`
 }
@@ -270,4 +275,25 @@ func GetRecursoHash(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).SendString(hash)
+}
+
+func GetRecursoInterno(email string, id int) (error, Recursos) {
+
+	coll := client.Database("portalDeNovedades").Collection("recursos")
+	var recurso Recursos
+	if id != 0 {
+		err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", id}}).Decode(&recurso)
+		if err != nil {
+			return err, recurso
+		}
+	} else if email != "" {
+		err := coll.FindOne(context.TODO(), bson.D{{"mail", email}}).Decode(&recurso)
+		if err != nil {
+			return err, recurso
+		}
+	} else {
+		return errors.New("No se obtuvo un usuario valido"), recurso
+	}
+
+	return nil, recurso
 }
