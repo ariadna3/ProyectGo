@@ -200,6 +200,7 @@ func main() {
 		app.Post("/Recurso", recursos.InsertRecurso)
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
+		app.Get("/RecursoFilted/:id", recursos.GetRecursoSameCecos)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser

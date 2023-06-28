@@ -197,6 +197,7 @@ func GetRecursoAll(c *fiber.Ctx) error {
 // obtener todos los recursos del mismo centro de costos
 func GetRecursoSameCecos(c *fiber.Ctx) error {
 
+	fmt.Println("withSameCeco")
 	// validar el token
 	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
 	if error != nil {
