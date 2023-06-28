@@ -89,6 +89,7 @@ func GetFecha(c *fiber.Ctx) error {
 // insertar recurso
 func InsertRecurso(c *fiber.Ctx) error {
 
+	fmt.Println("Ingreso de recurso")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
 	if error != nil {
@@ -100,6 +101,8 @@ func InsertRecurso(c *fiber.Ctx) error {
 	if err := c.BodyParser(recurso); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
+	fmt.Print("obtencion de datos ")
+	fmt.Println(recurso)
 
 	//setea la fecha
 	recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaString)
@@ -195,9 +198,9 @@ func GetRecursoAll(c *fiber.Ctx) error {
 }
 
 // obtener todos los recursos del mismo centro de costos
-func GetRecursoSameCecos(c *fiber.Ctx) error {
+func GetRecursoSameManager(c *fiber.Ctx) error {
 
-	fmt.Println("withSameCeco")
+	fmt.Println("withSameManager")
 	// validar el token
 	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
 	if error != nil {
@@ -213,12 +216,7 @@ func GetRecursoSameCecos(c *fiber.Ctx) error {
 		return c.Status(404).SendString("No encontrado")
 	}
 
-	var listadoCentrosDeCostos []bson.M
-	for _, ceco := range recurso.Rcc {
-		listadoCentrosDeCostos = append(listadoCentrosDeCostos, bson.M{"p.cc": ceco.CcNum})
-	}
-
-	cursor, err := coll.Find(context.TODO(), bson.M{"$or": listadoCentrosDeCostos})
+	cursor, err := coll.Find(context.TODO(), bson.M{"gerente": recurso.Gerente})
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
 	}
