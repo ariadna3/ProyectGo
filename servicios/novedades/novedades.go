@@ -94,7 +94,7 @@ type Cecos struct {
 	Cliente     string `bson:"cliente"`
 	Proyecto    string `bson:"proyecto"`
 	Codigo      int    `bson:"codigo"`
-	Legajo      int    `bson:"legajo"`
+	CuitCuil    int    `bson:"cuitcuil"`
 }
 
 type Distribuciones struct {
@@ -610,7 +610,7 @@ func GetCecosAll(c *fiber.Ctx) error {
 	}
 
 	for index, _ := range cecos {
-		obtenerLegajo(&cecos[index])
+		obtenerCuitCuil(&cecos[index])
 	}
 
 	fmt.Println("procesado cecos")
@@ -638,7 +638,7 @@ func GetCecos(c *fiber.Ctx) error {
 	}
 
 	for index, _ := range cecos {
-		obtenerLegajo(&cecos[index])
+		obtenerCuitCuil(&cecos[index])
 	}
 
 	fmt.Println("procesado cecos")
@@ -676,7 +676,7 @@ func GetCecosFiltro(c *fiber.Ctx) error {
 	}
 
 	for index, _ := range result {
-		obtenerLegajo(&result[index])
+		obtenerCuitCuil(&result[index])
 	}
 
 	return c.JSON(result)
@@ -1030,10 +1030,10 @@ func validarPasos(novedad *Novedades) error {
 	return nil
 }
 
-func obtenerLegajo(ceco *Cecos) {
-	if ceco.Legajo == 0 {
-		legajoNuevo := strings.Split(ceco.Descripcion, "(")[len(strings.Split(ceco.Descripcion, "("))-1]
-		legajoNuevo = strings.Replace(legajoNuevo, ")", "", 1)
-		ceco.Legajo, _ = strconv.Atoi(legajoNuevo)
+func obtenerCuitCuil(ceco *Cecos) {
+	if ceco.CuitCuil == 0 {
+		CuitCuilNuevo := strings.Split(ceco.Descripcion, "(")[len(strings.Split(ceco.Descripcion, "("))-1]
+		CuitCuilNuevo = strings.Replace(CuitCuilNuevo, ")", "", 1)
+		ceco.CuitCuil, _ = strconv.Atoi(CuitCuilNuevo)
 	}
 }
