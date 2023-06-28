@@ -561,7 +561,7 @@ func InsertCecos(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 
-	obtenerLegajo(cecos)
+	obtenerCuitCuil(cecos)
 
 	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	filter := bson.D{}
