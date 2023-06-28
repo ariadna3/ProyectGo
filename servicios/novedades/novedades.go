@@ -94,6 +94,7 @@ type Cecos struct {
 	Cliente     string `bson:"cliente"`
 	Proyecto    string `bson:"proyecto"`
 	Codigo      int    `bson:"codigo"`
+	Legajo      int    `bson:"legajo"`
 }
 
 type Distribuciones struct {
@@ -559,6 +560,9 @@ func InsertCecos(c *fiber.Ctx) error {
 	if err := c.BodyParser(cecos); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
+
+	obtenerLegajo(cecos)
+
 	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
 	filter := bson.D{}
 	opts := options.Find().SetSort(bson.D{{"idCecos", -1}})
@@ -604,6 +608,11 @@ func GetCecosAll(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &cecos); err != nil {
 		c.Status(503).SendString(err.Error())
 	}
+
+	for index, _ := range cecos {
+		obtenerLegajo(&cecos[index])
+	}
+
 	fmt.Println("procesado cecos")
 	return c.JSON(cecos)
 }
@@ -627,6 +636,11 @@ func GetCecos(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &cecos); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
+
+	for index, _ := range cecos {
+		obtenerLegajo(&cecos[index])
+	}
+
 	fmt.Println("procesado cecos")
 	fmt.Println(cecos)
 	return c.JSON(cecos)
@@ -660,6 +674,11 @@ func GetCecosFiltro(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &result); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
+
+	for index, _ := range result {
+		obtenerLegajo(&result[index])
+	}
+
 	return c.JSON(result)
 }
 
@@ -1009,4 +1028,12 @@ func validarPasos(novedad *Novedades) error {
 	nuevoWorkflow.Fecha = time.Now()
 	novedad.Workflow = append(novedad.Workflow, nuevoWorkflow)
 	return nil
+}
+
+func obtenerLegajo(ceco *Cecos) {
+	if ceco.Legajo == 0 {
+		legajoNuevo := strings.Split(ceco.Descripcion, "(")[len(strings.Split(ceco.Descripcion, "("))-1]
+		legajoNuevo = strings.Replace(legajoNuevo, ")", "", 1)
+		ceco.Legajo, _ = strconv.Atoi(legajoNuevo)
+	}
 }
