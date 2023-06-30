@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/proyectoNovedades/servicios/actividades"
@@ -128,12 +126,10 @@ func main() {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("No se pudo cargar el archivo .env")
-		log.Fatal(err)
 	}
 	err = pruebaConexionEmail()
 	if err != nil {
 		fmt.Println("Error en el envio de mail")
-		log.Fatal(err)
 	}
 
 	goth.UseProviders(
