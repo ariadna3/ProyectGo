@@ -12,6 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
 
+	"github.com/proyectoNovedades/servicios/constantes"
 	"github.com/proyectoNovedades/servicios/userGoogle"
 )
 
@@ -54,7 +55,7 @@ func InsertProveedor(c *fiber.Ctx) error {
 	}
 
 	// obtiene el ultimo id
-	coll := client.Database("portalDeNovedades").Collection("proveedores")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
 	filter := bson.D{}
 	opts := options.Find().SetSort(bson.D{{"idProveedor", -1}})
 
@@ -87,7 +88,7 @@ func GetProveedor(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("proveedores")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idProveedor": idNumber})
 	fmt.Println(coll)
@@ -110,7 +111,7 @@ func GetProveedorAll(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("proveedores")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
@@ -132,7 +133,7 @@ func DeleteProveedor(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("proveedores")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idProveedor": idNumber})
 	if err != nil {

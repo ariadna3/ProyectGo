@@ -14,6 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/proyectoNovedades/servicios/constantes"
 	"github.com/proyectoNovedades/servicios/userGoogle"
 )
 
@@ -108,7 +109,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 	recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaString)
 
 	//Obtiene el ultimo Id
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	filter := bson.D{}
 	opts := options.Find().SetSort(bson.D{{"idRecurso", -1}})
 
@@ -124,7 +125,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 	}
 
 	//Obtiene los datos del ceco
-	collCeco := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	collCeco := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 
 	for pos, ceco := range recurso.Rcc {
 		intVar, err := strconv.Atoi(ceco.CcNum)
@@ -162,7 +163,7 @@ func GetRecurso(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	var recurso Recursos
 	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
@@ -184,7 +185,7 @@ func GetRecursoAll(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
@@ -207,7 +208,7 @@ func GetRecursoSameManager(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	var recurso RecursosWithID
 	err := coll.FindOne(context.TODO(), bson.D{{"mail", email}}).Decode(&recurso)
 	fmt.Println(coll)
@@ -237,7 +238,7 @@ func DeleteRecurso(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idRecurso": idNumber})
 	if err != nil {
@@ -258,7 +259,7 @@ func hashPassword(password string) (string, error) {
 }
 
 func GetRecursoHash(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	var recurso RecursosWithID
 	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
@@ -278,7 +279,7 @@ func GetRecursoHash(c *fiber.Ctx) error {
 
 func GetRecursoInterno(email string, id int) (error, Recursos) {
 
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	var recurso Recursos
 	if id != 0 {
 		err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", id}}).Decode(&recurso)

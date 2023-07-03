@@ -20,13 +20,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"github.com/proyectoNovedades/servicios/constantes"
 	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/userGoogle"
 )
-
-const adminRequired = true
-const adminNotRequired = false
-const anyRol = ""
 
 const FinalDeLosPasos = "fin de los pasos"
 const FormatoFecha = "2006-02-01"
@@ -155,7 +152,7 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 func InsertNovedad(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -176,7 +173,7 @@ func InsertNovedad(c *fiber.Ctx) error {
 	}
 
 	//le asigna un idSecuencial
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 
 	filter := bson.D{{}}
 	opts := options.Find().SetSort(bson.D{{"idSecuencial", -1}})
@@ -257,12 +254,12 @@ func InsertNovedad(c *fiber.Ctx) error {
 func GetNovedades(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
 	if err != nil {
@@ -282,12 +279,12 @@ func GetNovedades(c *fiber.Ctx) error {
 func GetNovedadFiltro(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 	var busqueda bson.M = bson.M{}
 	if c.Query("tipo") != "" {
 		busqueda["tipo"] = bson.M{"$regex": c.Query("tipo"), "$options": "im"}
@@ -370,12 +367,12 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 func GetNovedadesAll(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
@@ -394,12 +391,12 @@ func GetNovedadesAll(c *fiber.Ctx) error {
 func DeleteNovedad(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
 	if err != nil {
@@ -412,7 +409,7 @@ func DeleteNovedad(c *fiber.Ctx) error {
 func UpdateEstadoNovedades(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -430,7 +427,7 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 	//se conecta a la DB
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 
 	//Verifica que el estado sea uno valido
 	if estado != Pendiente && estado != Aceptada && estado != Rechazada {
@@ -461,7 +458,7 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 func UpdateMotivoNovedades(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -471,7 +468,7 @@ func UpdateMotivoNovedades(c *fiber.Ctx) error {
 	if err := c.BodyParser(novedad); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 
 	filter := bson.D{{"idSecuencial", idNumber}}
 	update := bson.D{{"$set", bson.D{{"motivo", novedad.Motivo}}}}
@@ -486,12 +483,12 @@ func UpdateMotivoNovedades(c *fiber.Ctx) error {
 func GetFiles(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	var novedad Novedades
 	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
@@ -528,7 +525,7 @@ func GetFiles(c *fiber.Ctx) error {
 func GetTipoNovedad(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -551,7 +548,7 @@ func GetTipoNovedad(c *fiber.Ctx) error {
 func InsertCecos(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -563,7 +560,7 @@ func InsertCecos(c *fiber.Ctx) error {
 
 	obtenerCuitCuil(cecos)
 
-	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 	filter := bson.D{}
 	opts := options.Find().SetSort(bson.D{{"idCecos", -1}})
 
@@ -594,12 +591,12 @@ func InsertCecos(c *fiber.Ctx) error {
 func GetCecosAll(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
@@ -621,12 +618,12 @@ func GetCecosAll(c *fiber.Ctx) error {
 func GetCecos(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"codigo": idNumber})
 	if err != nil {
@@ -649,12 +646,12 @@ func GetCecos(c *fiber.Ctx) error {
 func GetCecosFiltro(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 	var busqueda bson.M = bson.M{}
 	if c.Query("descripcion") != "" {
 		busqueda["descripcion"] = bson.M{"$regex": c.Query("descripcion"), "$options": "im"}
@@ -686,13 +683,13 @@ func GetCecosFiltro(c *fiber.Ctx) error {
 func AprobarWorkflow(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
 	var novedad Novedades
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
 	if err != nil {
@@ -711,7 +708,7 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
 		}
 	} else {
-		err, _, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, aprobador)
+		err, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
 		if err != nil {
 			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
 		}
@@ -745,13 +742,13 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 func RechazarWorkflow(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
 	var novedad Novedades
-	coll := client.Database("portalDeNovedades").Collection("novedades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
 	if err != nil {
@@ -770,7 +767,7 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
 		}
 	} else {
-		err, _, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, aprobador)
+		err, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
 		if err != nil {
 			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
 		}
@@ -798,19 +795,19 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 func GetNovedadesPendientes(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	var usuario userGoogle.UserITP
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 	if err2 != nil {
 		return c.Status(200).SendString("usuario no encontrada")
 	}
 
-	coll = client.Database("portalDeNovedades").Collection("novedades")
+	coll = client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 	andMail := bson.D{{"$and", bson.A{bson.D{{"aprobador", email}}, bson.D{{"estado", Pendiente}}}}}
 	andGrupo := bson.D{{"$and", bson.A{bson.D{{"aprobador", usuario.Rol}, {"estado", Pendiente}}}}}
 	orTodo := bson.D{{"$or", bson.A{andMail, andGrupo}}}
@@ -999,7 +996,7 @@ func validarPasos(novedad *Novedades) error {
 	posicionActual := len(novedad.Workflow)
 
 	var pasosWorkflow PasosWorkflow
-	coll := client.Database("portalDeNovedades").Collection("pasosWorkflow")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
 	err := coll.FindOne(context.TODO(), bson.M{"tipo": novedad.Descripcion}).Decode(&pasosWorkflow)
 	if err != nil {
 		return err
