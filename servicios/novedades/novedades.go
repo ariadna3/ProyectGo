@@ -569,6 +569,7 @@ func InsertCecos(c *fiber.Ctx) error {
 		return c.Status(404).SendString(err.Error())
 	}
 
+	// obtiene el id del centro de costos
 	var results []Cecos
 	if err = cursor.All(context.TODO(), &results); err != nil {
 		return c.Status(503).SendString(err.Error())
@@ -579,6 +580,14 @@ func InsertCecos(c *fiber.Ctx) error {
 	} else {
 		cecos.IdCecos = results[0].IdCecos + 1
 	}
+
+	// elimina el ceco si ya existe
+	err = elCecoYaExiste(cecos.Descripcion)
+	if err != nil {
+		eliminarCeco(cecos.Descripcion)
+	}
+
+	// inserta el centro de costos nuevo
 	result, err := coll.InsertOne(context.TODO(), cecos)
 	if err != nil {
 		return c.Status(503).SendString(err.Error())
@@ -1033,4 +1042,28 @@ func obtenerCuitCuil(ceco *Cecos) {
 		CuitCuilNuevo = strings.Replace(CuitCuilNuevo, ")", "", 1)
 		ceco.CuitCuil, _ = strconv.Atoi(CuitCuilNuevo)
 	}
+}
+
+func elCecoYaExiste(descripcion string) error {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
+	filter := bson.D{{Key: "descripcioncecos", Value: descripcion}}
+
+	cursor, _ := coll.Find(context.TODO(), filter)
+
+	var results []Cecos
+	cursor.All(context.TODO(), &results)
+	if len(results) != 0 {
+		return errors.New("ya existe el centro de costos")
+	}
+	return nil
+}
+
+func eliminarCeco(descripcion string) error {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"descripcioncecos": descripcion})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	return nil
 }
