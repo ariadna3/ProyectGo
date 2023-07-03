@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/proyectoNovedades/servicios/constantes"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
@@ -246,6 +248,51 @@ func InsertUserITP(c *fiber.Ctx) error {
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.SendString("ok")
+}
+
+func insertUser(email string, nombre string, apellido string) error {
+	//obtiene los datos
+	var userITP UserITP
+	userITP.Email = email
+	userITP.Nombre = nombre
+	userITP.Apellido = apellido
+	userITP.EsAdministrador = true
+	userITP.Rol = constantes.Admin
+
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+
+	//inserta el usuario
+	result, err := coll.InsertOne(context.TODO(), userITP)
+	if err != nil {
+		fmt.Print(err.Error())
+		return err
+	}
+
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return nil
+}
+
+func InsertFirstUserITP(email string, nombre string, apellido string) error {
+
+	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	var usuario UserITP
+	err := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
+	if err != nil {
+		insertUser(email, nombre, apellido)
+	}
+	if !usuario.EsAdministrador || usuario.Rol != constantes.Admin {
+
+		filter := bson.D{{"email", email}}
+
+		update := bson.D{{"$set", bson.D{{"esAdministrador", true}, {"rol", constantes.Admin}}}}
+
+		_, err := coll.UpdateOne(context.TODO(), filter, update)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func GetUserITP(c *fiber.Ctx) error {

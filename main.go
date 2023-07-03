@@ -151,6 +151,8 @@ func main() {
 
 		fmt.Println("Conectado con mongo")
 
+		userGoogle.InsertFirstUserITP(os.Getenv("USER_EMAIL_PRINCIPAL"), "", "")
+
 		//Actividades
 		app.Post("/Actividad", actividades.InsertActividad)
 		app.Get("/Actividad/:id", actividades.GetActividad)
