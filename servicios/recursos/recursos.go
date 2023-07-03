@@ -297,3 +297,27 @@ func GetRecursoInterno(email string, id int) (error, Recursos) {
 
 	return nil, recurso
 }
+
+func elRecursoYaExiste(email string) error {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	filter := bson.D{{Key: "mail", Value: email}}
+
+	cursor, _ := coll.Find(context.TODO(), filter)
+
+	var results []Recursos
+	cursor.All(context.TODO(), &results)
+	if len(results) != 0 {
+		return errors.New("ya existe el usuario")
+	}
+	return nil
+}
+
+func eliminarRecurso(email string) error {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"mail": email})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	return nil
+}
