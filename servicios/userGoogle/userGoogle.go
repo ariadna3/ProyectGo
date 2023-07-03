@@ -418,7 +418,7 @@ func UpdateUserITP(c *fiber.Ctx) error {
 
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		panic(err)
+		return c.Status(fiber.ErrBadRequest.Code).SendString(err.Error())
 	}
 	return c.Status(200).JSON(result)
 }

@@ -928,7 +928,7 @@ func enviarMail(novedad Novedades) {
 	if emailFile != "" {
 		datosComoBytes, err := ioutil.ReadFile(emailFile)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err.Error())
 		}
 		// convertir el arreglo a string
 		datosComoString := string(datosComoBytes)
@@ -949,7 +949,7 @@ func enviarMail(novedad Novedades) {
 		auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
 		err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUsername, to, msg)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err.Error())
 		}
 		log.Println("Correo electrónico enviado con éxito.")
 	}
