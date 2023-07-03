@@ -105,13 +105,18 @@ func InsertRecurso(c *fiber.Ctx) error {
 	fmt.Print("obtencion de datos ")
 	fmt.Println(recurso)
 
+	err := elRecursoYaExiste(recurso.Mail)
+	if err != nil {
+		eliminarRecurso(recurso.Mail)
+	}
+
 	//setea la fecha
 	recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaString)
 
 	//Obtiene el ultimo Id
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	filter := bson.D{}
-	opts := options.Find().SetSort(bson.D{{"idRecurso", -1}})
+	opts := options.Find().SetSort(bson.D{{Key: "idRecurso", Value: -1}})
 
 	cursor, _ := coll.Find(context.TODO(), filter, opts)
 
@@ -133,7 +138,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 			fmt.Println(err)
 			return c.Status(418).SendString(err.Error())
 		}
-		filter := bson.D{{"codigo", intVar}}
+		filter := bson.D{{Key: "codigo", Value: intVar}}
 
 		var cecoEncontrado Cecos
 		collCeco.FindOne(context.TODO(), filter).Decode(&cecoEncontrado)
@@ -166,7 +171,7 @@ func GetRecurso(c *fiber.Ctx) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	var recurso Recursos
-	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: idNumber}}).Decode(&recurso)
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
@@ -210,7 +215,7 @@ func GetRecursoSameManager(c *fiber.Ctx) error {
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	var recurso RecursosWithID
-	err := coll.FindOne(context.TODO(), bson.D{{"mail", email}}).Decode(&recurso)
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "mail", Value: email}}).Decode(&recurso)
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
@@ -262,7 +267,7 @@ func GetRecursoHash(c *fiber.Ctx) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	var recurso RecursosWithID
-	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: idNumber}}).Decode(&recurso)
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
@@ -282,12 +287,12 @@ func GetRecursoInterno(email string, id int) (error, Recursos) {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	var recurso Recursos
 	if id != 0 {
-		err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", id}}).Decode(&recurso)
+		err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: id}}).Decode(&recurso)
 		if err != nil {
 			return err, recurso
 		}
 	} else if email != "" {
-		err := coll.FindOne(context.TODO(), bson.D{{"mail", email}}).Decode(&recurso)
+		err := coll.FindOne(context.TODO(), bson.D{{Key: "mail", Value: email}}).Decode(&recurso)
 		if err != nil {
 			return err, recurso
 		}
