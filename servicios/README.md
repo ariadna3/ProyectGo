@@ -9,6 +9,7 @@ En esta sección se encuentra los distintos objetos y funciones que se encargan 
 - Proveedores: proveedores
 - Recursos: recursos (Empleados)
 - UserGoogle: usuarios (Whitelist de control de acceso)
+- Constantes: constantes del programa
 
 ## Implementaciones a futuro
 

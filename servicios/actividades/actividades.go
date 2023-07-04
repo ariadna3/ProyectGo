@@ -12,12 +12,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
 
+	"github.com/proyectoNovedades/servicios/constantes"
 	"github.com/proyectoNovedades/servicios/userGoogle"
 )
-
-const adminRequired = true
-const adminNotRequired = false
-const anyRol = ""
 
 type Actividades struct {
 	IdActividad int    `bson:"idActividad"`
@@ -44,7 +41,7 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 func InsertActividad(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -56,7 +53,7 @@ func InsertActividad(c *fiber.Ctx) error {
 	}
 
 	// obtiene el ultimo id
-	coll := client.Database("portalDeNovedades").Collection("actividades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionActividad)
 	filter := bson.D{}
 	opts := options.Find().SetSort(bson.D{{"idActividad", -1}})
 
@@ -89,12 +86,12 @@ func InsertActividad(c *fiber.Ctx) error {
 func GetActividad(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
-	if error != nil {
-		return c.Status(codigo).SendString(error.Error())
-	}
+	//	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	//	if error != nil {
+	//		return c.Status(codigo).SendString(error.Error())
+	//	}
 
-	coll := client.Database("portalDeNovedades").Collection("actividades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionActividad)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idActividad": idNumber})
 	fmt.Println(coll)
@@ -112,12 +109,12 @@ func GetActividad(c *fiber.Ctx) error {
 func GetActividadAll(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("actividades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionActividad)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		c.Status(404).SendString(err.Error())
@@ -133,12 +130,12 @@ func GetActividadAll(c *fiber.Ctx) error {
 func DeleteActividad(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("actividades")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionActividad)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idActividad": idNumber})
 	if err != nil {

@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/proyectoNovedades/servicios/constantes"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
@@ -126,12 +128,12 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 		return err, email
 	}
 	//valida el mail
-	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	var usuario UserITP
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 	if err2 != nil {
 		if os.Getenv("USE_RECURSOS_LIKE_USERS") == "1" {
-			collRecurso := client.Database("portalDeNovedades").Collection("recursos")
+			collRecurso := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 			var recurso Recursos
 			err2 = collRecurso.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
 			if err2 != nil {
@@ -171,7 +173,7 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 
 func ValidacionDeUsuarioPropio(obligatorioAdministrador bool, rolEsperado string, token string) (error, string) {
 	//valida el mail
-	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	var usuario UserITP
 	err2 := coll.FindOne(context.TODO(), bson.M{"token": token}).Decode(&usuario)
 	if err2 != nil {
@@ -182,7 +184,7 @@ func ValidacionDeUsuarioPropio(obligatorioAdministrador bool, rolEsperado string
 		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), "403"
 	}
 
-	if rolEsperado != "" && rolEsperado == usuario.Rol {
+	if rolEsperado != "" && rolEsperado != usuario.Rol {
 		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), "403"
 	}
 
@@ -202,7 +204,6 @@ func Authorization(authHeader string, administrationRequired bool, rolRequired s
 
 	// parsea el token
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
-	fmt.Println(tokenString)
 
 	// valida el token
 	err, codigo := ValidacionDeUsuarioPropio(administrationRequired, rolRequired, tokenString)
@@ -225,7 +226,7 @@ func InsertUserITP(c *fiber.Ctx) error {
 	}
 
 	if userITP.Nombre == "" || userITP.Apellido == "" {
-		coll := client.Database("portalDeNovedades").Collection("recursos")
+		coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 		email := userITP.Email
 		var recurso Recursos
 		err2 := coll.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
@@ -235,7 +236,7 @@ func InsertUserITP(c *fiber.Ctx) error {
 		}
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 
 	//inserta el usuario
 	result, err := coll.InsertOne(context.TODO(), userITP)
@@ -249,9 +250,54 @@ func InsertUserITP(c *fiber.Ctx) error {
 	return c.SendString("ok")
 }
 
+func insertUser(email string, nombre string, apellido string) error {
+	//obtiene los datos
+	var userITP UserITP
+	userITP.Email = email
+	userITP.Nombre = nombre
+	userITP.Apellido = apellido
+	userITP.EsAdministrador = true
+	userITP.Rol = constantes.Admin
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
+
+	//inserta el usuario
+	result, err := coll.InsertOne(context.TODO(), userITP)
+	if err != nil {
+		fmt.Print(err.Error())
+		return err
+	}
+
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return nil
+}
+
+func InsertFirstUserITP(email string, nombre string, apellido string) error {
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
+	var usuario UserITP
+	err := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
+	if err != nil {
+		insertUser(email, nombre, apellido)
+	}
+	if !usuario.EsAdministrador || usuario.Rol != constantes.Admin {
+
+		filter := bson.D{{"email", email}}
+
+		update := bson.D{{"$set", bson.D{{"esAdministrador", true}, {"rol", constantes.Admin}}}}
+
+		_, err := coll.UpdateOne(context.TODO(), filter, update)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func GetUserITP(c *fiber.Ctx) error {
 
-	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	email := c.Params("email")
 	var usuario UserITP
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
@@ -281,7 +327,7 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 		}
 		return c.Status(404).SendString(err.Error())
 	}
-	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 
 	userITP := new(UserITP)
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
@@ -294,7 +340,7 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	collR := client.Database("portalDeNovedades").Collection("recursos")
+	collR := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	recurso := new(RecursosWithID)
 	err2 = collR.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
 
@@ -324,7 +370,7 @@ func GetUserITPAll(c *fiber.Ctx) error {
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
 
 	//valida el token
-	err, codigo := validacionDeUsuario(true, "admin,servicios", tokenString)
+	err, codigo := validacionDeUsuario(adminRequired, anyRol, tokenString)
 	if err != nil {
 		if codigo != "" {
 			codigoError, _ := strconv.Atoi(codigo)
@@ -334,7 +380,7 @@ func GetUserITPAll(c *fiber.Ctx) error {
 	}
 
 	//obtener los usuarios
-	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
@@ -347,7 +393,7 @@ func GetUserITPAll(c *fiber.Ctx) error {
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	emailDelete := c.Params("email")
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"email": emailDelete})
 	if err != nil {
@@ -362,7 +408,7 @@ func UpdateUserITP(c *fiber.Ctx) error {
 	if err := c.BodyParser(usuario); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
-	coll := client.Database("portalDeNovedades").Collection("usersITP")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 
 	fmt.Println(usuario)
 
@@ -372,7 +418,7 @@ func UpdateUserITP(c *fiber.Ctx) error {
 
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		panic(err)
+		return c.Status(fiber.ErrBadRequest.Code).SendString(err.Error())
 	}
 	return c.Status(200).JSON(result)
 }

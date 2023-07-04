@@ -121,6 +121,8 @@ type Files struct {
 	Nombre string `bson:"nombre"`
 }
 
+var app *fiber.App
+
 func main() {
 
 	err := godotenv.Load()
@@ -135,7 +137,7 @@ func main() {
 	goth.UseProviders(
 		google.New(os.Getenv("GOOGLEKEY"), os.Getenv("GOOGLESEC"), os.Getenv("GOOGLECALLBACK")),
 	)
-	app := fiber.New()
+	app = fiber.New()
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: os.Getenv("PUERTOCORS"),
@@ -148,6 +150,8 @@ func main() {
 	if connectedWithMongo {
 
 		fmt.Println("Conectado con mongo")
+
+		userGoogle.InsertFirstUserITP(os.Getenv("USER_EMAIL_PRINCIPAL"), "Julio", "Lanzani")
 
 		//Actividades
 		app.Post("/Actividad", actividades.InsertActividad)
@@ -165,6 +169,11 @@ func main() {
 		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
 		app.Get("/Novedad", novedades.GetNovedadesAll)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
+
+		//Workflow novedad
+		app.Get("/Aprobar/Novedad/:id", novedades.AprobarWorkflow)
+		app.Get("/Rechazar/Novedad/:id", novedades.RechazarWorkflow)
+		app.Get("/Pendiente/Novedad", novedades.GetNovedadesPendientes)
 
 		//obtener adjuntos novedades
 		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
@@ -189,7 +198,7 @@ func main() {
 		app.Post("/Recurso", recursos.InsertRecurso)
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
-		app.Get("/Recurso/filted/:id", recursos.GetRecursoSameCecos)
+		app.Get("/RecursoFilted/:id", recursos.GetRecursoSameManager)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
