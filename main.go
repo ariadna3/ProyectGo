@@ -151,7 +151,7 @@ func main() {
 
 		fmt.Println("Conectado con mongo")
 
-		userGoogle.InsertFirstUserITP(os.Getenv("USER_EMAIL_PRINCIPAL"), "", "")
+		userGoogle.InsertFirstUserITP(os.Getenv("USER_EMAIL_PRINCIPAL"), "j", "l")
 
 		//Actividades
 		app.Post("/Actividad", actividades.InsertActividad)
@@ -199,6 +199,7 @@ func main() {
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
 		app.Get("/RecursoFilted/:id", recursos.GetRecursoSameManager)
+		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser
