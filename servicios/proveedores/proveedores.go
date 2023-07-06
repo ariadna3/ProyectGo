@@ -23,7 +23,7 @@ const anyRol = ""
 
 type Proveedores struct {
 	IdProveedor int    `bson:"idProveedor"`
-	Cuit        string `bson:"cuit"`
+	NumeroDoc   string `bson:"cuit"`
 	RazonSocial string `bson:"razonSocial"`
 }
 
