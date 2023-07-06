@@ -133,16 +133,25 @@ func InsertRecurso(c *fiber.Ctx) error {
 	collCeco := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 
 	for pos, ceco := range recurso.Rcc {
-		intVar, err := strconv.Atoi(ceco.CcNum)
-		if err != nil {
-			fmt.Println(err)
-			return c.Status(418).SendString(err.Error())
-		}
-		filter := bson.D{{Key: "codigo", Value: intVar}}
-
+		var intVar int
 		var cecoEncontrado Cecos
-		collCeco.FindOne(context.TODO(), filter).Decode(&cecoEncontrado)
+		if ceco.CcNum != "" {
+			intVar, err = strconv.Atoi(ceco.CcNum)
+			if err != nil {
+				fmt.Println(err)
+				return c.Status(418).SendString(err.Error())
+			}
+			filter := bson.D{{Key: "codigo", Value: intVar}}
 
+			collCeco.FindOne(context.TODO(), filter).Decode(&cecoEncontrado)
+
+		} else {
+			cecoEncontrado.Cliente = ""
+			cecoEncontrado.Codigo = 0
+			cecoEncontrado.Descripcion = ""
+			cecoEncontrado.IdCecos = 0
+			cecoEncontrado.Proyecto = ""
+		}
 		fmt.Print("Ceco encontrado: ")
 		fmt.Println(cecoEncontrado)
 
