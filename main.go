@@ -199,6 +199,7 @@ func main() {
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
 		app.Get("/RecursoFiltered", recursos.GetRecursoSameManager)
+		app.Get("/RecursoFiltered/Cecos", recursos.GetRecursoSameCecos)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
