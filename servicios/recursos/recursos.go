@@ -231,7 +231,7 @@ func GetRecursoSameManager(c *fiber.Ctx) error {
 		return c.Status(404).SendString("No encontrado")
 	}
 
-	cursor, err := coll.Find(context.TODO(), bson.M{"gerente": recurso.Gerente})
+	cursor, err := coll.Find(context.TODO(), bson.M{"gerente": recurso.Legajo})
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
 	}
