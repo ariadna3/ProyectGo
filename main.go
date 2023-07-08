@@ -198,7 +198,8 @@ func main() {
 		app.Post("/Recurso", recursos.InsertRecurso)
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
-		app.Get("/RecursoFilted/:id", recursos.GetRecursoSameManager)
+		app.Get("/RecursoFiltered", recursos.GetRecursoSameManager)
+		app.Get("/RecursoFiltered/Cecos", recursos.GetRecursoSameCecos)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 

@@ -243,6 +243,40 @@ func GetRecursoSameManager(c *fiber.Ctx) error {
 	return c.Status(200).JSON(recursos)
 }
 
+func GetRecursoSameCecos(c *fiber.Ctx) error {
+
+	// validar el token
+	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	var usuario Recursos
+	err2 := coll.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&usuario)
+	if err2 != nil {
+		return c.Status(200).SendString("usuario no encontrada")
+	}
+
+	coll = client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	cecos := bson.A{}
+	for _, elem := range usuario.Rcc {
+		cecos = append(cecos, elem.CcNum)
+	}
+	orTodo := bson.D{{Key: "$or", Value: cecos}}
+	filter := bson.D{{Key: "p", Value: bson.D{{Key: "$elemMatch", Value: orTodo}}}}
+	fmt.Println(filter)
+	cursor, err := coll.Find(context.TODO(), filter)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
+	var recursosEncontrados []Recursos
+	if err = cursor.All(context.Background(), &recursosEncontrados); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	return c.JSON(recursosEncontrados)
+}
+
 // borrar recurso por id
 func DeleteRecurso(c *fiber.Ctx) error {
 
