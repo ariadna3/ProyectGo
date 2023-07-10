@@ -20,6 +20,8 @@ Se deben crear el archivo .env que contenga las variables de ambiente. A continu
 - USER_PASSWORD: Contraseña del usuario de los mails 
 - USER_PORT: Puerto del POP para enviar los datos (recomendable "587")
 - USER_HOST: Host del POP para enviar los datos (recomendable "smtp.gmail.com")
+- USER_EMAIL_FILE_WORKFLOW: Archivo txt con el email que devuelve cuando cambia el estado del workflow
+- USER_EMAIL_FILE: Archivo txt con el email que devuelve cuando cambia el estado
 - FOLDER_FILE: Carpeta donde se subiran los archivos (ejemplo en .env.example)
 - USE_RECURSOS_LIKE_USERS: Si esta en 1 utilizara la lista de recursos como una lista de usuarios, en cualquier otro caso solo hara caso a la lista de usuarios (ejemplo en .env.example)
 ### carpeta de archivos
@@ -37,3 +39,4 @@ El asunto y el mensaje se separan con un "|" y un salto de linea. A su vez se po
 - %S -> usuario
 - %M -> motivo
 - %C -> comentarios
+- %E -> estado

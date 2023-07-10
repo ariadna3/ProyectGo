@@ -150,7 +150,7 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 // ----Novedades----
 // insertar novedad
 func InsertNovedad(c *fiber.Ctx) error {
-
+	fmt.Println("InsertNovedad")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -252,7 +252,7 @@ func InsertNovedad(c *fiber.Ctx) error {
 
 // obtener novedad por id
 func GetNovedades(c *fiber.Ctx) error {
-
+	fmt.Println("GetNovedades")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -277,7 +277,7 @@ func GetNovedades(c *fiber.Ctx) error {
 
 // Busqueda con parametros Novedades
 func GetNovedadFiltro(c *fiber.Ctx) error {
-
+	fmt.Println("GetNovedadFiltro")
 	// validar el token
 	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -386,7 +386,7 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 
 // obtener todas las novedades
 func GetNovedadesAll(c *fiber.Ctx) error {
-
+	fmt.Println("GetNovedadesAll")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -410,7 +410,7 @@ func GetNovedadesAll(c *fiber.Ctx) error {
 
 // borrar novedad por id
 func DeleteNovedad(c *fiber.Ctx) error {
-
+	fmt.Println("DeleteNovedad")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -428,7 +428,7 @@ func DeleteNovedad(c *fiber.Ctx) error {
 }
 
 func UpdateEstadoNovedades(c *fiber.Ctx) error {
-
+	fmt.Println("UpdateEstadoNovedades")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -477,7 +477,7 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 }
 
 func UpdateMotivoNovedades(c *fiber.Ctx) error {
-
+	fmt.Println("UpdateMotivoNovedades")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -502,7 +502,7 @@ func UpdateMotivoNovedades(c *fiber.Ctx) error {
 }
 
 func GetFiles(c *fiber.Ctx) error {
-
+	fmt.Println("GetFiles")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -544,7 +544,7 @@ func GetFiles(c *fiber.Ctx) error {
 
 // ----Tipo Novedades----
 func GetTipoNovedad(c *fiber.Ctx) error {
-
+	fmt.Println("GetTipoNovedad")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -567,7 +567,7 @@ func GetTipoNovedad(c *fiber.Ctx) error {
 // ----Cecos----
 // insertar cecos
 func InsertCecos(c *fiber.Ctx) error {
-
+	fmt.Println("InsertCecos")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -619,7 +619,7 @@ func InsertCecos(c *fiber.Ctx) error {
 
 // obtener todos los cecos
 func GetCecosAll(c *fiber.Ctx) error {
-
+	fmt.Println("GetCecosAll")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -646,7 +646,7 @@ func GetCecosAll(c *fiber.Ctx) error {
 
 // obtener los cecos por codigo
 func GetCecos(c *fiber.Ctx) error {
-
+	fmt.Println("GetCecos")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -674,7 +674,7 @@ func GetCecos(c *fiber.Ctx) error {
 }
 
 func GetCecosFiltro(c *fiber.Ctx) error {
-
+	fmt.Println("GetCecosFiltro")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -711,7 +711,7 @@ func GetCecosFiltro(c *fiber.Ctx) error {
 
 // aprobar un workflow
 func AprobarWorkflow(c *fiber.Ctx) error {
-
+	fmt.Println("AprobarWorkflow")
 	// validar el token
 	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -770,7 +770,7 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 
 // rechazar un workflow
 func RechazarWorkflow(c *fiber.Ctx) error {
-
+	fmt.Println("RechazarWorkflow")
 	// validar el token
 	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -823,7 +823,7 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 }
 
 func GetNovedadesPendientes(c *fiber.Ctx) error {
-
+	fmt.Println("GetNovedadPendiente")
 	// validar el token
 	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -982,11 +982,50 @@ func enviarMail(novedad Novedades) {
 	}
 }
 
+func enviarMailWorkflow(novedad Novedades) {
+	// Configuración de SMTP
+	smtpHost := os.Getenv("USER_HOST")
+	smtpPort := os.Getenv("USER_PORT")
+	smtpUsername := os.Getenv("USER_EMAIL")
+	smtpPassword := os.Getenv("USER_PASSWORD")
+	emailFile := os.Getenv("USER_EMAIL_FILE")
+
+	if emailFile != "" {
+		datosComoBytes, err := ioutil.ReadFile(emailFile)
+		if err != nil {
+			log.Println(err.Error())
+		}
+		// convertir el arreglo a string
+		datosComoString := string(datosComoBytes)
+		// imprimir el string
+		mailMessage := strings.Split(strings.Replace(datosComoString, "\n", "", 1), "|")
+		mailMessage[1] = replaceStringWithData(mailMessage[1], novedad)
+
+		// Mensaje de correo electrónico
+		to := []string{novedad.EnviarA}
+		from := os.Getenv("USER_EMAIL")
+		toMsg := novedad.EnviarA
+		subject := mailMessage[0]
+		body := mailMessage[1]
+
+		msg := ComposeMimeMail(toMsg, from, subject, body)
+
+		// Autenticación y envío del correo electrónico
+		auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
+		err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUsername, to, msg)
+		if err != nil {
+			log.Println(err.Error())
+		}
+		log.Println("Correo electrónico enviado con éxito.")
+	}
+}
+
 func replaceStringWithData(message string, novedad Novedades) string {
 	message = strings.ReplaceAll(message, "%D", novedad.Descripcion)
 	message = strings.ReplaceAll(message, "%S", novedad.Usuario)
 	message = strings.ReplaceAll(message, "%M", novedad.Motivo)
 	message = strings.ReplaceAll(message, "%C", novedad.Comentarios)
+	message = strings.ReplaceAll(message, "%E", novedad.Estado)
 	return message
 }
 
