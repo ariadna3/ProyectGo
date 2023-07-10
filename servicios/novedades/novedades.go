@@ -279,7 +279,7 @@ func GetNovedades(c *fiber.Ctx) error {
 func GetNovedadFiltro(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -321,6 +321,27 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	}
 	if c.Query("departamento") != "" {
 		busqueda["departamento"] = bson.M{"$regex": c.Query("departamento"), "$options": "im"}
+	}
+	if c.Query("estadoWF") != "" {
+		coll2 := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
+		var usuario userGoogle.UserITP
+		err2 := coll2.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
+		if err2 != nil {
+			return c.Status(200).SendString("usuario no encontrada")
+		}
+		if c.Query("estadoWF") == "all" {
+			mail := bson.D{{Key: "aprobador", Value: email}}
+			grupo := bson.D{{Key: "aprobador", Value: usuario.Rol}}
+			orTodo := bson.D{{Key: "$or", Value: bson.A{mail, grupo}}}
+
+			busqueda["workflow"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
+		} else {
+			andMail := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: email}}, bson.D{{Key: "estado", Value: c.Query("estadoWF")}}}}}
+			andGrupo := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: c.Query("estadoWF")}}}}}
+			orTodo := bson.D{{Key: "$or", Value: bson.A{andMail, andGrupo}}}
+
+			busqueda["workflow"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
+		}
 	}
 	fmt.Println(busqueda)
 	cursor, err := coll.Find(context.TODO(), busqueda)
@@ -435,12 +456,12 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	}
 
 	//crea el filtro
-	filter := bson.D{{"idSecuencial", idNumber}}
+	filter := bson.D{{Key: "idSecuencial", Value: idNumber}}
 
 	//le dice que es lo que hay que modificar y con que
-	update := bson.D{{"$set", bson.D{{"estado", estado}}}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "estado", Value: estado}}}}
 	if novedad.Motivo != "" {
-		update = bson.D{{"$set", bson.D{{"estado", estado}, {"motivo", novedad.Motivo}}}}
+		update = bson.D{{Key: "$set", Value: bson.D{{Key: "estado", Value: estado}, {Key: "motivo", Value: novedad.Motivo}}}}
 	}
 
 	fmt.Println(update)
@@ -470,8 +491,8 @@ func UpdateMotivoNovedades(c *fiber.Ctx) error {
 	}
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 
-	filter := bson.D{{"idSecuencial", idNumber}}
-	update := bson.D{{"$set", bson.D{{"motivo", novedad.Motivo}}}}
+	filter := bson.D{{Key: "idSecuencial", Value: idNumber}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "motivo", Value: novedad.Motivo}}}}
 
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
@@ -817,11 +838,11 @@ func GetNovedadesPendientes(c *fiber.Ctx) error {
 	}
 
 	coll = client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
-	andMail := bson.D{{"$and", bson.A{bson.D{{"aprobador", email}}, bson.D{{"estado", Pendiente}}}}}
-	andGrupo := bson.D{{"$and", bson.A{bson.D{{"aprobador", usuario.Rol}, {"estado", Pendiente}}}}}
-	orTodo := bson.D{{"$or", bson.A{andMail, andGrupo}}}
+	andMail := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: email}}, bson.D{{Key: "estado", Value: Pendiente}}}}}
+	andGrupo := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: Pendiente}}}}}
+	orTodo := bson.D{{Key: "$or", Value: bson.A{andMail, andGrupo}}}
 
-	filter := bson.D{{"workflow", bson.D{{"$elemMatch", orTodo}}}}
+	filter := bson.D{{Key: "workflow", Value: bson.D{{Key: "$elemMatch", Value: orTodo}}}}
 	fmt.Println(filter)
 	cursor, err := coll.Find(context.TODO(), filter)
 	if err != nil {
