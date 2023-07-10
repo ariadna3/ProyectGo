@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/proyectoNovedades/servicios/actividades"
@@ -130,12 +128,10 @@ func main() {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("No se pudo cargar el archivo .env")
-		log.Fatal(err)
 	}
 	err = pruebaConexionEmail()
 	if err != nil {
 		fmt.Println("Error en el envio de mail")
-		log.Fatal(err)
 	}
 
 	goth.UseProviders(
@@ -155,6 +151,8 @@ func main() {
 
 		fmt.Println("Conectado con mongo")
 
+		userGoogle.InsertFirstUserITP(os.Getenv("USER_EMAIL_PRINCIPAL"), "Julio", "Lanzani")
+
 		//Actividades
 		app.Post("/Actividad", actividades.InsertActividad)
 		app.Get("/Actividad/:id", actividades.GetActividad)
@@ -173,9 +171,9 @@ func main() {
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
 		//Workflow novedad
+		app.Post("/Workflow", novedades.InsertWorkFlow)
 		app.Get("/Aprobar/Novedad/:id", novedades.AprobarWorkflow)
 		app.Get("/Rechazar/Novedad/:id", novedades.RechazarWorkflow)
-		app.Get("/Pendiente/Novedad", novedades.GetNovedadesPendientes)
 
 		//obtener adjuntos novedades
 		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
@@ -200,6 +198,9 @@ func main() {
 		app.Post("/Recurso", recursos.InsertRecurso)
 		app.Get("/Recurso/:id", recursos.GetRecurso)
 		app.Get("/Recurso", recursos.GetRecursoAll)
+		app.Get("/RecursoFiltered", recursos.GetRecursoSameManager)
+		app.Get("/RecursoFiltered/Cecos", recursos.GetRecursoSameCecos)
+		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser

@@ -14,6 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/proyectoNovedades/servicios/constantes"
 	"github.com/proyectoNovedades/servicios/userGoogle"
 )
 
@@ -89,6 +90,7 @@ func GetFecha(c *fiber.Ctx) error {
 // insertar recurso
 func InsertRecurso(c *fiber.Ctx) error {
 
+	fmt.Println("Ingreso de recurso")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
 	if error != nil {
@@ -100,14 +102,21 @@ func InsertRecurso(c *fiber.Ctx) error {
 	if err := c.BodyParser(recurso); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
+	fmt.Print("obtencion de datos ")
+	fmt.Println(recurso)
+
+	err := elRecursoYaExiste(recurso.Mail)
+	if err != nil {
+		eliminarRecurso(recurso.Mail)
+	}
 
 	//setea la fecha
 	recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaString)
 
 	//Obtiene el ultimo Id
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	filter := bson.D{}
-	opts := options.Find().SetSort(bson.D{{"idRecurso", -1}})
+	opts := options.Find().SetSort(bson.D{{Key: "idRecurso", Value: -1}})
 
 	cursor, _ := coll.Find(context.TODO(), filter, opts)
 
@@ -121,19 +130,28 @@ func InsertRecurso(c *fiber.Ctx) error {
 	}
 
 	//Obtiene los datos del ceco
-	collCeco := client.Database("portalDeNovedades").Collection("centroDeCostos")
+	collCeco := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 
 	for pos, ceco := range recurso.Rcc {
-		intVar, err := strconv.Atoi(ceco.CcNum)
-		if err != nil {
-			fmt.Println(err)
-			return c.Status(418).SendString(err.Error())
-		}
-		filter := bson.D{{"codigo", intVar}}
-
+		var intVar int
 		var cecoEncontrado Cecos
-		collCeco.FindOne(context.TODO(), filter).Decode(&cecoEncontrado)
+		if ceco.CcNum != "" {
+			intVar, err = strconv.Atoi(ceco.CcNum)
+			if err != nil {
+				fmt.Println(err)
+				return c.Status(418).SendString(err.Error())
+			}
+			filter := bson.D{{Key: "codigo", Value: intVar}}
 
+			collCeco.FindOne(context.TODO(), filter).Decode(&cecoEncontrado)
+
+		} else {
+			cecoEncontrado.Cliente = ""
+			cecoEncontrado.Codigo = 0
+			cecoEncontrado.Descripcion = ""
+			cecoEncontrado.IdCecos = 0
+			cecoEncontrado.Proyecto = ""
+		}
 		fmt.Print("Ceco encontrado: ")
 		fmt.Println(cecoEncontrado)
 
@@ -159,10 +177,10 @@ func GetRecurso(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	var recurso Recursos
-	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: idNumber}}).Decode(&recurso)
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
@@ -181,7 +199,7 @@ func GetRecursoAll(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
@@ -195,29 +213,23 @@ func GetRecursoAll(c *fiber.Ctx) error {
 }
 
 // obtener todos los recursos del mismo centro de costos
-func GetRecursoSameCecos(c *fiber.Ctx) error {
+func GetRecursoSameManager(c *fiber.Ctx) error {
 
+	fmt.Println("withSameManager")
 	// validar el token
 	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	var recurso RecursosWithID
-	err := coll.FindOne(context.TODO(), bson.D{{"mail", email}}).Decode(&recurso)
-	fmt.Println(coll)
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "mail", Value: email}}).Decode(&recurso)
 	if err != nil {
 		fmt.Print(err)
 		return c.Status(404).SendString("No encontrado")
 	}
-
-	var listadoCentrosDeCostos []bson.M
-	for _, ceco := range recurso.Rcc {
-		listadoCentrosDeCostos = append(listadoCentrosDeCostos, bson.M{"p.cc": ceco.CcNum})
-	}
-
-	cursor, err := coll.Find(context.TODO(), bson.M{"$or": listadoCentrosDeCostos})
+	cursor, err := coll.Find(context.TODO(), bson.M{"gerente": strconv.Itoa(recurso.Legajo)})
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
 	}
@@ -229,6 +241,40 @@ func GetRecursoSameCecos(c *fiber.Ctx) error {
 	return c.Status(200).JSON(recursos)
 }
 
+func GetRecursoSameCecos(c *fiber.Ctx) error {
+
+	// validar el token
+	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	var usuario Recursos
+	err2 := coll.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&usuario)
+	if err2 != nil {
+		return c.Status(200).SendString("usuario no encontrada")
+	}
+
+	coll = client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	cecos := bson.A{}
+	for _, elem := range usuario.Rcc {
+		cecos = append(cecos, elem.CcNum)
+	}
+	orTodo := bson.D{{Key: "$or", Value: cecos}}
+	filter := bson.D{{Key: "p", Value: bson.D{{Key: "$elemMatch", Value: orTodo}}}}
+	fmt.Println(filter)
+	cursor, err := coll.Find(context.TODO(), filter)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
+	var recursosEncontrados []Recursos
+	if err = cursor.All(context.Background(), &recursosEncontrados); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	return c.JSON(recursosEncontrados)
+}
+
 // borrar recurso por id
 func DeleteRecurso(c *fiber.Ctx) error {
 
@@ -238,7 +284,7 @@ func DeleteRecurso(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idRecurso": idNumber})
 	if err != nil {
@@ -259,10 +305,10 @@ func hashPassword(password string) (string, error) {
 }
 
 func GetRecursoHash(c *fiber.Ctx) error {
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	var recurso RecursosWithID
-	err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", idNumber}}).Decode(&recurso)
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: idNumber}}).Decode(&recurso)
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
@@ -279,15 +325,15 @@ func GetRecursoHash(c *fiber.Ctx) error {
 
 func GetRecursoInterno(email string, id int) (error, Recursos) {
 
-	coll := client.Database("portalDeNovedades").Collection("recursos")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	var recurso Recursos
 	if id != 0 {
-		err := coll.FindOne(context.TODO(), bson.D{{"idRecurso", id}}).Decode(&recurso)
+		err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: id}}).Decode(&recurso)
 		if err != nil {
 			return err, recurso
 		}
 	} else if email != "" {
-		err := coll.FindOne(context.TODO(), bson.D{{"mail", email}}).Decode(&recurso)
+		err := coll.FindOne(context.TODO(), bson.D{{Key: "mail", Value: email}}).Decode(&recurso)
 		if err != nil {
 			return err, recurso
 		}
@@ -296,4 +342,28 @@ func GetRecursoInterno(email string, id int) (error, Recursos) {
 	}
 
 	return nil, recurso
+}
+
+func elRecursoYaExiste(email string) error {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	filter := bson.D{{Key: "mail", Value: email}}
+
+	cursor, _ := coll.Find(context.TODO(), filter)
+
+	var results []Recursos
+	cursor.All(context.TODO(), &results)
+	if len(results) != 0 {
+		return errors.New("ya existe el usuario")
+	}
+	return nil
+}
+
+func eliminarRecurso(email string) error {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"mail": email})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	return nil
 }

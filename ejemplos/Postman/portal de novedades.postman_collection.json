@@ -247,6 +247,52 @@
 					"response": []
 				},
 				{
+					"name": "GetNovedadPendientes",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Dis",
+									"value": "",
+									"type": "default"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Pendiente/Novedad",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Pendiente",
+								"Novedad"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GetFiltro",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -855,7 +901,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "$2a$14$hpA89O4Inc2R2sDTQBjI8eVn5CUMNz9eaK8KWjpGFt5WAKCou/yTG",
+									"value": "{{token}}",
 									"type": "string"
 								}
 							]
@@ -872,13 +918,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Recurso/filted/30",
+							"raw": "{{url}}/RecursoFilted/30",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Recurso",
-								"filted",
+								"RecursoFilted",
 								"30"
 							]
 						}

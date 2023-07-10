@@ -2,6 +2,7 @@ package proveedores
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -12,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
 
+	"github.com/proyectoNovedades/servicios/constantes"
 	"github.com/proyectoNovedades/servicios/userGoogle"
 )
 
@@ -21,7 +23,7 @@ const anyRol = ""
 
 type Proveedores struct {
 	IdProveedor int    `bson:"idProveedor"`
-	Cuit        string `bson:"cuit"`
+	CodProv     string `bson:"cuit"`
 	RazonSocial string `bson:"razonSocial"`
 }
 
@@ -54,9 +56,9 @@ func InsertProveedor(c *fiber.Ctx) error {
 	}
 
 	// obtiene el ultimo id
-	coll := client.Database("portalDeNovedades").Collection("proveedores")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
 	filter := bson.D{}
-	opts := options.Find().SetSort(bson.D{{"idProveedor", -1}})
+	opts := options.Find().SetSort(bson.D{{Key: "idProveedor", Value: -1}})
 
 	cursor, _ := coll.Find(context.TODO(), filter, opts)
 
@@ -67,6 +69,12 @@ func InsertProveedor(c *fiber.Ctx) error {
 		proveedor.IdProveedor = 0
 	} else {
 		proveedor.IdProveedor = results[0].IdProveedor + 1
+	}
+
+	// verifica la existencia del proveedor
+	err := elProveedorYaExiste(proveedor.RazonSocial)
+	if err != nil {
+		eliminarProveedor(proveedor.RazonSocial)
 	}
 
 	// inserta el proveedor
@@ -87,7 +95,7 @@ func GetProveedor(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("proveedores")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idProveedor": idNumber})
 	fmt.Println(coll)
@@ -110,7 +118,7 @@ func GetProveedorAll(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("proveedores")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
@@ -132,7 +140,7 @@ func DeleteProveedor(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	coll := client.Database("portalDeNovedades").Collection("proveedores")
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idProveedor": idNumber})
 	if err != nil {
@@ -140,4 +148,28 @@ func DeleteProveedor(c *fiber.Ctx) error {
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
 	return c.Status(200).SendString("proveedor eliminado")
+}
+
+func elProveedorYaExiste(razonSocial string) error {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
+	filter := bson.D{{Key: "razonSocial", Value: razonSocial}}
+
+	cursor, _ := coll.Find(context.TODO(), filter)
+
+	var results []Proveedores
+	cursor.All(context.TODO(), &results)
+	if len(results) != 0 {
+		return errors.New("ya existe el proveedor")
+	}
+	return nil
+}
+
+func eliminarProveedor(razonSocial string) error {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"razonSocial": razonSocial})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	return nil
 }
