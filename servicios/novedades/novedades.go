@@ -579,7 +579,7 @@ func InsertCecos(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 
-	obtenerLegajo(cecos)
+	//obtenerLegajo(cecos)
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 	filter := bson.D{}
