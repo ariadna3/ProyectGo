@@ -171,9 +171,9 @@ func main() {
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
 		//Workflow novedad
+		app.Post("/Workflow", novedades.InsertWorkFlow)
 		app.Get("/Aprobar/Novedad/:id", novedades.AprobarWorkflow)
 		app.Get("/Rechazar/Novedad/:id", novedades.RechazarWorkflow)
-		app.Get("/Pendiente/Novedad", novedades.GetNovedadesPendientes)
 
 		//obtener adjuntos novedades
 		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)

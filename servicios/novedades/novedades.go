@@ -709,6 +709,31 @@ func GetCecosFiltro(c *fiber.Ctx) error {
 	return c.JSON(result)
 }
 
+// ----Workflow----
+// ingresar un workflow
+func InsertWorkFlow(c *fiber.Ctx) error {
+	fmt.Println("InsertWorkFlow")
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	workflow := new(Workflow)
+	if err := c.BodyParser(workflow); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	// inserta el centro de costos nuevo
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
+	result, err := coll.InsertOne(context.TODO(), workflow)
+	if err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return c.JSON(workflow)
+}
+
 // aprobar un workflow
 func AprobarWorkflow(c *fiber.Ctx) error {
 	fmt.Println("AprobarWorkflow")
@@ -1062,7 +1087,9 @@ func ComposeMimeMail(to string, from string, subject string, body string) []byte
 }
 
 func validarPasos(novedad *Novedades) error {
+	fmt.Print("Validando pasos, Actual: ")
 	posicionActual := len(novedad.Workflow)
+	fmt.Println(posicionActual)
 
 	var pasosWorkflow PasosWorkflow
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
