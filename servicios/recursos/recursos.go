@@ -225,13 +225,11 @@ func GetRecursoSameManager(c *fiber.Ctx) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	var recurso RecursosWithID
 	err := coll.FindOne(context.TODO(), bson.D{{Key: "mail", Value: email}}).Decode(&recurso)
-	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
 		return c.Status(404).SendString("No encontrado")
 	}
-
-	cursor, err := coll.Find(context.TODO(), bson.M{"gerente": recurso.Legajo})
+	cursor, err := coll.Find(context.TODO(), bson.M{"gerente": strconv.Itoa(recurso.Legajo)})
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
 	}
