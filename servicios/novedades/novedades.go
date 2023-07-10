@@ -1094,6 +1094,9 @@ func validarPasos(novedad *Novedades) error {
 	var pasosWorkflow PasosWorkflow
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
 	err := coll.FindOne(context.TODO(), bson.M{"tipo": novedad.Descripcion}).Decode(&pasosWorkflow)
+	fmt.Println("novedad tipo: " + novedad.Descripcion)
+	fmt.Print("novedad encontrada: ")
+	fmt.Println(pasosWorkflow)
 	if err != nil {
 		return err
 	}
