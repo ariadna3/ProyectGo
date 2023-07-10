@@ -719,7 +719,7 @@ func InsertWorkFlow(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	workflow := new(Workflow)
+	workflow := new(PasosWorkflow)
 	if err := c.BodyParser(workflow); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
@@ -777,13 +777,14 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 	if err != nil {
 		if err.Error() == FinalDeLosPasos {
 			novedad.Estado = Aceptada
+			enviarMailWorkflow(novedad)
 		}
 	}
 	//crea el filtro
-	filter := bson.D{{"idSecuencial", idNumber}}
+	filter := bson.D{{Key: "idSecuencial", Value: idNumber}}
 
 	//le dice que es lo que hay que modificar y con que
-	update := bson.D{{"$set", bson.D{{"workflow", novedad.Workflow}, {"estado", novedad.Estado}}}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "workflow", Value: novedad.Workflow}, {Key: "estado", Value: novedad.Estado}}}}
 
 	//hace la modificacion
 	_, err = coll.UpdateOne(context.TODO(), filter, update)
@@ -833,11 +834,12 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 	novedad.Workflow[len(novedad.Workflow)-1].Fecha = time.Now()
 	novedad.Workflow[len(novedad.Workflow)-1].FechaStr = time.Now().Format(FormatoFecha)
 	novedad.Estado = Rechazada
+	enviarMailWorkflow(novedad)
 	//crea el filtro
-	filter := bson.D{{"idSecuencial", idNumber}}
+	filter := bson.D{{Key: "idSecuencial", Value: idNumber}}
 
 	//le dice que es lo que hay que modificar y con que
-	update := bson.D{{"$set", bson.D{{"workflow", novedad.Workflow}, {"estado", novedad.Estado}}}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "workflow", Value: novedad.Workflow}, {Key: "estado", Value: novedad.Estado}}}}
 
 	//hace la modificacion
 	_, err = coll.UpdateOne(context.TODO(), filter, update)
@@ -1013,7 +1015,7 @@ func enviarMailWorkflow(novedad Novedades) {
 	smtpPort := os.Getenv("USER_PORT")
 	smtpUsername := os.Getenv("USER_EMAIL")
 	smtpPassword := os.Getenv("USER_PASSWORD")
-	emailFile := os.Getenv("USER_EMAIL_FILE")
+	emailFile := os.Getenv("USER_EMAIL_FILE_WORKFLOW")
 
 	if emailFile != "" {
 		datosComoBytes, err := ioutil.ReadFile(emailFile)

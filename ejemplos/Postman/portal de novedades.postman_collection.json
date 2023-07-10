@@ -142,7 +142,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Descripcion\":\"Vacaciones\",\r\n    \"Comentarios\": \"\",\r\n    \"DistribucionesStr\": \"[{\\\"Cecos\\\": {\\\"Cliente\\\": \\\"NNNNN\\\",\\\"Codigo\\\": 100,\\\"IdCecos\\\": 38,\\\"Proyecto\\\": \\\"undefined\\\"},\\\"Porcentaje\\\":100}]\",\r\n    \"Fecha\": \"2023-05-10\",\r\n    \"Freelance\": false,\r\n    \"Hora\": \"13:57:54\",\r\n    \"ImporteTotal\": 66,\r\n    \"Periodo\": \"04-2023\",\r\n    \"Plazo\": \"undefined\",\r\n    \"EnviarA\":\"\",\r\n    \"Proveedor\": \"ABAXDECO S.R.L (000772)\",\r\n    \"Departamento\":\"Departamento de ejemplo\",\r\n    \"Tipo\": \"NP\",\r\n    \"Usuario\": \"lgonzalez@itpatagonia.com\",\r\n    \"Recurso\": {\r\n        \"HorasExtras\":[{\r\n            \"TipoDia\": \"Feriado\",\r\n            \"TipoHora\": \"Diurno\",\r\n            \"Cantidad\": 100\r\n        }],\r\n        \"Rcc\":[\r\n            {\r\n                \"ccNombre\": \"ICBC\",\r\n                \"ccPorc\": 100.0\r\n            }\r\n        ]\r\n    }\r\n}",
+							"raw": "{\r\n    \"Descripcion\":\"Licencia por vacaciones\",\r\n    \"Comentarios\": \"\",\r\n    \"DistribucionesStr\": \"[{\\\"Cecos\\\": {\\\"Cliente\\\": \\\"NNNNN\\\",\\\"Codigo\\\": 100,\\\"IdCecos\\\": 38,\\\"Proyecto\\\": \\\"undefined\\\"},\\\"Porcentaje\\\":100}]\",\r\n    \"Fecha\": \"2023-05-10\",\r\n    \"Freelance\": false,\r\n    \"Hora\": \"13:57:54\",\r\n    \"ImporteTotal\": 66,\r\n    \"Periodo\": \"04-2023\",\r\n    \"Plazo\": \"undefined\",\r\n    \"EnviarA\":\"\",\r\n    \"Proveedor\": \"ABAXDECO S.R.L (000772)\",\r\n    \"Departamento\":\"Departamento de ejemplo\",\r\n    \"Tipo\": \"NP\",\r\n    \"Usuario\": \"lgonzalez@itpatagonia.com\",\r\n    \"Recurso\": {\r\n        \"HorasExtras\":[{\r\n            \"TipoDia\": \"Feriado\",\r\n            \"TipoHora\": \"Diurno\",\r\n            \"Cantidad\": 100\r\n        }],\r\n        \"Rcc\":[\r\n            {\r\n                \"ccNombre\": \"ICBC\",\r\n                \"ccPorc\": 100.0\r\n            }\r\n        ]\r\n    },\r\n    \"Workflow\": null\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -320,7 +320,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Novedad/?diferenciaFechas=12",
+							"raw": "{{url}}/Novedad/?estadoWF=aceptada",
 							"host": [
 								"{{url}}"
 							],
@@ -391,7 +391,12 @@
 								},
 								{
 									"key": "diferenciaFechas",
-									"value": "12"
+									"value": "12",
+									"disabled": true
+								},
+								{
+									"key": "estadoWF",
+									"value": "aceptada"
 								}
 							]
 						}
@@ -672,6 +677,42 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "InsertWorkflow",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Tipo\":\"Vacaciones\",\r\n    \"Pasos\":[\r\n        {\r\n            \"Aprobador\": \"manager\",\r\n            \"Responsable\":\"\"\r\n        },\r\n        {\r\n            \"Aprobador\": \"grupo\",\r\n            \"Responsable\": \"po\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Workflow",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Workflow"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -702,6 +743,33 @@
 								}
 							}
 						},
+						"url": {
+							"raw": "{{url}}/Proveedor",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Proveedor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetProveedorAll",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
 						"url": {
 							"raw": "{{url}}/Proveedor",
 							"host": [
