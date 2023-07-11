@@ -424,7 +424,8 @@ func ingresarPaqueteDeRecursos(paqueteDeRecursos PackageOfRecursos) {
 	}
 
 	//Empieza el setteo y subida
-	for _, recurso := range paqueteDeRecursos.Paquete {
+	arrayOfResources := make([]interface{}, len(x))
+	for index, recurso := range paqueteDeRecursos.Paquete {
 		//setea la fecha
 		recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaIng)
 
@@ -457,13 +458,12 @@ func ingresarPaqueteDeRecursos(paqueteDeRecursos PackageOfRecursos) {
 			recurso.Rcc[pos].CcNombre = cecoEncontrado.Cliente
 			recurso.Rcc[pos].CcCliente = cecoEncontrado.Descripcion
 		}
-
-		//Ingresa el recurso
-		// TODO Cambiar por un insertMany
-		result, err := coll.InsertOne(context.TODO(), recurso)
-		if err != nil {
-			// terminar ejecucion del recurso actual y avisar
-		}
-		fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+		arrayOfResources[index] = recurso
 	}
+	// Ingresa el recurso
+	result, err := coll.InsertMany(context.TODO(), arrayOfResources)
+	if err != nil {
+		// terminar ejecucion del recurso actual y avisar
+	}
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedIDs...)
 }
