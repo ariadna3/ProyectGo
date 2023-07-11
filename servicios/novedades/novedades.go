@@ -340,8 +340,9 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 
 			busqueda["workflow"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
 		} else {
-			andMail := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: email}}, bson.D{{Key: "estado", Value: c.Query("estadoWF")}}}}}
-			andGrupo := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: c.Query("estadoWF")}}}}}
+			estadoWFRegex := bson.M{"$regex": c.Query("estadoWF"), "$options": "im"}
+			andMail := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: email}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}}
+			andGrupo := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: estadoWFRegex}}}}}
 			orTodo := bson.D{{Key: "$or", Value: bson.A{andMail, andGrupo}}}
 
 			busqueda["workflow"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
