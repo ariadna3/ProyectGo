@@ -66,6 +66,7 @@ type Novedades struct {
 	Tipo                  string     `bson:"tipo"`
 	Usuario               string     `bson:"usuario"`
 	Workflow              []Workflow `bson:"workflow"`
+	Archivado             bool       `bson:"archivado"`
 }
 
 const (
@@ -321,6 +322,9 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	}
 	if c.Query("departamento") != "" {
 		busqueda["departamento"] = bson.M{"$regex": c.Query("departamento"), "$options": "im"}
+	}
+	if c.QueryBool("archivado") == true {
+		busqueda["archivado"] = bson.M{"$regex": c.Query("archivado"), "$options": "im"}
 	}
 	if c.Query("estadoWF") != "" {
 		coll2 := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
