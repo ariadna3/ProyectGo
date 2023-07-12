@@ -389,30 +389,6 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	return c.Status(200).JSON(nuevaListaNovedades)
 }
 
-// obtener todas las novedades
-func GetNovedadesAll(c *fiber.Ctx) error {
-	fmt.Println("GetNovedadesAll")
-	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
-	if error != nil {
-		return c.Status(codigo).SendString(error.Error())
-	}
-
-	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
-	cursor, err := coll.Find(context.TODO(), bson.M{})
-	if err != nil {
-		return c.Status(404).SendString(err.Error())
-	}
-	var novedades []Novedades
-	if err = cursor.All(context.Background(), &novedades); err != nil {
-		return c.Status(503).SendString(err.Error())
-	}
-	for index, element := range novedades {
-		novedades[index].Resumen = resumenNovedad(element)
-	}
-	return c.Status(200).JSON(novedades)
-}
-
 // borrar novedad por id
 func DeleteNovedad(c *fiber.Ctx) error {
 	fmt.Println("DeleteNovedad")

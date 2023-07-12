@@ -170,7 +170,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 
 // obtener recurso por id
 func GetRecurso(c *fiber.Ctx) error {
-
+	fmt.Println("GetRecurso")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
 	if error != nil {
@@ -188,28 +188,6 @@ func GetRecurso(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(recurso)
-}
-
-// obtener todos los recursos
-func GetRecursoAll(c *fiber.Ctx) error {
-
-	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
-	if error != nil {
-		return c.Status(codigo).SendString(error.Error())
-	}
-
-	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
-	cursor, err := coll.Find(context.TODO(), bson.M{})
-	if err != nil {
-		return c.Status(404).SendString(err.Error())
-	}
-	var recursos []Recursos
-	if err = cursor.All(context.Background(), &recursos); err != nil {
-		return c.Status(404).SendString(err.Error())
-	}
-
-	return c.Status(200).JSON(recursos)
 }
 
 // obtener todos los recursos del mismo centro de costos
@@ -242,7 +220,7 @@ func GetRecursoSameManager(c *fiber.Ctx) error {
 }
 
 func GetRecursoSameCecos(c *fiber.Ctx) error {
-
+	fmt.Println("GetRecursoSameCecos")
 	// validar el token
 	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
@@ -265,6 +243,33 @@ func GetRecursoSameCecos(c *fiber.Ctx) error {
 	filter := bson.D{{Key: "p", Value: bson.D{{Key: "$elemMatch", Value: orTodo}}}}
 	fmt.Println(filter)
 	cursor, err := coll.Find(context.TODO(), filter)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
+	var recursosEncontrados []Recursos
+	if err = cursor.All(context.Background(), &recursosEncontrados); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	return c.JSON(recursosEncontrados)
+}
+
+func GetRecursoFilter(c *fiber.Ctx) error {
+	fmt.Println("GetRecursoFilter")
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	var busqueda bson.M = bson.M{}
+	if c.Query("cecos") != "" {
+		cecoSearch := bson.D{{Key: "cc", Value: c.Query("cecos")}}
+		busqueda["p"] = bson.D{{Key: "$elemMatch", Value: cecoSearch}}
+	}
+
+	fmt.Println(busqueda)
+	cursor, err := coll.Find(context.TODO(), busqueda)
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
 	}

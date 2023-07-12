@@ -167,7 +167,6 @@ func main() {
 		app.Post("/Novedad", novedades.InsertNovedad)
 		app.Get("/Novedad/:id", novedades.GetNovedades)
 		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
-		app.Get("/Novedad", novedades.GetNovedadesAll)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
 		//Workflow novedad
@@ -197,7 +196,7 @@ func main() {
 		//Recursos
 		app.Post("/Recurso", recursos.InsertRecurso)
 		app.Get("/Recurso/:id", recursos.GetRecurso)
-		app.Get("/Recurso", recursos.GetRecursoAll)
+		app.Get("/Recurso/*", recursos.GetRecursoFilter)
 		app.Get("/RecursoFiltered", recursos.GetRecursoSameManager)
 		app.Get("/RecursoFiltered/Cecos", recursos.GetRecursoSameCecos)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
