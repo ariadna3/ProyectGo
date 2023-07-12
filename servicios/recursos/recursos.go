@@ -189,7 +189,7 @@ func InsertRecursoPackage(c *fiber.Ctx) error {
 	}
 	fmt.Print("obtencion de datos ")
 	fmt.Println(packageRecursos)
-
+	ingresarPaqueteDeRecursos(*packageRecursos)
 	return c.Status(200).JSON(packageRecursos)
 }
 
