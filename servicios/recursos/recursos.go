@@ -424,7 +424,7 @@ func ingresarPaqueteDeRecursos(paqueteDeRecursos PackageOfRecursos) {
 	}
 
 	//Empieza el setteo y subida
-	arrayOfResources := make([]interface{}, len(x))
+	arrayOfResources := make([]interface{}, len(paqueteDeRecursos.Paquete))
 	for index, recurso := range paqueteDeRecursos.Paquete {
 		//setea la fecha
 		recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaIng)
