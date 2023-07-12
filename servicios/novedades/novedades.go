@@ -583,7 +583,7 @@ func InsertCecos(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 
-	//obtenerLegajo(cecos)
+	obtenerCuitCuil(cecos)
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 	filter := bson.D{}
@@ -1217,6 +1217,7 @@ func ingresarPaqueteDeCecos(paqueteDeCecos PackageOfCecos) {
 	//Empieza el setteo y subida
 	arrayOfCecos := make([]interface{}, len(paqueteDeCecos.Paquete))
 	for index, ceco := range paqueteDeCecos.Paquete {
+		obtenerCuitCuil(&ceco)
 		ceco.Codigo = ultimoId
 		ultimoId = ultimoId + 1
 		arrayOfCecos[index] = ceco
