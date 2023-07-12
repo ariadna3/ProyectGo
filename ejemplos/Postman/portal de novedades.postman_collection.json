@@ -920,6 +920,51 @@
 					"response": []
 				},
 				{
+					"name": "GetRecursoFilter",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Recurso?cecos=201",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Recurso"
+							],
+							"query": [
+								{
+									"key": "cecos",
+									"value": "201"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GetRecursoAll",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
