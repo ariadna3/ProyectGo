@@ -194,6 +194,7 @@ func main() {
 		app.Get("/Proveedor/:id", proveedores.GetProveedor)
 		app.Get("/Proveedor", proveedores.GetProveedorAll)
 		app.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
+		app.Post("/Proveedor/Package", proveedores.InsertRecursoPackage)
 
 		//Recursos
 		app.Post("/Recurso", recursos.InsertRecurso)
