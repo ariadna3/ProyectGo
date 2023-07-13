@@ -8,12 +8,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"net/mail"
 	"net/smtp"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	// "github.com/360EntSecGroup-Skylar/excelize"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -249,6 +252,44 @@ func InsertNovedad(c *fiber.Ctx) error {
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.Status(200).JSON(novedad)
+
+}
+
+// ingresar datos a un excel
+func DatosExcel(novedad Novedades) error {
+
+	// crear/abrir archivo de excel
+	file, err := excelize.OpenFile("novedades.xlsx")
+	if err != nil {
+		file := excelize.NewFile()
+	}
+
+	// crear/abrir una hoja de calculo
+	sheet, err := sheet.OpenSheet("novedades")
+	if err != nil {
+		sheet := "novedades"
+	file.NewSheet(sheet)
+	}
+
+	// establecer columnas 
+	columns := Novedades
+	for i, col := range columns {
+		cell := fmt.Sprintf("%s%d", excelize.ToAlphaString(i+1), 1)
+		file.SetCellValue(sheet, cell, col)
+	}
+
+	// escribir datos en el excel
+	for i, dato := range datos {
+		row := i + 2
+		file.SetCellValue(sheet, fmt.Sprintf("A%d", row), dato.Novedades)
+	}
+
+	// guardar archivo
+	if err := file.SaveAs("datos.xlsx"), err != nil{
+		log.Fatal("No se pudo guardar el archivo de Excel", err)
+	}
+
+	return c.JSON ("datos ingresados")
 }
 
 // obtener novedad por id
