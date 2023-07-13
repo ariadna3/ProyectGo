@@ -264,13 +264,6 @@ func DatosExcel(novedad Novedades) error {
 		file := excelize.NewFile()
 	}
 
-	// crear/abrir una hoja de calculo
-	sheet, err := sheet.OpenSheet("novedades")
-	if err != nil {
-		sheet := "novedades"
-	file.NewSheet(sheet)
-	}
-
 	// establecer columnas 
 	columns := Novedades
 	for i, col := range columns {
@@ -285,7 +278,7 @@ func DatosExcel(novedad Novedades) error {
 	}
 
 	// guardar archivo
-	if err := file.SaveAs("datos.xlsx"), err != nil{
+	if err != file.SaveAs("datos.xlsx"), err != nil{
 		log.Fatal("No se pudo guardar el archivo de Excel", err)
 	}
 
