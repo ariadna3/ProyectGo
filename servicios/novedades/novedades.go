@@ -236,6 +236,9 @@ func InsertNovedad(c *fiber.Ctx) error {
 	//valida los pasos del workflow
 	err = validarPasos(novedad)
 	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			return c.Status(fiber.ErrNotFound.Code).SendString("Tipo de novedad no encontrada")
+		}
 		fmt.Println(err)
 	}
 
