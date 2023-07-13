@@ -587,7 +587,7 @@ func InsertCecos(c *fiber.Ctx) error {
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 	filter := bson.D{}
-	opts := options.Find().SetSort(bson.D{{"idCecos", -1}})
+	opts := options.Find().SetSort(bson.D{{Key: "idCecos", Value: -1}})
 
 	cursor, err := coll.Find(context.TODO(), filter, opts)
 	if err != nil {
@@ -1199,7 +1199,7 @@ func ingresarPaqueteDeCecos(paqueteDeCecos PackageOfCecos) {
 
 	//Obtiene el ultimo Id
 	filter := bson.D{}
-	opts := options.Find().SetSort(bson.D{{Key: "codigo", Value: -1}})
+	opts := options.Find().SetSort(bson.D{{Key: "idCecos", Value: -1}})
 
 	cursor, _ := coll.Find(context.TODO(), filter, opts)
 
@@ -1211,17 +1211,19 @@ func ingresarPaqueteDeCecos(paqueteDeCecos PackageOfCecos) {
 	if len(results) == 0 {
 		ultimoId = 0
 	} else {
-		ultimoId = results[0].Codigo + 1
+		ultimoId = results[0].IdCecos + 1
 	}
 
 	//Empieza el setteo y subida
 	arrayOfCecos := make([]interface{}, len(paqueteDeCecos.Paquete))
 	for index, ceco := range paqueteDeCecos.Paquete {
 		obtenerCuitCuil(&ceco)
-		ceco.Codigo = ultimoId
+		ceco.IdCecos = ultimoId
 		ultimoId = ultimoId + 1
 		arrayOfCecos[index] = ceco
+		paqueteDeCecos.Paquete[index] = ceco
 	}
+
 	// Ingresa el recurso
 	result, err := coll.InsertMany(context.TODO(), arrayOfCecos)
 	if err != nil {

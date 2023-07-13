@@ -458,7 +458,10 @@ func ingresarPaqueteDeRecursos(paqueteDeRecursos PackageOfRecursos) {
 			recurso.Rcc[pos].CcNombre = cecoEncontrado.Cliente
 			recurso.Rcc[pos].CcCliente = cecoEncontrado.Descripcion
 		}
+		fmt.Print("recurso final: ")
+		fmt.Println(recurso)
 		arrayOfResources[index] = recurso
+		paqueteDeRecursos.Paquete[index] = recurso
 	}
 	// Ingresa el recurso
 	result, err := coll.InsertMany(context.TODO(), arrayOfResources)
