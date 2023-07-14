@@ -334,17 +334,21 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 		var usuario userGoogle.UserITP
 		err2 := coll2.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 		if err2 != nil {
-			return c.Status(200).SendString("usuario no encontrada")
+			return c.Status(404).SendString("Usuario no encontrada")
+		}
+		err, recurso := recursos.GetRecursoInterno(email, 0)
+		if err != nil {
+			return c.Status(404).SendString("Gerente no encontrado")
 		}
 		if c.Query("estadoWF") == "all" {
-			mail := bson.D{{Key: "aprobador", Value: email}}
+			mail := bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}}
 			grupo := bson.D{{Key: "aprobador", Value: usuario.Rol}}
 			orTodo := bson.D{{Key: "$or", Value: bson.A{mail, grupo}}}
 
 			busqueda["workflow"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
 		} else {
 			estadoWFRegex := bson.M{"$regex": c.Query("estadoWF"), "$options": "im"}
-			andMail := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: email}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}}
+			andMail := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}}
 			andGrupo := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: estadoWFRegex}}}}}
 			orTodo := bson.D{{Key: "$or", Value: bson.A{andMail, andGrupo}}}
 
