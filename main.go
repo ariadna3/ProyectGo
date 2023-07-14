@@ -170,6 +170,8 @@ func main() {
 		app.Get("/Novedad", novedades.GetNovedadesAll)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
+		app.Get("/Excel/Novedad", novedades.GetExcelFile)
+
 		//Workflow novedad
 		app.Post("/Workflow", novedades.InsertWorkFlow)
 		app.Get("/Aprobar/Novedad/:id", novedades.AprobarWorkflow)

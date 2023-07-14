@@ -1,3 +1,6 @@
 .env
 archivosSubidos/
 email.txt
+
+go.mod
+go.sum

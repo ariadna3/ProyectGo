@@ -8,15 +8,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"net/mail"
 	"net/smtp"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
-	// "github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/360EntSecGroup-Skylar/excelize"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -255,34 +255,60 @@ func InsertNovedad(c *fiber.Ctx) error {
 
 }
 
-// ingresar datos a un excel
-func DatosExcel(novedad Novedades) error {
-
-	// crear/abrir archivo de excel
-	file, err := excelize.OpenFile("novedades.xlsx")
-	if err != nil {
-		file := excelize.NewFile()
+// Crear excel
+func GetExcelFile(c *fiber.Ctx) error {
+	fmt.Println("GetExcelFile")
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
 	}
 
-	// establecer columnas 
-	columns := Novedades
-	for i, col := range columns {
-		cell := fmt.Sprintf("%s%d", excelize.ToAlphaString(i+1), 1)
-		file.SetCellValue(sheet, cell, col)
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
+	var novedades []Novedades
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	datosExcel(novedades)
+
+	return c.Status(200).SendString("Se creo el excel")
+}
+
+// ingresar datos a un excel
+func datosExcel(novedades []Novedades) error {
+
+	// Abrir archivo de excel
+	file, err := excelize.OpenFile(os.Getenv("EXCEL_FILE"))
+	if err != nil {
+		file = excelize.NewFile()
+	}
+
+	// establecer columnas
+	val := reflect.ValueOf(novedades[0]).Elem()
+	for index := 0; index < val.NumField(); index++ {
+		cell := fmt.Sprintf("%s%d", excelize.ToAlphaString(index+1), 1)
+		file.SetCellValue("novedades", cell, val.Type().Field(index).Name)
 	}
 
 	// escribir datos en el excel
-	for i, dato := range datos {
-		row := i + 2
-		file.SetCellValue(sheet, fmt.Sprintf("A%d", row), dato.Novedades)
+	for index, novedad := range novedades {
+		row := index + 2
+		file.SetCellValue("novedades", fmt.Sprintf("A%d", row), novedad.AdjuntoMotivo)
 	}
 
 	// guardar archivo
-	if err != file.SaveAs("datos.xlsx"), err != nil{
-		log.Fatal("No se pudo guardar el archivo de Excel", err)
+	err = file.SaveAs(os.Getenv("EXCEL_FILE"))
+	if err != nil {
+		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
+		return err
 	}
 
-	return c.JSON ("datos ingresados")
+	return nil
 }
 
 // obtener novedad por id
