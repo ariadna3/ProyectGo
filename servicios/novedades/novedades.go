@@ -744,19 +744,22 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 		return c.Status(fiber.ErrForbidden.Code).SendString("La novedad ya fue modificada")
 	}
 
-	//comprueba que el usuario sea el autorizado
-	aprobador := novedad.Workflow[len(novedad.Workflow)-1].Aprobador
-	if strings.Contains(aprobador, "@") {
-		if email != aprobador {
-			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
-		}
-	} else {
-		err, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
-		if err != nil {
-			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
-		}
+	//Busca el legajo del usuario registrado
+	err, recurso := recursos.GetRecursoInterno(email, 0)
+	if err != nil {
+		return c.Status(404).SendString("Gerente no encontrado")
 	}
 
+	//comprueba que el usuario sea el autorizado
+	aprobador := novedad.Workflow[len(novedad.Workflow)-1].Aprobador
+	err, _, _ = userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
+	if err != nil {
+		return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
+	} else if strconv.Itoa(recurso.Legajo) != aprobador {
+		return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
+	}
+
+	//Settea la aprobacion
 	novedad.Workflow[len(novedad.Workflow)-1].Estado = Aceptada
 	novedad.Workflow[len(novedad.Workflow)-1].Autorizador = email
 	novedad.Workflow[len(novedad.Workflow)-1].Fecha = time.Now()
@@ -804,19 +807,22 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 		return c.Status(fiber.ErrForbidden.Code).SendString("La novedad ya fue modificada")
 	}
 
-	//comprueba que el usuario sea el autorizado
-	aprobador := novedad.Workflow[len(novedad.Workflow)-1].Aprobador
-	if strings.Contains(aprobador, "@") {
-		if email != aprobador {
-			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
-		}
-	} else {
-		err, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
-		if err != nil {
-			return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
-		}
+	//Busca el legajo del usuario registrado
+	err, recurso := recursos.GetRecursoInterno(email, 0)
+	if err != nil {
+		return c.Status(404).SendString("Gerente no encontrado")
 	}
 
+	//comprueba que el usuario sea el autorizado
+	aprobador := novedad.Workflow[len(novedad.Workflow)-1].Aprobador
+	err, _, _ = userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
+	if err != nil {
+		return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
+	} else if strconv.Itoa(recurso.Legajo) != aprobador {
+		return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
+	}
+
+	//Settea el rechazo
 	novedad.Workflow[len(novedad.Workflow)-1].Estado = Rechazada
 	novedad.Workflow[len(novedad.Workflow)-1].Autorizador = email
 	novedad.Workflow[len(novedad.Workflow)-1].Fecha = time.Now()
