@@ -823,9 +823,8 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 	//comprueba que el usuario sea el autorizado
 	aprobador := novedad.Workflow[len(novedad.Workflow)-1].Aprobador
 	err, _, _ = userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
-	if err != nil {
-		return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
-	} else if strconv.Itoa(recurso.Legajo) != aprobador {
+
+	if strconv.Itoa(recurso.Legajo) != aprobador && err != nil {
 		return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
 	}
 
