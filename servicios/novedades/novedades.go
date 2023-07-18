@@ -11,9 +11,12 @@ import (
 	"net/mail"
 	"net/smtp"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/360EntSecGroup-Skylar/excelize"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -252,6 +255,73 @@ func InsertNovedad(c *fiber.Ctx) error {
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.Status(200).JSON(novedad)
+
+}
+
+// Crear excel
+func GetExcelFile(c *fiber.Ctx) error {
+	fmt.Println("GetExcelFile")
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+	var novedades []Novedades
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	err = datosExcel(novedades)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
+	}
+
+	return c.Status(fiber.StatusOK).SendFile(os.Getenv("EXCEL_FILE"))
+}
+
+// ingresar datos a un excel
+func datosExcel(novedades []Novedades) error {
+
+	// Abrir archivo de excel
+	file, err := excelize.OpenFile(os.Getenv("EXCEL_FILE"))
+	if err != nil {
+		file = excelize.NewFile()
+		file.SetSheetName("Sheet1", "novedades")
+	}
+
+	// establecer columnas
+	valType := reflect.TypeOf(novedades[0])
+
+	for index := 0; index < valType.NumField(); index++ {
+		cell := fmt.Sprintf("%s%d", excelize.ToAlphaString(index), 1)
+		file.SetCellValue("novedades", cell, valType.Field(index).Name)
+	}
+
+	// escribir datos en el excel
+	for index, novedad := range novedades {
+		row := index + 2
+		valValue := reflect.ValueOf(novedad)
+		for indexValues := 0; indexValues < valValue.NumField(); indexValues++ {
+			fieldValue := valValue.Field(indexValues)
+			file.SetCellValue("novedades", fmt.Sprintf("%s%d", excelize.ToAlphaString(indexValues), row), fieldValue.Interface())
+		}
+
+	}
+
+	// guardar archivo
+	err = file.SaveAs(os.Getenv("EXCEL_FILE"))
+	if err != nil {
+		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
+		return err
+	}
+
+	return nil
 }
 
 // obtener novedad por id
