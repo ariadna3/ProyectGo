@@ -267,16 +267,19 @@ func GetExcelFile(c *fiber.Ctx) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var novedades []Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
 
-	datosExcel(novedades)
+	err = datosExcel(novedades)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
+	}
 
-	return c.Status(200).SendString("Se creo el excel")
+	return c.Status(fiber.StatusOK).SendFile(os.Getenv("EXCEL_FILE"))
 }
 
 // ingresar datos a un excel
@@ -286,19 +289,26 @@ func datosExcel(novedades []Novedades) error {
 	file, err := excelize.OpenFile(os.Getenv("EXCEL_FILE"))
 	if err != nil {
 		file = excelize.NewFile()
+		file.SetSheetName("Sheet1", "novedades")
 	}
 
 	// establecer columnas
-	val := reflect.ValueOf(novedades[0]).Elem()
-	for index := 0; index < val.NumField(); index++ {
-		cell := fmt.Sprintf("%s%d", excelize.ToAlphaString(index+1), 1)
-		file.SetCellValue("novedades", cell, val.Type().Field(index).Name)
+	valType := reflect.TypeOf(novedades[0])
+
+	for index := 0; index < valType.NumField(); index++ {
+		cell := fmt.Sprintf("%s%d", excelize.ToAlphaString(index), 1)
+		file.SetCellValue("novedades", cell, valType.Field(index).Name)
 	}
 
 	// escribir datos en el excel
 	for index, novedad := range novedades {
 		row := index + 2
-		file.SetCellValue("novedades", fmt.Sprintf("A%d", row), novedad.AdjuntoMotivo)
+		valValue := reflect.ValueOf(novedad)
+		for indexValues := 0; indexValues < valValue.NumField(); indexValues++ {
+			fieldValue := valValue.Field(indexValues)
+			file.SetCellValue("novedades", fmt.Sprintf("%s%d", excelize.ToAlphaString(indexValues), row), fieldValue.Interface())
+		}
+
 	}
 
 	// guardar archivo
