@@ -600,6 +600,46 @@ func GetFiles(c *fiber.Ctx) error {
 	return c.Status(400).SendString("debe especificar el archivo")
 }
 
+// Agregar archivos a una notificacion
+func UpdateFileAdd(c *fiber.Ctx) error {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	var novedad Novedades
+	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
+	if err != nil {
+		return c.Status(404).SendString("novedad no encontrada")
+	}
+
+	//ingresa los archivos
+	form, err := c.MultipartForm()
+	if err != nil {
+		return c.Status(fiber.StatusNoContent).SendString("archivo no encontrado")
+	} else {
+		fmt.Println(form.File)
+		for _, fileHeaders := range form.File {
+			for _, fileHeader := range fileHeaders {
+				fmt.Println(fileHeader)
+				existeEnAdjuntos, _ := findInStringArray(novedad.Adjuntos, fileHeader.Filename)
+				if !existeEnAdjuntos && novedad.AdjuntoMotivo != fileHeader.Filename {
+					novedad.Adjuntos = append(novedad.Adjuntos, fileHeader.Filename)
+				}
+				idName := strconv.Itoa(novedad.IdSecuencial)
+				c.SaveFile(fileHeader, os.Getenv("FOLDER_FILE")+"/"+idName+fileHeader.Filename)
+			}
+		}
+	}
+
+	filter := bson.D{{Key: "idSecuencial", Value: idNumber}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "adjuntos", Value: novedad.Adjuntos}}}}
+
+	_, err = coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
+
+	return c.Status(fiber.StatusOK).SendString("Subidos archivos correctamente")
+}
+
 // ----Tipo Novedades----
 func GetTipoNovedad(c *fiber.Ctx) error {
 	fmt.Println("GetTipoNovedad")

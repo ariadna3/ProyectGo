@@ -178,6 +178,7 @@ func main() {
 
 		//obtener adjuntos novedades
 		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
+		app.Put("/Archivos/Novedad/Adjuntos/:id", novedades.UpdateFileAdd)
 
 		//Tipo Novedades
 		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
