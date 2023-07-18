@@ -29,7 +29,6 @@ import (
 )
 
 const FinalDeLosPasos = "fin de los pasos"
-const FormatoFecha = "2006-02-01"
 
 type Novedades struct {
 	AdjuntoMotivo         string           `bson:"adjuntoMotivo"`
@@ -71,17 +70,6 @@ type Novedades struct {
 	Workflow              []Workflow `bson:"workflow"`
 	Archivado             bool       `bson:"archivado"`
 }
-
-const (
-	Pendiente = "pendiente"
-	Aceptada  = "aceptada"
-	Rechazada = "rechazada"
-)
-
-const (
-	TipoGerente = "manager"
-	TipoGrupo   = "grupo"
-)
 
 type TipoNovedad struct {
 	IdSecuencial int    `bson:"idSecuencial"`
@@ -172,8 +160,8 @@ func InsertNovedad(c *fiber.Ctx) error {
 	}
 
 	// valida el estado
-	if novedad.Estado != Pendiente && novedad.Estado != Aceptada && novedad.Estado != Rechazada {
-		novedad.Estado = Pendiente
+	if novedad.Estado != constantes.Pendiente && novedad.Estado != constantes.Aceptada && novedad.Estado != constantes.Rechazada {
+		novedad.Estado = constantes.Pendiente
 	}
 
 	//le asigna un idSecuencial
@@ -509,7 +497,7 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 
 	//Verifica que el estado sea uno valido
-	if estado != Pendiente && estado != Aceptada && estado != Rechazada {
+	if estado != constantes.Pendiente && estado != constantes.Aceptada && estado != constantes.Rechazada {
 		return c.SendString("estado no valido")
 	}
 
@@ -850,7 +838,7 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 	}
 
 	//Comprueba que la novedad no este aceptada o rechazada
-	if novedad.Estado != Pendiente {
+	if novedad.Estado != constantes.Pendiente {
 		return c.Status(fiber.ErrForbidden.Code).SendString("La novedad ya fue modificada")
 	}
 
@@ -869,14 +857,14 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 	}
 
 	//Settea la aprobacion
-	novedad.Workflow[len(novedad.Workflow)-1].Estado = Aceptada
+	novedad.Workflow[len(novedad.Workflow)-1].Estado = constantes.Aceptada
 	novedad.Workflow[len(novedad.Workflow)-1].Autorizador = email
 	novedad.Workflow[len(novedad.Workflow)-1].Fecha = time.Now()
-	novedad.Workflow[len(novedad.Workflow)-1].FechaStr = time.Now().Format(FormatoFecha)
+	novedad.Workflow[len(novedad.Workflow)-1].FechaStr = time.Now().Format(constantes.FormatoFecha)
 	err = validarPasos(&novedad)
 	if err != nil {
 		if err.Error() == FinalDeLosPasos {
-			novedad.Estado = Aceptada
+			novedad.Estado = constantes.Aceptada
 			enviarMailWorkflow(novedad)
 		}
 	}
@@ -912,7 +900,7 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 	}
 
 	//Comprueba que la novedad no este aceptada o rechazada
-	if novedad.Estado != Pendiente {
+	if novedad.Estado != constantes.Pendiente {
 		return c.Status(fiber.ErrForbidden.Code).SendString("La novedad ya fue modificada")
 	}
 
@@ -930,11 +918,11 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 	}
 
 	//Settea el rechazo
-	novedad.Workflow[len(novedad.Workflow)-1].Estado = Rechazada
+	novedad.Workflow[len(novedad.Workflow)-1].Estado = constantes.Rechazada
 	novedad.Workflow[len(novedad.Workflow)-1].Autorizador = email
 	novedad.Workflow[len(novedad.Workflow)-1].Fecha = time.Now()
-	novedad.Workflow[len(novedad.Workflow)-1].FechaStr = time.Now().Format(FormatoFecha)
-	novedad.Estado = Rechazada
+	novedad.Workflow[len(novedad.Workflow)-1].FechaStr = time.Now().Format(constantes.FormatoFecha)
+	novedad.Estado = constantes.Rechazada
 	enviarMailWorkflow(novedad)
 	//crea el filtro
 	filter := bson.D{{Key: "idSecuencial", Value: idNumber}}
@@ -966,8 +954,8 @@ func GetNovedadesPendientes(c *fiber.Ctx) error {
 	}
 
 	coll = client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
-	andMail := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: email}}, bson.D{{Key: "estado", Value: Pendiente}}}}}
-	andGrupo := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: Pendiente}}}}}
+	andMail := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: email}}, bson.D{{Key: "estado", Value: constantes.Pendiente}}}}}
+	andGrupo := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: constantes.Pendiente}}}}}
 	orTodo := bson.D{{Key: "$or", Value: bson.A{andMail, andGrupo}}}
 
 	filter := bson.D{{Key: "workflow", Value: bson.D{{Key: "$elemMatch", Value: orTodo}}}}
@@ -1210,18 +1198,18 @@ func validarPasos(novedad *Novedades) error {
 
 	pasoActual := listaDePasos[posicionActual]
 	var nuevoWorkflow Workflow
-	if pasoActual.Aprobador == TipoGerente {
+	if pasoActual.Aprobador == constantes.TipoGerente {
 		err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
 		if err != nil {
 			return err
 		}
 		nuevoWorkflow.Aprobador = recurso.Gerente
-	} else if pasoActual.Aprobador == TipoGrupo {
+	} else if pasoActual.Aprobador == constantes.TipoGrupo {
 		nuevoWorkflow.Aprobador = pasoActual.Responsable
 	} else {
 		return errors.New("Paso invalido detectado")
 	}
-	nuevoWorkflow.Estado = Pendiente
+	nuevoWorkflow.Estado = constantes.Pendiente
 	nuevoWorkflow.Autorizador = ""
 	nuevoWorkflow.FechaStr = ""
 	nuevoWorkflow.Fecha = time.Now()
