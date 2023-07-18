@@ -1633,6 +1633,59 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "AddArchivo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "archivo",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/Archivos/Novedad/Adjuntos/838/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Archivos",
+								"Novedad",
+								"Adjuntos",
+								"838",
+								""
+							],
+							"query": [
+								{
+									"key": "nombre",
+									"value": "8j49rdpjarr51.webp",
+									"disabled": true
+								},
+								{
+									"key": "pos",
+									"value": "0",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
