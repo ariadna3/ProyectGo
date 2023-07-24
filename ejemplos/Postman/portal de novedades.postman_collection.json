@@ -142,7 +142,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Descripcion\":\"Vacaciones\",\r\n    \"Comentarios\": \"\",\r\n    \"DistribucionesStr\": \"[{\\\"Cecos\\\": {\\\"Cliente\\\": \\\"NNNNN\\\",\\\"Codigo\\\": 100,\\\"IdCecos\\\": 38,\\\"Proyecto\\\": \\\"undefined\\\"},\\\"Porcentaje\\\":100}]\",\r\n    \"Fecha\": \"2023-05-10\",\r\n    \"Freelance\": false,\r\n    \"Hora\": \"13:57:54\",\r\n    \"ImporteTotal\": 66,\r\n    \"Periodo\": \"04-2023\",\r\n    \"Plazo\": \"undefined\",\r\n    \"EnviarA\":\"\",\r\n    \"Proveedor\": \"ABAXDECO S.R.L (000772)\",\r\n    \"Departamento\":\"Departamento de ejemplo\",\r\n    \"Tipo\": \"NP\",\r\n    \"Usuario\": \"lgonzalez@itpatagonia.com\",\r\n    \"Recurso\": {\r\n        \"HorasExtras\":[{\r\n            \"TipoDia\": \"Feriado\",\r\n            \"TipoHora\": \"Diurno\",\r\n            \"Cantidad\": 100\r\n        }],\r\n        \"Rcc\":[\r\n            {\r\n                \"ccNombre\": \"ICBC\",\r\n                \"ccPorc\": 100.0\r\n            }\r\n        ]\r\n    }\r\n}",
+							"raw": "{\r\n    \"Descripcion\":\"Licencia por vacaciones\",\r\n    \"Comentarios\": \"\",\r\n    \"DistribucionesStr\": \"[{\\\"Cecos\\\": {\\\"Cliente\\\": \\\"NNNNN\\\",\\\"Codigo\\\": 100,\\\"IdCecos\\\": 38,\\\"Proyecto\\\": \\\"undefined\\\"},\\\"Porcentaje\\\":100}]\",\r\n    \"Fecha\": \"2023-05-10\",\r\n    \"Freelance\": false,\r\n    \"Hora\": \"13:57:54\",\r\n    \"ImporteTotal\": 66,\r\n    \"Periodo\": \"04-2023\",\r\n    \"Plazo\": \"undefined\",\r\n    \"EnviarA\":\"\",\r\n    \"Proveedor\": \"ABAXDECO S.R.L (000772)\",\r\n    \"Departamento\":\"Departamento de ejemplo\",\r\n    \"Tipo\": \"NP\",\r\n    \"Usuario\": \"lgonzalez@itpatagonia.com\",\r\n    \"Recurso\": {\r\n        \"HorasExtras\":[{\r\n            \"TipoDia\": \"Feriado\",\r\n            \"TipoHora\": \"Diurno\",\r\n            \"Cantidad\": 100\r\n        }],\r\n        \"Rcc\":[\r\n            {\r\n                \"ccNombre\": \"ICBC\",\r\n                \"ccPorc\": 100.0\r\n            }\r\n        ]\r\n    },\r\n    \"Workflow\": null\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -320,7 +320,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Novedad/?diferenciaFechas=12",
+							"raw": "{{url}}/Novedad/?estadoWF=aceptada",
 							"host": [
 								"{{url}}"
 							],
@@ -391,7 +391,12 @@
 								},
 								{
 									"key": "diferenciaFechas",
-									"value": "12"
+									"value": "12",
+									"disabled": true
+								},
+								{
+									"key": "estadoWF",
+									"value": "aceptada"
 								}
 							]
 						}
@@ -672,6 +677,70 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "InsertWorkflow",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Tipo\":\"Vacaciones\",\r\n    \"Pasos\":[\r\n        {\r\n            \"Aprobador\": \"manager\",\r\n            \"Responsable\":\"\"\r\n        },\r\n        {\r\n            \"Aprobador\": \"grupo\",\r\n            \"Responsable\": \"po\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Workflow",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Workflow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetExcelNovedades",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Excel/Novedad",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Excel",
+								"Novedad"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -702,6 +771,33 @@
 								}
 							}
 						},
+						"url": {
+							"raw": "{{url}}/Proveedor",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Proveedor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetProveedorAll",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
 						"url": {
 							"raw": "{{url}}/Proveedor",
 							"host": [
@@ -812,6 +908,43 @@
 					"response": []
 				},
 				{
+					"name": "InsertRecursoPackage",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Paquete\": [\r\n        {\r\n            \"legajo\": 1500,\r\n            \"apellido\": \"REY\",\r\n            \"nombre\": \"PALOMA\",\r\n            \"fechaString\": \"11/04/2022\",\r\n            \"mail\": \"prey@itpatagonia.com\",\r\n            \"sueldo\": 150000,\r\n            \"Rcc\": [\r\n                {\r\n                    \"CcNum\": \"20\",\r\n                    \"CcPorc\": 100.0\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"gerente\": \"1400\",\r\n            \"nombre\": \"CLARA\",\r\n            \"apellido\": \"ABERASTAIN DIZ \",\r\n            \"legajo\": 1375,\r\n            \"mail\": \"caberastain@itpatagonia.com\",\r\n            \"fechaIng\": \"14/07/2021\",\r\n            \"sueldo\": 137500,\r\n            \"Rcc\": [\r\n                {\r\n                    \"CcNum\": \"030\",\r\n                    \"CcPorc\": 100\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"Gerente\": \"\",\r\n            \"Nombre\": \"LUCIA BELEN\",\r\n            \"Apellido\": \"DONNINI \",\r\n            \"Legajo\": 1411,\r\n            \"Mail\": \"ldonnini@itpatagonia.com\",\r\n            \"FechaIng\": \"10/05/2021\",\r\n            \"Sueldo\": 141100,\r\n            \"Rcc\": [\r\n                {\r\n                    \"CcNum\": \"030\",\r\n                    \"CcPorc\": 100\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Recurso/Package",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Recurso",
+								"Package"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GetRecurso",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -846,6 +979,51 @@
 							"path": [
 								"Recurso",
 								"425"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetRecursoFilter",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Recurso?cecos=201",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Recurso"
+							],
+							"query": [
+								{
+									"key": "cecos",
+									"value": "201"
+								}
 							]
 						}
 					},
@@ -1113,6 +1291,43 @@
 							],
 							"path": [
 								"Cecos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InsertCecoPackage",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Paquete\":[\r\n        {\r\n            \"Descripcion\": \"(9601) - OPEN PASS S.A. - OPEN PASS S.A. (30716794748)\",\r\n            \"Codigo\": 9601,\r\n            \"Cliente\": \"OPEN PASS S.A.\",\r\n            \"Proyecto\": \"OPEN PASS S.A.\"\r\n        },\r\n        {\r\n            \"Descripcion\": \"(0002) - Oficina Corrientes - NNNNN (99999999999)\",\r\n            \"Codigo\": 2,\r\n            \"Cliente\": \"NNNNN\",\r\n            \"Proyecto\": \"Oficina Corrientes\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Cecos/Package",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Cecos",
+								"Package"
 							]
 						}
 					},
@@ -1413,6 +1628,59 @@
 								{
 									"key": "pos",
 									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddArchivo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "archivo",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/Archivos/Novedad/Adjuntos/838/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Archivos",
+								"Novedad",
+								"Adjuntos",
+								"838",
+								""
+							],
+							"query": [
+								{
+									"key": "nombre",
+									"value": "8j49rdpjarr51.webp",
+									"disabled": true
+								},
+								{
+									"key": "pos",
+									"value": "0",
+									"disabled": true
 								}
 							]
 						}

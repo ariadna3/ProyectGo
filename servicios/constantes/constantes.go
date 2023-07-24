@@ -1,14 +1,33 @@
 package constantes
 
-const AdminRequired = true
-const AdminNotRequired = false
-const AnyRol = ""
-const Admin = "admin"
+const (
+	AdminRequired    = true
+	AdminNotRequired = false
+	AnyRol           = ""
+	Admin            = "admin"
+)
+
+const FormatoFecha = "2006-02-01"
+
 const Database = "portalDeNovedades"
-const CollectionPasosWorkflow = "pasosWorkflow"
-const CollectionProveedor = "proveedores"
-const CollectionActividad = "actividades"
-const CollectionNovedad = "novedades"
-const CollectionRecurso = "recursos"
-const CollectionUserITP = "usersITP"
-const CollectionCecos = "centroDeCostos"
+
+const (
+	CollectionPasosWorkflow = "pasosWorkflow"
+	CollectionProveedor     = "proveedores"
+	CollectionActividad     = "actividades"
+	CollectionNovedad       = "novedades"
+	CollectionRecurso       = "recursos"
+	CollectionUserITP       = "usersITP"
+	CollectionCecos         = "centroDeCostos"
+)
+
+const (
+	Pendiente = "pendiente"
+	Aceptada  = "aceptada"
+	Rechazada = "rechazada"
+)
+
+const (
+	TipoGerente = "manager"
+	TipoGrupo   = "grupo"
+)

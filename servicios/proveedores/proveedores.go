@@ -27,6 +27,10 @@ type Proveedores struct {
 	RazonSocial string `bson:"razonSocial"`
 }
 
+type PackageOfProveedores struct {
+	Paquete []Proveedores
+}
+
 var store *session.Store = session.New()
 var dbUser *gorm.DB
 var client *mongo.Client
@@ -84,6 +88,27 @@ func InsertProveedor(c *fiber.Ctx) error {
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.Status(200).JSON(proveedor)
+}
+
+// InsertProveedoresPackage
+func InsertRecursoPackage(c *fiber.Ctx) error {
+
+	fmt.Println("Ingreso de paquete de recursos")
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	//obtencion de datos
+	packageProveedores := new(PackageOfProveedores)
+	if err := c.BodyParser(packageProveedores); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	fmt.Print("obtencion de datos ")
+	fmt.Println(packageProveedores)
+	ingresarPaqueteDeProveedores(*packageProveedores)
+	return c.Status(200).JSON(packageProveedores)
 }
 
 // obtener proveedor por id
@@ -172,4 +197,50 @@ func eliminarProveedor(razonSocial string) error {
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
 	return nil
+}
+
+func ingresarPaqueteDeProveedores(paqueteDeProveedores PackageOfProveedores) {
+	fmt.Println("Eliminado de los cecos: ")
+	for _, proveedor := range paqueteDeProveedores.Paquete {
+		err := elProveedorYaExiste(proveedor.RazonSocial)
+		if err != nil {
+			fmt.Print(proveedor.RazonSocial)
+			fmt.Print(", ")
+			eliminarProveedor(proveedor.RazonSocial)
+		}
+	}
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
+
+	//Obtiene el ultimo Id
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{Key: "idProveedores", Value: -1}})
+
+	cursor, _ := coll.Find(context.TODO(), filter, opts)
+
+	var results []Proveedores
+	cursor.All(context.TODO(), &results)
+
+	var ultimoId int
+
+	if len(results) == 0 {
+		ultimoId = 0
+	} else {
+		ultimoId = results[0].IdProveedor + 1
+	}
+
+	// Empieza el setteo y subida
+	arrayOfProveedores := make([]interface{}, len(paqueteDeProveedores.Paquete))
+	for index, proveedor := range paqueteDeProveedores.Paquete {
+		proveedor.IdProveedor = ultimoId
+		ultimoId = ultimoId + 1
+		arrayOfProveedores[index] = proveedor
+		paqueteDeProveedores.Paquete[index] = proveedor
+	}
+
+	// Ingresa el recurso
+	result, err := coll.InsertMany(context.TODO(), arrayOfProveedores)
+	if err != nil {
+		// terminar ejecucion del recurso actual y avisar
+	}
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedIDs...)
 }
