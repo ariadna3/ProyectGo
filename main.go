@@ -189,12 +189,14 @@ func main() {
 		app.Post("/Cecos", novedades.InsertCecos)
 		app.Get("/Cecos/", novedades.GetCecosAll)
 		app.Get("/Cecos/:id", novedades.GetCecos)
+		app.Post("/Cecos/Package", novedades.InsertCecosPackage)
 
 		//Proveedores
 		app.Post("/Proveedor", proveedores.InsertProveedor)
 		app.Get("/Proveedor/:id", proveedores.GetProveedor)
 		app.Get("/Proveedor", proveedores.GetProveedorAll)
 		app.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
+		app.Post("/Proveedor/Package", proveedores.InsertRecursoPackage)
 
 		//Recursos
 		app.Post("/Recurso", recursos.InsertRecurso)
@@ -203,6 +205,7 @@ func main() {
 		app.Get("/RecursoFiltered", recursos.GetRecursoSameManager)
 		app.Get("/RecursoFiltered/Cecos", recursos.GetRecursoSameCecos)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
+		app.Post("/Recurso/Package", recursos.InsertRecursoPackage)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser

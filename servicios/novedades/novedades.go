@@ -86,6 +86,10 @@ type Cecos struct {
 	CuitCuil    int    `bson:"cuitcuil"`
 }
 
+type PackageOfCecos struct {
+	Paquete []Cecos
+}
+
 type Distribuciones struct {
 	Porcentaje float32 `bson:"porcentaje"`
 	Cecos      Cecos   `bson:"cecos"`
@@ -665,11 +669,11 @@ func InsertCecos(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 
-	//obtenerLegajo(cecos)
+	obtenerCuitCuil(cecos)
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 	filter := bson.D{}
-	opts := options.Find().SetSort(bson.D{{"idCecos", -1}})
+	opts := options.Find().SetSort(bson.D{{Key: "idCecos", Value: -1}})
 
 	cursor, err := coll.Find(context.TODO(), filter, opts)
 	if err != nil {
@@ -701,6 +705,27 @@ func InsertCecos(c *fiber.Ctx) error {
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.JSON(cecos)
+}
+
+// insertar paquete de centros de costos
+func InsertCecosPackage(c *fiber.Ctx) error {
+
+	fmt.Println("Ingreso de paquete de centros de costos")
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	//obtencion de datos
+	packageCecos := new(PackageOfCecos)
+	if err := c.BodyParser(packageCecos); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	fmt.Print("obtencion de datos ")
+	fmt.Println(packageCecos)
+	ingresarPaqueteDeCecos(*packageCecos)
+	return c.Status(200).JSON(packageCecos)
 }
 
 // obtener todos los cecos
@@ -1247,4 +1272,51 @@ func eliminarCeco(descripcion string) error {
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
 	return nil
+}
+
+func ingresarPaqueteDeCecos(paqueteDeCecos PackageOfCecos) {
+	fmt.Println("Eliminado de los cecos: ")
+	for _, cecos := range paqueteDeCecos.Paquete {
+		err := elCecoYaExiste(cecos.Descripcion)
+		if err != nil {
+			fmt.Print(cecos.Codigo)
+			fmt.Print(", ")
+			eliminarCeco(cecos.Descripcion)
+		}
+	}
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
+
+	//Obtiene el ultimo Id
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{Key: "idCecos", Value: -1}})
+
+	cursor, _ := coll.Find(context.TODO(), filter, opts)
+
+	var results []Cecos
+	cursor.All(context.TODO(), &results)
+
+	var ultimoId int
+
+	if len(results) == 0 {
+		ultimoId = 0
+	} else {
+		ultimoId = results[0].IdCecos + 1
+	}
+
+	//Empieza el setteo y subida
+	arrayOfCecos := make([]interface{}, len(paqueteDeCecos.Paquete))
+	for index, ceco := range paqueteDeCecos.Paquete {
+		obtenerCuitCuil(&ceco)
+		ceco.IdCecos = ultimoId
+		ultimoId = ultimoId + 1
+		arrayOfCecos[index] = ceco
+		paqueteDeCecos.Paquete[index] = ceco
+	}
+
+	// Ingresa el recurso
+	result, err := coll.InsertMany(context.TODO(), arrayOfCecos)
+	if err != nil {
+		// terminar ejecucion del recurso actual y avisar
+	}
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedIDs...)
 }

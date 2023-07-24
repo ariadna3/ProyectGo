@@ -58,6 +58,10 @@ type RecursosWithID struct {
 	Rcc         []P                `bson:"p"`
 }
 
+type PackageOfRecursos struct {
+	Paquete []Recursos
+}
+
 type P struct {
 	CcNum     string  `bson:"cc"`
 	CcPorc    float32 `bson:"porcCC"`
@@ -166,6 +170,27 @@ func InsertRecurso(c *fiber.Ctx) error {
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.Status(200).JSON(recurso)
+}
+
+// insertar paquete de recursos
+func InsertRecursoPackage(c *fiber.Ctx) error {
+
+	fmt.Println("Ingreso de paquete de recursos")
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	//obtencion de datos
+	packageRecursos := new(PackageOfRecursos)
+	if err := c.BodyParser(packageRecursos); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	fmt.Print("obtencion de datos ")
+	fmt.Println(packageRecursos)
+	ingresarPaqueteDeRecursos(*packageRecursos)
+	return c.Status(200).JSON(packageRecursos)
 }
 
 // obtener recurso por id
@@ -371,4 +396,82 @@ func eliminarRecurso(email string) error {
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
 	return nil
+}
+
+func ingresarPaqueteDeRecursos(paqueteDeRecursos PackageOfRecursos) {
+	fmt.Println("Eliminado de los recursos: ")
+	for _, recurso := range paqueteDeRecursos.Paquete {
+		err := elRecursoYaExiste(recurso.Mail)
+		if err != nil {
+			fmt.Print(recurso.Legajo)
+			fmt.Print(", ")
+			eliminarRecurso(recurso.Mail)
+		}
+	}
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	collCeco := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
+
+	//Obtiene el ultimo Id
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{Key: "idRecurso", Value: -1}})
+
+	cursor, _ := coll.Find(context.TODO(), filter, opts)
+
+	var results []Recursos
+	cursor.All(context.TODO(), &results)
+
+	var ultimoId int
+
+	if len(results) == 0 {
+		ultimoId = 0
+	} else {
+		ultimoId = results[0].IdRecurso + 1
+	}
+
+	//Empieza el setteo y subida
+	arrayOfResources := make([]interface{}, len(paqueteDeRecursos.Paquete))
+	for index, recurso := range paqueteDeRecursos.Paquete {
+		//setea la fecha
+		recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaIng)
+
+		recurso.IdRecurso = ultimoId
+		ultimoId = ultimoId + 1
+
+		//Obtiene los datos del ceco
+		for pos, ceco := range recurso.Rcc {
+			var cecoEncontrado Cecos
+			if ceco.CcNum != "" {
+				intVar, err := strconv.Atoi(ceco.CcNum)
+				if err != nil {
+					fmt.Println(err)
+					// terminar ejecucion del recurso actual y avisar
+				}
+				filter := bson.D{{Key: "codigo", Value: intVar}}
+
+				collCeco.FindOne(context.TODO(), filter).Decode(&cecoEncontrado)
+
+			} else {
+				cecoEncontrado.Cliente = ""
+				cecoEncontrado.Codigo = 0
+				cecoEncontrado.Descripcion = ""
+				cecoEncontrado.IdCecos = 0
+				cecoEncontrado.Proyecto = ""
+			}
+			fmt.Print("Ceco encontrado: ")
+			fmt.Println(cecoEncontrado)
+
+			recurso.Rcc[pos].CcNombre = cecoEncontrado.Cliente
+			recurso.Rcc[pos].CcCliente = cecoEncontrado.Descripcion
+		}
+		fmt.Print("recurso final: ")
+		fmt.Println(recurso)
+		arrayOfResources[index] = recurso
+		paqueteDeRecursos.Paquete[index] = recurso
+	}
+	// Ingresa el recurso
+	result, err := coll.InsertMany(context.TODO(), arrayOfResources)
+	if err != nil {
+		// terminar ejecucion del recurso actual y avisar
+	}
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedIDs...)
 }
