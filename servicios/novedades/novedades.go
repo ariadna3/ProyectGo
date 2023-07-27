@@ -127,8 +127,9 @@ type Workflow struct {
 }
 
 type PasosWorkflow struct {
-	Tipo  string `bson:"tipo"`
-	Pasos []Paso `bson:"pasos"`
+	TipoExcel string `bson:"tipoExcel"`
+	Tipo      string `bson:"tipo"`
+	Pasos     []Paso `bson:"pasos"`
 }
 
 type Paso struct {

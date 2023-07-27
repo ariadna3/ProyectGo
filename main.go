@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/proyectoNovedades/servicios/actividades"
+	"github.com/proyectoNovedades/servicios/excel"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
@@ -169,7 +170,7 @@ func main() {
 		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
-		app.Get("/Excel/Novedad", novedades.GetExcelFile)
+		app.Get("/Excel/Novedad", excel.GetExcelFile)
 
 		//Workflow novedad
 		app.Post("/Workflow", novedades.InsertWorkFlow)
@@ -196,7 +197,7 @@ func main() {
 		app.Get("/Proveedor/:id", proveedores.GetProveedor)
 		app.Get("/Proveedor", proveedores.GetProveedorAll)
 		app.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
-		app.Post("/Proveedor/Package", proveedores.InsertRecursoPackage)
+		app.Post("/Proveedor/Package", proveedores.InsertProveedoresPackage)
 
 		//Recursos
 		app.Post("/Recurso", recursos.InsertRecurso)
@@ -256,6 +257,7 @@ func createConnectionWithMongo() bool {
 		proveedores.ConnectMongoDb(client)
 		recursos.ConnectMongoDb(client)
 		userGoogle.ConnectMongoDb(client)
+		excel.ConnectMongoDb(client)
 		return true
 	}
 	return false

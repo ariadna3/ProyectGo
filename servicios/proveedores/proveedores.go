@@ -91,9 +91,9 @@ func InsertProveedor(c *fiber.Ctx) error {
 }
 
 // InsertProveedoresPackage
-func InsertRecursoPackage(c *fiber.Ctx) error {
+func InsertProveedoresPackage(c *fiber.Ctx) error {
 
-	fmt.Println("Ingreso de paquete de recursos")
+	fmt.Println("Ingreso de paquete de proveedores")
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminRequired, anyRol)
 	if error != nil {
