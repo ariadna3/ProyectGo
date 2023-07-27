@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -354,6 +355,10 @@ func GetRecursoHash(c *fiber.Ctx) error {
 }
 
 func GetRecursoInterno(email string, id int) (error, Recursos) {
+
+	if !strings.Contains(email, "@") {
+		email = email + "@itpatagonia.com"
+	}
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	var recurso Recursos
