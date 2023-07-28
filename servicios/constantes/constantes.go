@@ -12,3 +12,9 @@ const CollectionNovedad = "novedades"
 const CollectionRecurso = "recursos"
 const CollectionUserITP = "usersITP"
 const CollectionCecos = "centroDeCostos"
+
+const (
+	SheetGeneral    = "General"
+	SheetHorasExtra = "Horas extra"
+	SheetLicencias  = "Licencias"
+)
