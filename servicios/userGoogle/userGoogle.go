@@ -49,6 +49,7 @@ type UserITPWithRecursosData struct {
 	Rol             string `bson:"rol"`
 	IdEncripted     string
 	IdSecuencial    int
+	Legajo          int
 }
 
 type GoogleClaims struct {
@@ -354,6 +355,7 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	}
 	userITPWithRecursosData.IdEncripted = idObjectHash
 	userITPWithRecursosData.IdSecuencial = recurso.IdRecurso
+	userITPWithRecursosData.Legajo = recurso.Legajo
 
 	return c.Status(200).JSON(userITPWithRecursosData)
 }

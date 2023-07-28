@@ -167,8 +167,9 @@ func main() {
 		app.Post("/Novedad", novedades.InsertNovedad)
 		app.Get("/Novedad/:id", novedades.GetNovedades)
 		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
-		app.Get("/Novedad", novedades.GetNovedadesAll)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
+
+		app.Get("/Excel/Novedad", novedades.GetExcelFile)
 
 		//Workflow novedad
 		app.Post("/Workflow", novedades.InsertWorkFlow)
@@ -177,6 +178,7 @@ func main() {
 
 		//obtener adjuntos novedades
 		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
+		app.Put("/Archivos/Novedad/Adjuntos/:id", novedades.UpdateFileAdd)
 
 		//Tipo Novedades
 		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
@@ -187,20 +189,23 @@ func main() {
 		app.Post("/Cecos", novedades.InsertCecos)
 		app.Get("/Cecos/", novedades.GetCecosAll)
 		app.Get("/Cecos/:id", novedades.GetCecos)
+		app.Post("/Cecos/Package", novedades.InsertCecosPackage)
 
 		//Proveedores
 		app.Post("/Proveedor", proveedores.InsertProveedor)
 		app.Get("/Proveedor/:id", proveedores.GetProveedor)
 		app.Get("/Proveedor", proveedores.GetProveedorAll)
 		app.Delete("/Proveedor/:id", proveedores.DeleteProveedor)
+		app.Post("/Proveedor/Package", proveedores.InsertRecursoPackage)
 
 		//Recursos
 		app.Post("/Recurso", recursos.InsertRecurso)
 		app.Get("/Recurso/:id", recursos.GetRecurso)
-		app.Get("/Recurso", recursos.GetRecursoAll)
+		app.Get("/Recurso/*", recursos.GetRecursoFilter)
 		app.Get("/RecursoFiltered", recursos.GetRecursoSameManager)
 		app.Get("/RecursoFiltered/Cecos", recursos.GetRecursoSameCecos)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
+		app.Post("/Recurso/Package", recursos.InsertRecursoPackage)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser
