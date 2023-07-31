@@ -394,6 +394,16 @@ func GetUserITPAll(c *fiber.Ctx) error {
 	return c.Status(200).JSON(usuarios)
 }
 
+func GetInternUserITP(email string) (error, UserITP) {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
+	var usuario UserITP
+	err := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
+	if err != nil {
+		return err, usuario
+	}
+	return nil, usuario
+}
+
 func DeleteUserITP(c *fiber.Ctx) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	emailDelete := c.Params("email")
