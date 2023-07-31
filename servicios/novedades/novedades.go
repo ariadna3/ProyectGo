@@ -399,7 +399,7 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 		busqueda["departamento"] = bson.M{"$regex": c.Query("departamento"), "$options": "im"}
 	}
 	if c.Query("rol") != "" {
-		busqueda["rol"] = bson.M{"$regex": c.Query("rol"), "$options": "im"}
+		busqueda["rolUsuario"] = bson.M{"$regex": c.Query("rol"), "$options": "im"}
 	}
 	if c.Query("archivado") != "" {
 		busqueda["archivado"] = c.QueryBool("true")
