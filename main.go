@@ -207,6 +207,7 @@ func main() {
 		app.Get("/RecursoFiltered/Cecos", recursos.GetRecursoSameCecos)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 		app.Post("/Recurso/Package", recursos.InsertRecursoPackage)
+		app.Patch("/Recurso/:id/*", recursos.UpdateRecurso)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser

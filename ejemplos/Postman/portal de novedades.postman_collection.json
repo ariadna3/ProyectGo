@@ -1175,6 +1175,53 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "PatchRecurso",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Recurso/18/?gerente=1500&nombre=JUAN&apellido=GUTIERREZ&mail=jgutierrez@itpatagonia",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Recurso",
+								"18",
+								""
+							],
+							"query": [
+								{
+									"key": "gerente",
+									"value": "1500"
+								},
+								{
+									"key": "nombre",
+									"value": "JUAN"
+								},
+								{
+									"key": "apellido",
+									"value": "GUTIERREZ"
+								},
+								{
+									"key": "mail",
+									"value": "jgutierrez@itpatagonia"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
