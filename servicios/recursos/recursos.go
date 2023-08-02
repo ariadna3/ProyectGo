@@ -110,7 +110,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 	fmt.Print("obtencion de datos ")
 	fmt.Println(recurso)
 
-	err := elRecursoYaExiste(recurso.Mail)
+	err, _ := elRecursoYaExiste(recurso.Mail)
 	if err != nil {
 		eliminarRecurso(recurso.Mail)
 	}
@@ -317,11 +317,14 @@ func UpdateRecurso(c *fiber.Ctx) error {
 	var busqueda bson.D = bson.D{}
 	for _, item := range querys {
 		queryEncontrada := strings.Split(item, "=")
-		busqueda = append(busqueda, bson.E{Key: queryEncontrada[0], Value: queryEncontrada[1]})
+		if strings.Contains(constantes.AceptarCambiosRecursos, queryEncontrada[0]) {
+			busqueda = append(busqueda, bson.E{Key: queryEncontrada[0], Value: queryEncontrada[1]})
+		}
 	}
 	fmt.Println(busqueda)
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
-	filter := bson.D{{Key: "idRecurso", Value: c.Params("id")}}
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	filter := bson.D{{Key: "idRecurso", Value: idNumber}}
 	update := bson.D{{Key: "$set", Value: busqueda}}
 	fmt.Println(filter)
 	fmt.Println(update)

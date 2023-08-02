@@ -45,3 +45,7 @@ const (
 	DescPrestamo    = "Prestamo"
 	DescLicencia    = "Licencia"
 )
+
+const (
+	AceptarCambiosRecursos = "apellido,nombre,gerente,mail,fechaString"
+)
