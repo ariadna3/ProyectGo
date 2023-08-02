@@ -335,8 +335,8 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	if err2 != nil {
 		return c.Status(404).SendString("usuario no encontrado")
 	}
-	filter := bson.D{{"email", email}}
-	update := bson.D{{"$set", bson.D{{"token", tokenString}}}}
+	filter := bson.D{{Key: "email", Value: email}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "token", Value: tokenString}}}}
 	_, err = coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		fmt.Println(err)
@@ -424,9 +424,9 @@ func UpdateUserITP(c *fiber.Ctx) error {
 
 	fmt.Println(usuario)
 
-	filter := bson.D{{"email", usuario.Email}}
+	filter := bson.D{{Key: "email", Value: usuario.Email}}
 
-	update := bson.D{{"$set", bson.D{{"esAdministrador", usuario.EsAdministrador}, {"rol", usuario.Rol}}}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "esAdministrador", Value: usuario.EsAdministrador}, {Key: "rol", Value: usuario.Rol}}}}
 
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
