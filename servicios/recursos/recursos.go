@@ -317,7 +317,7 @@ func UpdateRecurso(c *fiber.Ctx) error {
 	var busqueda bson.D = bson.D{}
 	for _, item := range querys {
 		queryEncontrada := strings.Split(item, "=")
-		if strings.Contains(constantes.AceptarCambiosRecursos, queryEncontrada[0]) {
+		if len(queryEncontrada) == 2 && strings.Contains(constantes.AceptarCambiosRecursos, queryEncontrada[0]) {
 			busqueda = append(busqueda, bson.E{Key: queryEncontrada[0], Value: queryEncontrada[1]})
 		}
 	}

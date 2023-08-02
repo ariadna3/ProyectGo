@@ -47,5 +47,5 @@ const (
 )
 
 const (
-	AceptarCambiosRecursos = "apellido,nombre,gerente,mail,fechaString"
+	AceptarCambiosRecursos = "gerente,mail,fechaString"
 )
