@@ -308,7 +308,7 @@ func GetRecursoFilter(c *fiber.Ctx) error {
 
 func UpdateRecurso(c *fiber.Ctx) error {
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}

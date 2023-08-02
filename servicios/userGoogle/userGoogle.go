@@ -300,7 +300,7 @@ func GetUserITP(c *fiber.Ctx) error {
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	email := c.Params("email")
-	var usuario UserITP
+	var usuario UserITPWithRecursosData
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 	if err2 != nil {
 		return c.Status(200).SendString("usuario no encontrada")
@@ -387,7 +387,7 @@ func GetUserITPAll(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
 	}
-	var usuarios []UserITP
+	var usuarios []UserITPWithRecursosData
 	if err = cursor.All(context.Background(), &usuarios); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
