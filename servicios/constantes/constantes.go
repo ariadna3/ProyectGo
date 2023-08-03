@@ -36,6 +36,12 @@ const (
 )
 
 const (
+	PestanaGeneral     = "General"
+	PestanaLicencias   = "Licencias"
+	PestanaHorasExtras = "Horas extras"
+)
+
+const (
 	Pendiente = "pendiente"
 	Aceptada  = "aceptada"
 	Rechazada = "rechazada"
@@ -45,4 +51,16 @@ const (
 	TipoGerente = "manager"
 	TipoGrupo   = "grupo"
 >>>>>>> 51b0cdb5d47be5d7745884bfa3d33cecb1b6860b
+)
+
+const (
+	DescSueldoNuevo = "Nuevo sueldo"
+	DescHorasExtras = "Horas extras"
+	DescAnticipo    = "Anticipo"
+	DescPrestamo    = "Prestamo"
+	DescLicencia    = "Licencia"
+)
+
+const (
+	AceptarCambiosRecursos = "gerente,mail,fechaString"
 )

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -109,7 +110,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 	fmt.Print("obtencion de datos ")
 	fmt.Println(recurso)
 
-	err := elRecursoYaExiste(recurso.Mail)
+	err, _ := elRecursoYaExiste(recurso.Mail)
 	if err != nil {
 		eliminarRecurso(recurso.Mail)
 	}
@@ -305,6 +306,35 @@ func GetRecursoFilter(c *fiber.Ctx) error {
 	return c.JSON(recursosEncontrados)
 }
 
+func UpdateRecurso(c *fiber.Ctx) error {
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	querys := strings.Split(string(c.Request().URI().QueryString()), "&")
+	var busqueda bson.D = bson.D{}
+	for _, item := range querys {
+		queryEncontrada := strings.Split(item, "=")
+		if len(queryEncontrada) == 2 && strings.Contains(constantes.AceptarCambiosRecursos, queryEncontrada[0]) {
+			busqueda = append(busqueda, bson.E{Key: queryEncontrada[0], Value: queryEncontrada[1]})
+		}
+	}
+	fmt.Println(busqueda)
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	filter := bson.D{{Key: "idRecurso", Value: idNumber}}
+	update := bson.D{{Key: "$set", Value: busqueda}}
+	fmt.Println(filter)
+	fmt.Println(update)
+	result, err := coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return c.Status(404).SendString(err.Error())
+	}
+	return c.JSON(result)
+}
+
 // borrar recurso por id
 func DeleteRecurso(c *fiber.Ctx) error {
 
@@ -355,6 +385,10 @@ func GetRecursoHash(c *fiber.Ctx) error {
 
 func GetRecursoInterno(email string, id int) (error, Recursos) {
 
+	if !strings.Contains(email, "@") {
+		email = email + "@itpatagonia.com"
+	}
+
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	var recurso Recursos
 	if id != 0 {
@@ -374,7 +408,7 @@ func GetRecursoInterno(email string, id int) (error, Recursos) {
 	return nil, recurso
 }
 
-func elRecursoYaExiste(email string) error {
+func elRecursoYaExiste(email string) (error, int) {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	filter := bson.D{{Key: "mail", Value: email}}
 
@@ -383,9 +417,9 @@ func elRecursoYaExiste(email string) error {
 	var results []Recursos
 	cursor.All(context.TODO(), &results)
 	if len(results) != 0 {
-		return errors.New("ya existe el usuario")
+		return errors.New("ya existe el usuario"), results[0].IdRecurso
 	}
-	return nil
+	return nil, 0
 }
 
 func eliminarRecurso(email string) error {
@@ -400,14 +434,6 @@ func eliminarRecurso(email string) error {
 
 func ingresarPaqueteDeRecursos(paqueteDeRecursos PackageOfRecursos) {
 	fmt.Println("Eliminado de los recursos: ")
-	for _, recurso := range paqueteDeRecursos.Paquete {
-		err := elRecursoYaExiste(recurso.Mail)
-		if err != nil {
-			fmt.Print(recurso.Legajo)
-			fmt.Print(", ")
-			eliminarRecurso(recurso.Mail)
-		}
-	}
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	collCeco := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 
@@ -431,11 +457,18 @@ func ingresarPaqueteDeRecursos(paqueteDeRecursos PackageOfRecursos) {
 	//Empieza el setteo y subida
 	arrayOfResources := make([]interface{}, len(paqueteDeRecursos.Paquete))
 	for index, recurso := range paqueteDeRecursos.Paquete {
+		err, id := elRecursoYaExiste(recurso.Mail)
+		if err != nil {
+			fmt.Print(recurso.Legajo)
+			fmt.Print(", ")
+			eliminarRecurso(recurso.Mail)
+			recurso.IdRecurso = id
+		} else {
+			recurso.IdRecurso = ultimoId
+			ultimoId = ultimoId + 1
+		}
 		//setea la fecha
 		recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaIng)
-
-		recurso.IdRecurso = ultimoId
-		ultimoId = ultimoId + 1
 
 		//Obtiene los datos del ceco
 		for pos, ceco := range recurso.Rcc {

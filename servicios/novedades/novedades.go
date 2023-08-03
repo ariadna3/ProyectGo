@@ -67,6 +67,7 @@ type Novedades struct {
 	Resumen               string     `bson:"resumen"`
 	Tipo                  string     `bson:"tipo"`
 	Usuario               string     `bson:"usuario"`
+	RolUsuario            string     `bson:"rolUsuario"`
 	Workflow              []Workflow `bson:"workflow"`
 	Archivado             bool       `bson:"archivado"`
 }
@@ -127,8 +128,9 @@ type Workflow struct {
 }
 
 type PasosWorkflow struct {
-	Tipo  string `bson:"tipo"`
-	Pasos []Paso `bson:"pasos"`
+	TipoExcel string `bson:"tipoExcel"`
+	Tipo      string `bson:"tipo"`
+	Pasos     []Paso `bson:"pasos"`
 }
 
 type Paso struct {
@@ -148,7 +150,7 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 func InsertNovedad(c *fiber.Ctx) error {
 	fmt.Println("InsertNovedad")
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	error, codigo, emailUser := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -236,6 +238,14 @@ func InsertNovedad(c *fiber.Ctx) error {
 		}
 		fmt.Println(err)
 	}
+
+	//Ingresar rol del usuario
+	err, usuario := userGoogle.GetInternUserITP(emailUser)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	novedad.RolUsuario = usuario.Rol
+	novedad.Usuario = emailUser
 
 	//inserta la novedad
 	result, err := coll.InsertOne(context.TODO(), novedad)
@@ -387,6 +397,9 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	}
 	if c.Query("departamento") != "" {
 		busqueda["departamento"] = bson.M{"$regex": c.Query("departamento"), "$options": "im"}
+	}
+	if c.Query("rol") != "" {
+		busqueda["rolUsuario"] = bson.M{"$regex": c.Query("rol"), "$options": "im"}
 	}
 	if c.Query("archivado") != "" {
 		busqueda["archivado"] = c.QueryBool("true")

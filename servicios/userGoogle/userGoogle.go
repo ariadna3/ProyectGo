@@ -41,6 +41,14 @@ type UserITP struct {
 	Token           string `bson:"token"`
 }
 
+type UserITPSafe struct {
+	Nombre          string `bson:"nombre"`
+	Apellido        string `bson:"apellido"`
+	Email           string `bson:"email"`
+	EsAdministrador bool   `bson:"esAdministrador"`
+	Rol             string `bson:"rol"`
+}
+
 type UserITPWithRecursosData struct {
 	Nombre          string `bson:"nombre"`
 	Apellido        string `bson:"apellido"`
@@ -143,6 +151,8 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 			usuario.Email = recurso.Mail
 			usuario.EsAdministrador = false
 			usuario.Rol = ""
+			usuario.Nombre = recurso.Nombre
+			usuario.Apellido = recurso.Apellido
 			_, err := coll.InsertOne(context.TODO(), usuario)
 			if err != nil {
 				return errors.New("error al ingresar usuario desde recursos"), ""
@@ -300,7 +310,7 @@ func GetUserITP(c *fiber.Ctx) error {
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	email := c.Params("email")
-	var usuario UserITP
+	var usuario UserITPSafe
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 	if err2 != nil {
 		return c.Status(200).SendString("usuario no encontrada")
@@ -335,8 +345,8 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	if err2 != nil {
 		return c.Status(404).SendString("usuario no encontrado")
 	}
-	filter := bson.D{{"email", email}}
-	update := bson.D{{"$set", bson.D{{"token", tokenString}}}}
+	filter := bson.D{{Key: "email", Value: email}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "token", Value: tokenString}}}}
 	_, err = coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		fmt.Println(err)
@@ -387,11 +397,21 @@ func GetUserITPAll(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(404).SendString(err.Error())
 	}
-	var usuarios []UserITP
+	var usuarios []UserITPSafe
 	if err = cursor.All(context.Background(), &usuarios); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
 	return c.Status(200).JSON(usuarios)
+}
+
+func GetInternUserITP(email string) (error, UserITP) {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
+	var usuario UserITP
+	err := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
+	if err != nil {
+		return err, usuario
+	}
+	return nil, usuario
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
@@ -414,9 +434,9 @@ func UpdateUserITP(c *fiber.Ctx) error {
 
 	fmt.Println(usuario)
 
-	filter := bson.D{{"email", usuario.Email}}
+	filter := bson.D{{Key: "email", Value: usuario.Email}}
 
-	update := bson.D{{"$set", bson.D{{"esAdministrador", usuario.EsAdministrador}, {"rol", usuario.Rol}}}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "esAdministrador", Value: usuario.EsAdministrador}, {Key: "rol", Value: usuario.Rol}}}}
 
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
