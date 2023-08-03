@@ -151,6 +151,8 @@ func validacionDeUsuario(obligatorioAdministrador bool, rolEsperado string, toke
 			usuario.Email = recurso.Mail
 			usuario.EsAdministrador = false
 			usuario.Rol = ""
+			usuario.Nombre = recurso.Nombre
+			usuario.Apellido = recurso.Apellido
 			_, err := coll.InsertOne(context.TODO(), usuario)
 			if err != nil {
 				return errors.New("error al ingresar usuario desde recursos"), ""
