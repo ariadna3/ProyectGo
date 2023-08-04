@@ -22,7 +22,6 @@ import (
 
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/smtp"
 	"os"
 )

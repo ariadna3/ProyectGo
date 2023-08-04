@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -39,6 +38,8 @@ type UserITP struct {
 	EsAdministrador bool   `bson:"esAdministrador"`
 	Rol             string `bson:"rol"`
 	Token           string `bson:"token"`
+	ExpirationDate  time.Time `bson:"expirationDate"`
+
 }
 
 type UserITPSafe struct {
@@ -228,6 +229,20 @@ func Authorization(authHeader string, administrationRequired bool, rolRequired s
 	return nil, fiber.StatusAccepted, codigo
 }
 
+func ExpirationDate(c *jwt.StandardClaims) bool {
+	expiration := time.Unix(c.ExpiresAt, 0)
+	currentTime := time.Now()
+
+	if expiration.Before(currentTime) {
+		fmt.Println("La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+		return true
+	}
+
+	fmt.Println("La sesión aún está activa. Puedes continuar usando el token.")
+	return false
+}
+
+
 func InsertUserITP(c *fiber.Ctx) error {
 
 	//obtiene los datos
@@ -293,9 +308,9 @@ func InsertFirstUserITP(email string, nombre string, apellido string) error {
 	}
 	if !usuario.EsAdministrador || usuario.Rol != constantes.Admin {
 
-		filter := bson.D{{"email", email}}
+		filter := bson.D{{Key: "email", Value: email}}
 
-		update := bson.D{{"$set", bson.D{{"esAdministrador", true}, {"rol", constantes.Admin}}}}
+		update := bson.D{{Key: "$set", Value: bson.D{{Key: "esAdministrador", Value: true}, {Key: "rol", Value: constantes.Admin}}}}
 
 		_, err := coll.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
