@@ -236,8 +236,16 @@ func InsertUserITP(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
+
+	var usuario UserITP
+	err := coll.FindOne(context.TODO(), bson.M{"email": userITP.Email}).Decode(&usuario)
+	if err == nil {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("El usuario ya existe")
+	}
+
 	if userITP.Nombre == "" || userITP.Apellido == "" {
-		coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+		coll = client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 		email := userITP.Email
 		var recurso Recursos
 		err2 := coll.FindOne(context.TODO(), bson.M{"mail": email}).Decode(&recurso)
@@ -247,7 +255,7 @@ func InsertUserITP(c *fiber.Ctx) error {
 		}
 	}
 
-	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
+	coll = client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 
 	//inserta el usuario
 	result, err := coll.InsertOne(context.TODO(), userITP)
