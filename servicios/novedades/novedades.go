@@ -607,6 +607,11 @@ func GetFiles(c *fiber.Ctx) error {
 
 // Agregar archivos a una notificacion
 func UpdateFileAdd(c *fiber.Ctx) error {
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	var novedad Novedades
@@ -672,7 +677,7 @@ func GetTipoNovedad(c *fiber.Ctx) error {
 func InsertCecos(c *fiber.Ctx) error {
 	fmt.Println("InsertCecos")
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}

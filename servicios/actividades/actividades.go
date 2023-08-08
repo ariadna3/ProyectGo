@@ -86,10 +86,10 @@ func InsertActividad(c *fiber.Ctx) error {
 func GetActividad(c *fiber.Ctx) error {
 
 	// validar el token
-	//	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
-	//	if error != nil {
-	//		return c.Status(codigo).SendString(error.Error())
-	//	}
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionActividad)
 	idNumber, _ := strconv.Atoi(c.Params("id"))
@@ -130,7 +130,7 @@ func GetActividadAll(c *fiber.Ctx) error {
 func DeleteActividad(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
