@@ -5,6 +5,7 @@ const (
 	AdminNotRequired = false
 	AnyRol           = ""
 	Admin            = "admin"
+	AllRol           = "admin,po,servicios,ta,comercial,comunicaciones,marketing,externos"
 )
 
 const FormatoFecha = "2006-02-01"
