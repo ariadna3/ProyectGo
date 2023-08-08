@@ -321,7 +321,7 @@ func GetUserITP(c *fiber.Ctx) error {
 	var usuario UserITPSafe
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 	if err2 != nil {
-		return c.Status(200).SendString("usuario no encontrada")
+		return c.Status(fiber.StatusNotFound).SendString("usuario no encontrada")
 	}
 	return c.Status(200).JSON(usuario)
 }
