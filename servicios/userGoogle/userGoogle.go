@@ -230,6 +230,25 @@ func Authorization(authHeader string, administrationRequired bool, rolRequired s
 
 func InsertUserITP(c *fiber.Ctx) error {
 
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
+
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+
+	//valida el token
+	err, codigo := validacionDeUsuario(constantes.AdminRequired, constantes.AllRol, tokenString)
+	if err != nil {
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(404).SendString(err.Error())
+	}
+
 	//obtiene los datos
 	var userITP UserITP
 	if err := c.BodyParser(&userITP); err != nil {
@@ -239,7 +258,7 @@ func InsertUserITP(c *fiber.Ctx) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 
 	var usuario UserITP
-	err := coll.FindOne(context.TODO(), bson.M{"email": userITP.Email}).Decode(&usuario)
+	err = coll.FindOne(context.TODO(), bson.M{"email": userITP.Email}).Decode(&usuario)
 	if err == nil {
 		return c.Status(fiber.StatusMethodNotAllowed).SendString("El usuario ya existe")
 	}
@@ -315,7 +334,24 @@ func InsertFirstUserITP(email string, nombre string, apellido string) error {
 }
 
 func GetUserITP(c *fiber.Ctx) error {
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
 
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+
+	//valida el token
+	err, codigo := validacionDeUsuario(constantes.AdminNotRequired, constantes.AnyRol, tokenString)
+	if err != nil {
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(404).SendString(err.Error())
+	}
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	email := c.Params("email")
 	var usuario UserITPSafe
@@ -338,7 +374,7 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
 
 	//valida el token
-	err, email := validacionDeUsuario(false, "", tokenString)
+	err, email := validacionDeUsuario(constantes.AdminNotRequired, constantes.AnyRol, tokenString)
 	if err != nil {
 		if email != "" {
 			codigoError, _ := strconv.Atoi(email)
@@ -423,6 +459,24 @@ func GetInternUserITP(email string) (error, UserITP) {
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
+
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+
+	//valida el token
+	err, codigo := validacionDeUsuario(constantes.AdminRequired, constantes.AllRol, tokenString)
+	if err != nil {
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(404).SendString(err.Error())
+	}
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	emailDelete := c.Params("email")
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"email": emailDelete})
@@ -434,6 +488,24 @@ func DeleteUserITP(c *fiber.Ctx) error {
 }
 
 func UpdateUserITP(c *fiber.Ctx) error {
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// El token no está presente
+		return fiber.NewError(fiber.StatusUnauthorized, "No se proporcionó un token de autenticación")
+	}
+
+	// Parsea el token
+	tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+
+	//valida el token
+	err, codigo := validacionDeUsuario(constantes.AdminRequired, constantes.AllRol, tokenString)
+	if err != nil {
+		if codigo != "" {
+			codigoError, _ := strconv.Atoi(codigo)
+			return c.Status(codigoError).SendString(err.Error())
+		}
+		return c.Status(404).SendString(err.Error())
+	}
 	usuario := new(UserITP)
 	if err := c.BodyParser(usuario); err != nil {
 		return c.Status(503).SendString(err.Error())

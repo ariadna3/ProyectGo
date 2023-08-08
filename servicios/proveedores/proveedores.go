@@ -48,7 +48,7 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 func InsertProveedor(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -95,7 +95,7 @@ func InsertProveedoresPackage(c *fiber.Ctx) error {
 
 	fmt.Println("Ingreso de paquete de proveedores")
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -115,7 +115,7 @@ func InsertProveedoresPackage(c *fiber.Ctx) error {
 func GetProveedor(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AllRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -138,7 +138,7 @@ func GetProveedor(c *fiber.Ctx) error {
 func GetProveedorAll(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AllRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -160,7 +160,7 @@ func GetProveedorAll(c *fiber.Ctx) error {
 func DeleteProveedor(c *fiber.Ctx) error {
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, constantes.AllRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
