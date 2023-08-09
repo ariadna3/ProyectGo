@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> feature/excel
 	"os"
 	"reflect"
 
@@ -20,6 +23,7 @@ import (
 
 var client *mongo.Client
 var novedad novedades.Novedades
+<<<<<<< HEAD
 =======
 	"log"
 	"os"
@@ -41,6 +45,8 @@ var novedad novedades.Novedades
 
 var client *mongo.Client
 >>>>>>> a759c1746b01548e8f846a0b71b3b0fead1c1ac7
+=======
+>>>>>>> feature/excel
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
 	client = clientMongo
@@ -48,22 +54,29 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> feature/excel
 func GetExcelFile(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
 
 	//validar el token
+<<<<<<< HEAD
 =======
 // Crear excel
 func GetExcelFile(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
 	// validar el token
 >>>>>>> a759c1746b01548e8f846a0b71b3b0fead1c1ac7
+=======
+>>>>>>> feature/excel
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+<<<<<<< HEAD
 <<<<<<< HEAD
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 =======
@@ -78,6 +91,9 @@ func GetExcelFile(c *fiber.Ctx) error {
 
 	cursor, err := coll.Find(context.TODO(), filter, opts)
 >>>>>>> a759c1746b01548e8f846a0b71b3b0fead1c1ac7
+=======
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+>>>>>>> feature/excel
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
@@ -87,16 +103,23 @@ func GetExcelFile(c *fiber.Ctx) error {
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	err = DatosExcel(novedades)
 =======
 	err = datosExcel(novedades)
 >>>>>>> a759c1746b01548e8f846a0b71b3b0fead1c1ac7
+=======
+	err = DatosExcel(novedades)
+>>>>>>> feature/excel
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
 	}
 
 	return c.Status(fiber.StatusOK).SendFile(os.Getenv("EXCEL_FILE"))
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> feature/excel
 
 }
 
@@ -112,6 +135,7 @@ func DatosExcel(novedad []novedades.Novedades) error {
 	file.NewSheet(constantes.SheetGeneral)
 	file.NewSheet(constantes.SheetHorasExtra)
 	file.NewSheet(constantes.SheetLicencias)
+<<<<<<< HEAD
 =======
 }
 
@@ -174,10 +198,13 @@ func datosExcel(novedadesArr []novedades.Novedades) error {
 		return err
 	}
 >>>>>>> a759c1746b01548e8f846a0b71b3b0fead1c1ac7
+=======
+>>>>>>> feature/excel
 
 	return nil
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 func nuevosSueldo(fieldValue reflect.Value, file excelize.File, rowSave int, indexValue int) error {
 	file.SetCellValue("novedades", fmt.Sprintf("%s%d", excelize.ToAlphaString(indexValue), rowSave), fieldValue.Interface())
@@ -195,10 +222,34 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row int) erro
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), novedad.ImporteTotal)
 	if strings.Contains(novedad.Descripcion, "retroactivo") {
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), "SI")
+=======
+func nuevosSueldo(fieldValue reflect.Value, file excelize.File, rowSave int, indexValue int) error {
+	file.SetCellValue("novedades", fmt.Sprintf("%s%d", excelize.ToAlphaString(indexValue), rowSave), fieldValue.Interface())
+	return nil
+}
+
+func horaExtra(legajo int, horasExtras int) error {
+	if legajo == legajo {
+		horasExtras = horasExtras + 1
+	} else {
+		legajo = !legajo
+		horasExtras[0] = horasExtras + 1
+	}
+}
+
+func horasExtras(fieldValue reflect.Value, file excelize.File, rowSave int, indexValue int) error {
+	file.SetCellValue("novedades", fmt.Sprintf("%s%d", excelize.ToAlphaString(indexValue), rowSave), fieldValue.Interface())
+
+	// revisa horas extras con mismo legajo
+
+	if legajo == legajo {
+
+>>>>>>> feature/excel
 	}
 
 	return nil
 }
+<<<<<<< HEAD
 
 func anticipoPrestamo(file *excelize.File, novedad novedades.Novedades, row int, cuotas int) error {
 	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
@@ -340,3 +391,5 @@ func initializeExcel(file *excelize.File) error {
 >>>>>>> a759c1746b01548e8f846a0b71b3b0fead1c1ac7
 	return nil
 }
+=======
+>>>>>>> feature/excel

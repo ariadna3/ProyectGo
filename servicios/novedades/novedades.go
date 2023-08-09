@@ -16,8 +16,11 @@ import (
 	"strings"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/360EntSecGroup-Skylar/excelize"
 
+=======
+>>>>>>> feature/excel
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -108,6 +111,7 @@ type RecursosNovedades struct {
 }
 
 type HorasExtras struct {
+	Legajo   int    `bson:"legajo"`
 	TipoDia  string `bson:"tipoDia"`
 	TipoHora string `bson:"tipoHora"`
 	Cantidad int    `bson:"cantidad"`
@@ -257,6 +261,7 @@ func InsertNovedad(c *fiber.Ctx) error {
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.Status(200).JSON(novedad)
+<<<<<<< HEAD
 
 }
 
@@ -324,6 +329,8 @@ func datosExcel(novedades []Novedades) error {
 	}
 
 	return nil
+=======
+>>>>>>> feature/excel
 }
 
 // obtener novedad por id
