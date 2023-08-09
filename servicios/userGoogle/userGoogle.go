@@ -318,11 +318,11 @@ func InsertFirstUserITP(email string, nombre string, apellido string) error {
 	if err != nil {
 		insertUser(email, nombre, apellido)
 	}
-	if !usuario.EsAdministrador || usuario.Rol != constantes.Admin {
+	if !usuario.EsAdministrador {
 
-		filter := bson.D{{"email", email}}
+		filter := bson.D{{Key: "email", Value: email}}
 
-		update := bson.D{{"$set", bson.D{{"esAdministrador", true}, {"rol", constantes.Admin}}}}
+		update := bson.D{{Key: "$set", Value: bson.D{{Key: "esAdministrador", Value: true}}}}
 
 		_, err := coll.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
