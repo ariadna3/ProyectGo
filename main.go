@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/proyectoNovedades/servicios/actividades"
+	"github.com/proyectoNovedades/servicios/constantes"
 	"github.com/proyectoNovedades/servicios/excel"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
@@ -138,6 +139,9 @@ func main() {
 	goth.UseProviders(
 		google.New(os.Getenv("GOOGLEKEY"), os.Getenv("GOOGLESEC"), os.Getenv("GOOGLECALLBACK")),
 	)
+
+	constantes.AllRol = os.Getenv("ALL_ROL")
+
 	app = fiber.New()
 
 	app.Use(cors.New(cors.Config{
