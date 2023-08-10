@@ -49,7 +49,7 @@ func InsertActividad(c *fiber.Ctx) error {
 	// obtencion de datos
 	actividad := new(Actividades)
 	if err := c.BodyParser(actividad); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	// obtiene el ultimo id
@@ -59,12 +59,12 @@ func InsertActividad(c *fiber.Ctx) error {
 
 	cursor, err := coll.Find(context.TODO(), filter, opts)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 
 	var results []Actividades
 	if err = cursor.All(context.TODO(), &results); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	if len(results) == 0 {
@@ -76,7 +76,7 @@ func InsertActividad(c *fiber.Ctx) error {
 	// inserta la actividad
 	result, err := coll.InsertOne(context.TODO(), actividad)
 	if err != nil {
-		c.Status(404).SendString(err.Error())
+		c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.Status(200).JSON(actividad)
@@ -96,11 +96,11 @@ func GetActividad(c *fiber.Ctx) error {
 	cursor, err := coll.Find(context.TODO(), bson.M{"idActividad": idNumber})
 	fmt.Println(coll)
 	if err != nil {
-		c.Status(404).SendString(err.Error())
+		c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var actividad []Actividades
 	if err = cursor.All(context.Background(), &actividad); err != nil {
-		c.Status(503).SendString(err.Error())
+		c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	return c.Status(200).JSON(actividad)
 }
@@ -117,11 +117,11 @@ func GetActividadAll(c *fiber.Ctx) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionActividad)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		c.Status(404).SendString(err.Error())
+		c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var actividad []Actividades
 	if err = cursor.All(context.Background(), &actividad); err != nil {
-		c.Status(503).SendString(err.Error())
+		c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	return c.Status(200).JSON(actividad)
 }
@@ -139,7 +139,7 @@ func DeleteActividad(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idActividad": idNumber})
 	if err != nil {
-		c.Status(404).SendString(err.Error())
+		c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
 	return c.Status(200).SendString("actividad eliminada")

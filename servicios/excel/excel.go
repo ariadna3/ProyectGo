@@ -99,7 +99,7 @@ func GetExcelFile(c *fiber.Ctx) error {
 	}
 	var novedades []novedades.Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 <<<<<<< HEAD
