@@ -1,9 +1,5 @@
 package constantes
 
-import (
-	"os"
-)
-
 const (
 	AdminRequired    = true
 	AdminNotRequired = false
@@ -11,7 +7,7 @@ const (
 	Admin            = "admin"
 )
 
-var AllRol string = os.Getenv("ALL_ROL")
+var AllRol string = ""
 
 const FormatoFecha = "2006-02-01"
 
