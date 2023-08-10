@@ -11,12 +11,9 @@ import (
 	"net/mail"
 	"net/smtp"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/360EntSecGroup-Skylar/excelize"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -108,6 +105,7 @@ type RecursosNovedades struct {
 }
 
 type HorasExtras struct {
+	Legajo   int    `bson:"legajo"`
 	TipoDia  string `bson:"tipoDia"`
 	TipoHora string `bson:"tipoHora"`
 	Cantidad int    `bson:"cantidad"`
@@ -158,7 +156,7 @@ func InsertNovedad(c *fiber.Ctx) error {
 	//obtiene los datos
 	novedad := new(Novedades)
 	if err := c.BodyParser(novedad); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	if novedad.EnviarA != "" {
@@ -178,12 +176,12 @@ func InsertNovedad(c *fiber.Ctx) error {
 
 	cursor, err := coll.Find(context.TODO(), filter, opts)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 
 	var results []Novedades
 	if err = cursor.All(context.TODO(), &results); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	if len(results) == 0 {
@@ -252,78 +250,11 @@ func InsertNovedad(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Print(err)
 		fmt.Println("fail")
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.Status(200).JSON(novedad)
-
-}
-
-// Crear excel
-func GetExcelFile(c *fiber.Ctx) error {
-	fmt.Println("GetExcelFile")
-	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
-	if error != nil {
-		return c.Status(codigo).SendString(error.Error())
-	}
-
-	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
-	cursor, err := coll.Find(context.TODO(), bson.M{})
-	if err != nil {
-		return c.Status(fiber.StatusNotFound).SendString(err.Error())
-	}
-	var novedades []Novedades
-	if err = cursor.All(context.Background(), &novedades); err != nil {
-		return c.Status(503).SendString(err.Error())
-	}
-
-	err = datosExcel(novedades)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
-	}
-
-	return c.Status(fiber.StatusOK).SendFile(os.Getenv("EXCEL_FILE"))
-}
-
-// ingresar datos a un excel
-func datosExcel(novedades []Novedades) error {
-
-	// Abrir archivo de excel
-	file, err := excelize.OpenFile(os.Getenv("EXCEL_FILE"))
-	if err != nil {
-		file = excelize.NewFile()
-		file.SetSheetName("Sheet1", "novedades")
-	}
-
-	// establecer columnas
-	valType := reflect.TypeOf(novedades[0])
-
-	for index := 0; index < valType.NumField(); index++ {
-		cell := fmt.Sprintf("%s%d", excelize.ToAlphaString(index), 1)
-		file.SetCellValue("novedades", cell, valType.Field(index).Name)
-	}
-
-	// escribir datos en el excel
-	for index, novedad := range novedades {
-		row := index + 2
-		valValue := reflect.ValueOf(novedad)
-		for indexValues := 0; indexValues < valValue.NumField(); indexValues++ {
-			fieldValue := valValue.Field(indexValues)
-			file.SetCellValue("novedades", fmt.Sprintf("%s%d", excelize.ToAlphaString(indexValues), row), fieldValue.Interface())
-		}
-
-	}
-
-	// guardar archivo
-	err = file.SaveAs(os.Getenv("EXCEL_FILE"))
-	if err != nil {
-		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
-		return err
-	}
-
-	return nil
 }
 
 // obtener novedad por id
@@ -339,11 +270,11 @@ func GetNovedades(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"idSecuencial": idNumber})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var novedades []Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	for index, element := range novedades {
 		novedades[index].Resumen = resumenNovedad(element)
@@ -409,11 +340,11 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 		var usuario userGoogle.UserITP
 		err2 := coll2.FindOne(context.TODO(), bson.M{"email": email}).Decode(&usuario)
 		if err2 != nil {
-			return c.Status(404).SendString("Usuario no encontrada")
+			return c.Status(fiber.StatusNotFound).SendString("Usuario no encontrada")
 		}
 		err, recurso := recursos.GetRecursoInterno(email, 0)
 		if err != nil {
-			return c.Status(404).SendString("Gerente no encontrado")
+			return c.Status(fiber.StatusNotFound).SendString("Gerente no encontrado")
 		}
 		if c.Query("estadoWF") == "all" {
 			mail := bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}}
@@ -433,11 +364,11 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	fmt.Println(busqueda)
 	cursor, err := coll.Find(context.TODO(), busqueda)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var novedades []Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	var nuevaListaNovedades []Novedades
 	for _, element := range novedades {
@@ -484,7 +415,7 @@ func DeleteNovedad(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idSecuencial": idNumber})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection\n", result.DeletedCount)
 	return c.Status(200).SendString("novedad eliminada")
@@ -502,13 +433,13 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	idNumber, err := strconv.Atoi(c.Params("id"))
 	fmt.Println(idNumber)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	//se obtiene el estado
 	estado := c.Params("estado")
 	novedad := new(Novedades)
 	if err := c.BodyParser(novedad); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	//se conecta a la DB
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
@@ -533,7 +464,7 @@ func UpdateEstadoNovedades(c *fiber.Ctx) error {
 	//hace la modificacion
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	//devuelve el resultado
 	return c.Status(200).JSON(result)
@@ -550,7 +481,7 @@ func UpdateMotivoNovedades(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	novedad := new(Novedades)
 	if err := c.BodyParser(novedad); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 
@@ -559,7 +490,7 @@ func UpdateMotivoNovedades(c *fiber.Ctx) error {
 
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	return c.Status(200).JSON(result)
 }
@@ -577,7 +508,7 @@ func GetFiles(c *fiber.Ctx) error {
 	var novedad Novedades
 	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
 	if err != nil {
-		return c.Status(404).SendString("novedad no encontrada")
+		return c.Status(fiber.StatusNotFound).SendString("novedad no encontrada")
 	}
 
 	if c.Query("nombre") != "" {
@@ -601,8 +532,10 @@ func GetFiles(c *fiber.Ctx) error {
 		}
 		idName := strconv.Itoa(novedad.IdSecuencial)
 		return c.Status(200).SendFile(os.Getenv("FOLDER_FILE") + "/" + idName + novedad.Adjuntos[posicion])
-	}
-	return c.Status(400).SendString("debe especificar el archivo")
+		} else {
+			return c.Status(400).SendString("debe especificar el archivo")
+}
+	return c.Status(200).SendString("documento no encontrado")
 }
 
 // Agregar archivos a una notificacion
@@ -617,7 +550,7 @@ func UpdateFileAdd(c *fiber.Ctx) error {
 	var novedad Novedades
 	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
 	if err != nil {
-		return c.Status(404).SendString("novedad no encontrada")
+		return c.Status(fiber.StatusNotFound).SendString("novedad no encontrada")
 	}
 
 	//ingresa los archivos
@@ -644,7 +577,7 @@ func UpdateFileAdd(c *fiber.Ctx) error {
 
 	_, err = coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 
 	return c.Status(fiber.StatusOK).SendString("Subidos archivos correctamente")
@@ -662,12 +595,12 @@ func GetTipoNovedad(c *fiber.Ctx) error {
 	coll := client.Database("portalDeNovedades").Collection("tipoNovedad")
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var tipoNovedad []TipoNovedad
 
 	if err = cursor.All(context.Background(), &tipoNovedad); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	return c.Status(200).JSON(tipoNovedad)
 }
@@ -684,7 +617,7 @@ func InsertCecos(c *fiber.Ctx) error {
 
 	cecos := new(Cecos)
 	if err := c.BodyParser(cecos); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	obtenerCuitCuil(cecos)
@@ -695,13 +628,13 @@ func InsertCecos(c *fiber.Ctx) error {
 
 	cursor, err := coll.Find(context.TODO(), filter, opts)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 
 	// obtiene el id del centro de costos
 	var results []Cecos
 	if err = cursor.All(context.TODO(), &results); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	if len(results) == 0 {
@@ -719,7 +652,7 @@ func InsertCecos(c *fiber.Ctx) error {
 	// inserta el centro de costos nuevo
 	result, err := coll.InsertOne(context.TODO(), cecos)
 	if err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.JSON(cecos)
@@ -738,7 +671,7 @@ func InsertCecosPackage(c *fiber.Ctx) error {
 	//obtencion de datos
 	packageCecos := new(PackageOfCecos)
 	if err := c.BodyParser(packageCecos); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	fmt.Print("obtencion de datos ")
 	fmt.Println(packageCecos)
@@ -758,11 +691,11 @@ func GetCecosAll(c *fiber.Ctx) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var cecos []Cecos
 	if err = cursor.All(context.Background(), &cecos); err != nil {
-		c.Status(503).SendString(err.Error())
+		c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	for index, _ := range cecos {
@@ -786,11 +719,11 @@ func GetCecos(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	cursor, err := coll.Find(context.TODO(), bson.M{"codigo": idNumber})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var cecos []Cecos
 	if err = cursor.All(context.Background(), &cecos); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	for index, _ := range cecos {
@@ -824,11 +757,11 @@ func GetCecosFiltro(c *fiber.Ctx) error {
 
 	cursor, err := coll.Find(context.TODO(), busqueda)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var result []Cecos
 	if err = cursor.All(context.Background(), &result); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	for index, _ := range result {
@@ -850,14 +783,14 @@ func InsertWorkFlow(c *fiber.Ctx) error {
 
 	workflow := new(PasosWorkflow)
 	if err := c.BodyParser(workflow); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	// inserta el centro de costos nuevo
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
 	result, err := coll.InsertOne(context.TODO(), workflow)
 	if err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.JSON(workflow)
@@ -877,7 +810,7 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 
 	//Comprueba que la novedad no este aceptada o rechazada
@@ -888,7 +821,7 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 	//Busca el legajo del usuario registrado
 	err, recurso := recursos.GetRecursoInterno(email, 0)
 	if err != nil {
-		return c.Status(404).SendString("Gerente no encontrado")
+		return c.Status(fiber.StatusNotFound).SendString("Gerente no encontrado")
 	}
 
 	//comprueba que el usuario sea el autorizado
@@ -939,7 +872,7 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 
 	//Comprueba que la novedad no este aceptada o rechazada
@@ -950,7 +883,7 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 	//Busca el legajo del usuario registrado
 	err, recurso := recursos.GetRecursoInterno(email, 0)
 	if err != nil {
-		return c.Status(404).SendString("Gerente no encontrado")
+		return c.Status(fiber.StatusNotFound).SendString("Gerente no encontrado")
 	}
 
 	//comprueba que el usuario sea el autorizado
@@ -1005,11 +938,11 @@ func GetNovedadesPendientes(c *fiber.Ctx) error {
 	fmt.Println(filter)
 	cursor, err := coll.Find(context.TODO(), filter)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var novedades []Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	return c.JSON(novedades)
 }
