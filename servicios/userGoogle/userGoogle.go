@@ -194,9 +194,17 @@ func ValidacionDeUsuarioPropio(obligatorioAdministrador bool, rolEsperado string
 	if obligatorioAdministrador && usuario.EsAdministrador == false {
 		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), "403"
 	}
-
-	if rolEsperado != "" && strings.Contains(rolEsperado, usuario.Rol) {
-		return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), "403"
+	if rolEsperado != "" {
+		result := strings.Split(rolEsperado, ",")
+		var encontradoElRol bool
+		for _, rol := range result {
+			if rol == usuario.Rol {
+				encontradoElRol = true
+			}
+		}
+		if !encontradoElRol {
+			return errors.New("el usuario no tiene permiso para esta acción, no tiene el rol"), "403"
+		}
 	}
 
 	return nil, usuario.Email
