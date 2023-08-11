@@ -532,15 +532,10 @@ func GetFiles(c *fiber.Ctx) error {
 		}
 		idName := strconv.Itoa(novedad.IdSecuencial)
 		return c.Status(200).SendFile(os.Getenv("FOLDER_FILE") + "/" + idName + novedad.Adjuntos[posicion])
-<<<<<<< HEAD
+	} else {
+		return c.Status(400).SendString("debe especificar el archivo")
 	}
-	return c.Status(fiber.StatusBadRequest).SendString("debe especificar el archivo")
-=======
-		} else {
-			return c.Status(400).SendString("debe especificar el archivo")
-}
 	return c.Status(200).SendString("documento no encontrado")
->>>>>>> 923559957a5084123a040aaafc87ee8c5eb44c32
 }
 
 // Agregar archivos a una notificacion
