@@ -12,7 +12,6 @@ var AllRol string = ""
 const FormatoFecha = "2006-02-01"
 
 const Database = "portalDeNovedades"
-<<<<<<< HEAD
 const CollectionPasosWorkflow = "pasosWorkflow"
 const CollectionProveedor = "proveedores"
 const CollectionActividad = "actividades"
@@ -25,16 +24,6 @@ const (
 	SheetGeneral    = "General"
 	SheetHorasExtra = "Horas extra"
 	SheetLicencias  = "Licencias"
-=======
-
-const (
-	CollectionPasosWorkflow = "pasosWorkflow"
-	CollectionProveedor     = "proveedores"
-	CollectionActividad     = "actividades"
-	CollectionNovedad       = "novedades"
-	CollectionRecurso       = "recursos"
-	CollectionUserITP       = "usersITP"
-	CollectionCecos         = "centroDeCostos"
 )
 
 const (
@@ -52,7 +41,6 @@ const (
 const (
 	TipoGerente = "manager"
 	TipoGrupo   = "grupo"
->>>>>>> 51b0cdb5d47be5d7745884bfa3d33cecb1b6860b
 )
 
 const (
