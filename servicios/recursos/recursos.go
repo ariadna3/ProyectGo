@@ -105,7 +105,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 	//obtencion de datos
 	recurso := new(Recursos)
 	if err := c.BodyParser(recurso); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	fmt.Print("obtencion de datos ")
 	fmt.Println(recurso)
@@ -186,7 +186,7 @@ func InsertRecursoPackage(c *fiber.Ctx) error {
 	//obtencion de datos
 	packageRecursos := new(PackageOfRecursos)
 	if err := c.BodyParser(packageRecursos); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	fmt.Print("obtencion de datos ")
 	fmt.Println(packageRecursos)
@@ -274,7 +274,7 @@ func GetRecursoSameCecos(c *fiber.Ctx) error {
 	}
 	var recursosEncontrados []Recursos
 	if err = cursor.All(context.Background(), &recursosEncontrados); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	return c.JSON(recursosEncontrados)
 }
@@ -301,7 +301,7 @@ func GetRecursoFilter(c *fiber.Ctx) error {
 	}
 	var recursosEncontrados []Recursos
 	if err = cursor.All(context.Background(), &recursosEncontrados); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	return c.JSON(recursosEncontrados)
 }
@@ -377,7 +377,7 @@ func GetRecursoHash(c *fiber.Ctx) error {
 
 	hash, err := hashPassword(recurso.IdObject.Hex())
 	if err != nil {
-		return c.Status(400).SendString(err.Error())
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
 	return c.Status(200).SendString(hash)
