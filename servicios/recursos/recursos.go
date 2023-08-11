@@ -167,7 +167,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 	//Ingresa el recurso
 	result, err := coll.InsertOne(context.TODO(), recurso)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.Status(200).JSON(recurso)
@@ -210,7 +210,7 @@ func GetRecurso(c *fiber.Ctx) error {
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
-		return c.Status(404).SendString("No encontrado")
+		return c.Status(fiber.StatusNotFound).SendString("No encontrado")
 	}
 
 	return c.Status(200).JSON(recurso)
@@ -231,15 +231,15 @@ func GetRecursoSameManager(c *fiber.Ctx) error {
 	err := coll.FindOne(context.TODO(), bson.D{{Key: "mail", Value: email}}).Decode(&recurso)
 	if err != nil {
 		fmt.Print(err)
-		return c.Status(404).SendString("No encontrado")
+		return c.Status(fiber.StatusNotFound).SendString("No encontrado")
 	}
 	cursor, err := coll.Find(context.TODO(), bson.M{"gerente": strconv.Itoa(recurso.Legajo)})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var recursos []Recursos
 	if err = cursor.All(context.Background(), &recursos); err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 
 	return c.Status(200).JSON(recursos)
@@ -270,7 +270,7 @@ func GetRecursoSameCecos(c *fiber.Ctx) error {
 	fmt.Println(filter)
 	cursor, err := coll.Find(context.TODO(), filter)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var recursosEncontrados []Recursos
 	if err = cursor.All(context.Background(), &recursosEncontrados); err != nil {
@@ -297,7 +297,7 @@ func GetRecursoFilter(c *fiber.Ctx) error {
 	fmt.Println(busqueda)
 	cursor, err := coll.Find(context.TODO(), busqueda)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var recursosEncontrados []Recursos
 	if err = cursor.All(context.Background(), &recursosEncontrados); err != nil {
@@ -330,7 +330,7 @@ func UpdateRecurso(c *fiber.Ctx) error {
 	fmt.Println(update)
 	result, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	return c.JSON(result)
 }
@@ -348,7 +348,7 @@ func DeleteRecurso(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idRecurso": idNumber})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
 	return c.Status(200).SendString("recurso eliminado")
@@ -372,7 +372,7 @@ func GetRecursoHash(c *fiber.Ctx) error {
 	fmt.Println(coll)
 	if err != nil {
 		fmt.Print(err)
-		return c.Status(404).SendString("No encontrado")
+		return c.Status(fiber.StatusNotFound).SendString("No encontrado")
 	}
 
 	hash, err := hashPassword(recurso.IdObject.Hex())
