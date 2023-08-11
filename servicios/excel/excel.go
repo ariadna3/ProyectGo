@@ -63,25 +63,12 @@ func GetExcelFile(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
-	err = DatosExcel(novedades)
+	err = datosExcel(novedades)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
 	}
-}
-
-// ingresar datos a un excel
-func DatosExcel(novedad []novedades.Novedades) error {
-
-	// abrir archivo de excel
-	file, err := excelize.OpenFile(os.Getenv("EXCEL_FILE"))
-	if err != nil {
-		file = excelize.NewFile()
-
-	}
-	file.NewSheet(constantes.SheetGeneral)
-	file.NewSheet(constantes.SheetHorasExtra)
-	file.NewSheet(constantes.SheetLicencias)
+	return c.SendFile(os.Getenv("EXCEL_FILE"))
 }
 
 // ingresar datos a un excel
@@ -160,12 +147,13 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row int) erro
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), "SI")
 
 	}
+	return nil
 }
 
 func horasExtras(fieldValue reflect.Value, file excelize.File, rowSave int, indexValue int) error {
 	file.SetCellValue("novedades", fmt.Sprintf("%s%d", excelize.ToAlphaString(indexValue), rowSave), fieldValue.Interface())
-
 	// revisa horas extras con mismo legajo
+	return nil
 }
 
 func anticipoPrestamo(file *excelize.File, novedad novedades.Novedades, row int, cuotas int) error {

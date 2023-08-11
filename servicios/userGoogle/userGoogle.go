@@ -191,7 +191,7 @@ func ValidacionDeUsuarioPropio(obligatorioAdministrador bool, rolEsperado string
 		return errors.New("el usuario o token inexistente"), "401"
 	}
 
-	if obligatorioAdministrador && usuario.EsAdministrador == false {
+	if obligatorioAdministrador && !usuario.EsAdministrador {
 		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), "403"
 	}
 	if rolEsperado != "" {
