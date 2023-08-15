@@ -154,6 +154,7 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row *int) err
 	if strings.Contains(novedad.Descripcion, "retroactivo") {
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), "SI")
 	}
+	*row = *row - 1
 
 	return nil
 }
@@ -176,7 +177,7 @@ func nuevoSueldoMasivo(file *excelize.File, novedad novedades.Novedades, row *in
 	if strings.Contains(novedad.Descripcion, "retroactivo") {
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), "SI")
 	}
-
+	*row = *row - 1
 	return nil
 }
 
