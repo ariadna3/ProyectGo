@@ -347,7 +347,7 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 		if err2 != nil {
 			return c.Status(fiber.StatusNotFound).SendString("Usuario no encontrada")
 		}
-		err, recurso := recursos.GetRecursoInterno(email, 0)
+		err, recurso := recursos.GetRecursoInterno(email, 0, 0)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).SendString("Gerente no encontrado")
 		}
@@ -824,7 +824,7 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 	}
 
 	//Busca el legajo del usuario registrado
-	err, recurso := recursos.GetRecursoInterno(email, 0)
+	err, recurso := recursos.GetRecursoInterno(email, 0, 0)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString("Gerente no encontrado")
 	}
@@ -886,7 +886,7 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 	}
 
 	//Busca el legajo del usuario registrado
-	err, recurso := recursos.GetRecursoInterno(email, 0)
+	err, recurso := recursos.GetRecursoInterno(email, 0, 0)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString("Gerente no encontrado")
 	}
@@ -1180,7 +1180,7 @@ func validarPasos(novedad *Novedades) error {
 	pasoActual := listaDePasos[posicionActual]
 	var nuevoWorkflow Workflow
 	if pasoActual.Aprobador == constantes.TipoGerente {
-		err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
+		err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 		if err != nil {
 			return err
 		}

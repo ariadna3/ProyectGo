@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
-	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/gofiber/fiber/v2"
@@ -74,14 +74,12 @@ func GetExcelFile(c *fiber.Ctx) error {
 func datosExcel(novedadesArr []novedades.Novedades) error {
 
 	// Abrir archivo de excel
-	file, err := excelize.OpenFile(os.Getenv("EXCEL_FILE"))
-	if err != nil {
-		file = excelize.NewFile()
-		file.SetSheetName("Sheet1", constantes.PestanaGeneral)
-		file.NewSheet(constantes.PestanaHorasExtras)
-		file.NewSheet(constantes.PestanaLicencias)
-		initializeExcel(file)
-	}
+	os.Remove("EXCEL_FILE")
+	file := excelize.NewFile()
+	file.SetSheetName("Sheet1", constantes.PestanaGeneral)
+	file.NewSheet(constantes.PestanaHorasExtras)
+	file.NewSheet(constantes.PestanaLicencias)
+	initializeExcel(file)
 	var rowGeneral int = 3
 	var rowHorasExtras int = 3
 	var rowLicencias int = 3
@@ -120,7 +118,7 @@ func datosExcel(novedadesArr []novedades.Novedades) error {
 	}
 
 	// guardar archivo
-	err = file.SaveAs(os.Getenv("EXCEL_FILE"))
+	err := file.SaveAs(os.Getenv("EXCEL_FILE"))
 	if err != nil {
 		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
 		return err
@@ -129,16 +127,50 @@ func datosExcel(novedadesArr []novedades.Novedades) error {
 }
 
 func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row int) error {
-	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
+	for _, recursoInterno := range novedad.Recursos {
+		datosUsuario := strings.Split(recursoInterno.Recurso, "(")
+		if len(datosUsuario) == 2 {
+			datosUsuario[1] = strings.ReplaceAll(datosUsuario[1], ")", "")
+			legajo, err := strconv.Atoi(datosUsuario[1])
+			if err != nil {
+				return err
+			}
+			err, recurso := recursos.GetRecursoInterno("", 0, legajo)
+			if err != nil {
+				return err
+			}
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.Descripcion)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), recurso.Legajo)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Nombre)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Apellido)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), recursoInterno.Importe)
+			row = row + 1
+		}
+		
+	}
+
+	
+	if strings.Contains(novedad.Descripcion, "retroactivo") {
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), "SI")
+	}
+
+	return nil
+}
+
+func nuevoSueldoMasivo(file *excelize.File, novedad novedades.Novedades, row int) error {
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
 		return err
 	}
 
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.Descripcion)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Apellido)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), novedad.ImporteTotal)
+	for _, distribucion := range novedad.Distribuciones {
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.Descripcion)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), recurso.Legajo)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), distribucion.Cecos.Cliente)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), "")
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), fmt.Sprintf("%v", distribucion.Porcentaje) + "%" )	
+	}
+
 	if strings.Contains(novedad.Descripcion, "retroactivo") {
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), "SI")
 
@@ -147,7 +179,7 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row int) erro
 }
 
 func anticipoPrestamo(file *excelize.File, novedad novedades.Novedades, row int, cuotas int) error {
-	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
 		return err
 	}
@@ -164,7 +196,7 @@ func anticipoPrestamo(file *excelize.File, novedad novedades.Novedades, row int,
 }
 
 func gimnasio(file *excelize.File, novedad novedades.Novedades, row int) error {
-	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
 		return err
 	}
@@ -179,7 +211,7 @@ func gimnasio(file *excelize.File, novedad novedades.Novedades, row int) error {
 }
 
 func idioma(file *excelize.File, novedad novedades.Novedades, row int) error {
-	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
 		return err
 	}
@@ -194,7 +226,7 @@ func idioma(file *excelize.File, novedad novedades.Novedades, row int) error {
 }
 
 func tarjetaBeneficio(file *excelize.File, novedad novedades.Novedades, row int) error {
-	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
 		return err
 	}
@@ -209,19 +241,11 @@ func tarjetaBeneficio(file *excelize.File, novedad novedades.Novedades, row int)
 }
 
 func licencias(file *excelize.File, novedad novedades.Novedades, row int) error {
-	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
 		return err
 	}
-	fechaDesdeDate, err := time.Parse(constantes.FormatoFecha, novedad.FechaDesde)
-	if err != nil {
-		return err
-	}
-	fechaHastaDate, err := time.Parse(constantes.FormatoFecha, novedad.FechaHasta)
-	if err != nil {
-		return err
-	}
-	diferenciaFechas := int(fechaHastaDate.Sub(fechaDesdeDate).Hours() / 24)
+	diferenciaFechas, _ := strconv.Atoi(novedad.Cantidad)
 
 	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("A%d", row), recurso.Legajo)
 	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("B%d", row), recurso.Nombre)
@@ -233,7 +257,7 @@ func licencias(file *excelize.File, novedad novedades.Novedades, row int) error 
 }
 
 func horasExtras(file *excelize.File, novedad novedades.Novedades, row *int) error {
-	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
 		return err
 	}

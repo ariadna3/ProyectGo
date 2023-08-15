@@ -44,11 +44,12 @@ const (
 )
 
 const (
-	DescSueldoNuevo = "Nuevo sueldo"
-	DescHorasExtras = "Horas extras"
-	DescAnticipo    = "Anticipo"
-	DescPrestamo    = "Prestamo"
-	DescLicencia    = "Licencia"
+	DescSueldoNuevoMasivo = "Nuevo sueldo masivo"
+	DescSueldoNuevo       = "Nuevo sueldo"
+	DescHorasExtras       = "Horas extras"
+	DescAnticipo          = "Anticipo"
+	DescPrestamo          = "Prestamo"
+	DescLicencia          = "Licencia"
 )
 
 var HorasExtrasTipos = map[string]string{

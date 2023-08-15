@@ -383,12 +383,7 @@ func GetRecursoHash(c *fiber.Ctx) error {
 	return c.Status(200).SendString(hash)
 }
 
-func GetRecursoInterno(email string, id int) (error, Recursos) {
-
-	if !strings.Contains(email, "@") {
-		email = email + "@itpatagonia.com"
-	}
-
+func GetRecursoInterno(email string, id int, legajo int) (error, Recursos) {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	var recurso Recursos
 	if id != 0 {
@@ -397,7 +392,15 @@ func GetRecursoInterno(email string, id int) (error, Recursos) {
 			return err, recurso
 		}
 	} else if email != "" {
+		if !strings.Contains(email, "@") {
+			email = email + "@itpatagonia.com"
+		}
 		err := coll.FindOne(context.TODO(), bson.D{{Key: "mail", Value: email}}).Decode(&recurso)
+		if err != nil {
+			return err, recurso
+		}
+	} else if legajo != 0 {
+		err := coll.FindOne(context.TODO(), bson.D{{Key: "legajo", Value: legajo}}).Decode(&recurso)
 		if err != nil {
 			return err, recurso
 		}
