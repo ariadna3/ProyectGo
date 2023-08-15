@@ -179,7 +179,12 @@ func nuevoSueldoMasivo(file *excelize.File, novedad novedades.Novedades, row *in
 	}
 
 	if strings.Contains(novedad.Descripcion, "retroactivo") {
+<<<<<<< HEAD
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), "SI")
+=======
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), "SI")
+	}
+>>>>>>> 1.6.16
 
 	}
 	return nil
