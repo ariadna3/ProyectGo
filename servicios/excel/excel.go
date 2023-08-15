@@ -89,7 +89,13 @@ func datosExcel(novedadesArr []novedades.Novedades) error {
 			}
 		}
 		if pasosWorkflow.TipoExcel == constantes.DescSueldoNuevo {
-			err = nuevoSueldo(file, item, rowGeneral)
+			err = nuevoSueldo(file, item, &rowGeneral)
+			if err == nil {
+				rowGeneral = rowGeneral + 1
+			}
+		}
+		if pasosWorkflow.TipoExcel == constantes.DescSueldoNuevoMasivo {
+			err = nuevoSueldoMasivo(file, item, &rowGeneral)
 			if err == nil {
 				rowGeneral = rowGeneral + 1
 			}
@@ -121,7 +127,7 @@ func datosExcel(novedadesArr []novedades.Novedades) error {
 	return nil
 }
 
-func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row int) error {
+func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row *int) error {
 	for _, recursoInterno := range novedad.Recursos {
 		datosUsuario := strings.Split(recursoInterno.Recurso, "(")
 		if len(datosUsuario) == 2 {
@@ -134,12 +140,12 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row int) erro
 			if err != nil {
 				return err
 			}
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.Descripcion)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), recurso.Legajo)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Nombre)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Apellido)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), recursoInterno.Importe)
-			row = row + 1
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", *row), novedad.Descripcion)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", *row), recurso.Legajo)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", *row), recurso.Nombre)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", *row), recurso.Apellido)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), recursoInterno.Importe)
+			*row = *row + 1
 		}
 		
 	}
@@ -152,22 +158,23 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row int) erro
 	return nil
 }
 
-func nuevoSueldoMasivo(file *excelize.File, novedad novedades.Novedades, row int) error {
+func nuevoSueldoMasivo(file *excelize.File, novedad novedades.Novedades, row *int) error {
 	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
 		return err
 	}
 
 	for _, distribucion := range novedad.Distribuciones {
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.Descripcion)
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), recurso.Legajo)
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), distribucion.Cecos.Cliente)
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), "")
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), fmt.Sprintf("%v", distribucion.Porcentaje) + "%" )	
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", *row), novedad.Descripcion)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", *row), recurso.Legajo)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", *row), distribucion.Cecos.Cliente)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", *row), "")
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), fmt.Sprintf("%v", distribucion.Porcentaje) + "%" )
+		*row = *row + 1
 	}
 
 	if strings.Contains(novedad.Descripcion, "retroactivo") {
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), "SI")
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), "SI")
 	}
 
 	return nil
