@@ -77,16 +77,10 @@ func datosExcel(novedadesArr []novedades.Novedades) error {
 		initializeExcel(file)
 	}
 	var rowGeneral int = 3
-	//var rowHorasExtras int = 3
+	var rowHorasExtras int = 3
 	var rowLicencias int = 3
 
 	for _, item := range novedadesArr {
-		fmt.Print(item.IdSecuencial)
-		fmt.Println(" " + item.Descripcion)
-		if item.IdSecuencial == 298 {
-			fmt.Print(item.IdSecuencial)
-			fmt.Println(" " + item.Descripcion)
-		}
 		var pasosWorkflow novedades.PasosWorkflow
 		coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
 		err := coll.FindOne(context.TODO(), bson.M{"tipo": item.Descripcion}).Decode(&pasosWorkflow)
@@ -113,6 +107,9 @@ func datosExcel(novedadesArr []novedades.Novedades) error {
 			if err == nil {
 				rowGeneral = rowGeneral + 1
 			}
+		}
+		if pasosWorkflow.TipoExcel == constantes.DescHorasExtras {
+			horasExtras(file, item, &rowHorasExtras)
 		}
 	}
 
@@ -230,6 +227,29 @@ func licencias(file *excelize.File, novedad novedades.Novedades, row int) error 
 	return nil
 }
 
+func horasExtras(file *excelize.File, novedad novedades.Novedades, row *int) error {
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0)
+	if err != nil {
+		return err
+	}
+	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("A%d", *row), recurso.Legajo)
+	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("B%d", *row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("C%d", *row), recurso.Nombre)
+	for _, recursoNovedad := range novedad.Recursos {
+		file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("D%d", *row), recursoNovedad.Periodo)
+		for _, horasExtrasNovedad := range recursoNovedad.HorasExtras {
+			cell, ok := constantes.HorasExtrasTipos[(horasExtrasNovedad.TipoDia + horasExtrasNovedad.TipoHora)]
+			if ok {
+				file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("%s%d", cell, *row), horasExtrasNovedad.Cantidad)
+			} else {
+				fmt.Print("Error de tipo excel: " + (horasExtrasNovedad.TipoDia + horasExtrasNovedad.TipoHora))
+			}
+		}
+		*row = *row + 1
+	}
+	return nil
+}
+
 func initializeExcel(file *excelize.File) error {
 	// General
 	// Unir celdas de general para sueldos y prestamos
@@ -264,11 +284,12 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaHorasExtras, "A2", "LEGAJO")
 	file.SetCellValue(constantes.PestanaHorasExtras, "B2", "APELLIDO")
 	file.SetCellValue(constantes.PestanaHorasExtras, "C2", "NOMBRE")
-	file.SetCellValue(constantes.PestanaHorasExtras, "D2", "AL 50% EXENTAS (CONCEPTO 2212)")
-	file.SetCellValue(constantes.PestanaHorasExtras, "E2", "AL 100% EXENTAS (CONCEPTO 2220)")
-	file.SetCellValue(constantes.PestanaHorasExtras, "F2", "HORAS FERIADO")
-	file.SetCellValue(constantes.PestanaHorasExtras, "G2", "NOCTURNAS AL 50% (CONCEPTO 2213)")
-	file.SetCellValue(constantes.PestanaHorasExtras, "H2", "NOCTURNAS AL 100% (CONCEPTO 2221)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "D2", "PERIODO")
+	file.SetCellValue(constantes.PestanaHorasExtras, "E2", "AL 50% EXENTAS (CONCEPTO 2212)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "F2", "AL 100% EXENTAS (CONCEPTO 2220)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "G2", "HORAS FERIADO")
+	file.SetCellValue(constantes.PestanaHorasExtras, "H2", "NOCTURNAS AL 50% (CONCEPTO 2213)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "I2", "NOCTURNAS AL 100% (CONCEPTO 2221)")
 
 	// Licencias
 	// Unir celdas de licencias para sueldos y prestamos
