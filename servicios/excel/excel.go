@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"reflect"
 	"strings"
 	"time"
 
@@ -144,12 +143,6 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row int) erro
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), "SI")
 
 	}
-	return nil
-}
-
-func horasExtras(fieldValue reflect.Value, file excelize.File, rowSave int, indexValue int) error {
-	file.SetCellValue("novedades", fmt.Sprintf("%s%d", excelize.ToAlphaString(indexValue), rowSave), fieldValue.Interface())
-	// revisa horas extras con mismo legajo
 	return nil
 }
 
