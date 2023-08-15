@@ -48,6 +48,16 @@ const (
 	DescLicencia    = "Licencia"
 )
 
+var HorasExtrasTipos = map[string]string{
+	"50%diurno":       "E",
+	"100%diurno":      "F",
+	"50%nocturno":     "H",
+	"100%nocturno":    "I",
+	"feriadonocturno": "G",
+	"feriadodiurno":   "G",
+	"feriado":         "G",
+}
+
 const (
 	AceptarCambiosRecursos = "gerente,mail,fechaString"
 )
