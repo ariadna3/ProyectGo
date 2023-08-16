@@ -232,7 +232,7 @@ func InsertNovedad(c *fiber.Ctx) error {
 	err = validarPasos(novedad)
 	if err != nil {
 		if err.Error() == "mongo: no documents in result" {
-			return c.Status(fiber.ErrNotFound.Code).SendString("Tipo de novedad no encontrada")
+			return c.Status(fiber.StatusNotFound).SendString("Tipo de novedad no encontrada")
 		}
 		fmt.Println(err)
 	}
@@ -317,8 +317,15 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	if c.Query("comentarios") != "" {
 		busqueda["comentarios"] = bson.M{"$regex": c.Query("comentarios"), "$options": "im"}
 	}
-	if c.Query("cliente") != "" {
-		busqueda["cliente"] = bson.M{"$regex": c.Query("cliente"), "$options": "im"}
+	if c.Query("cliente") != "" || c.Query("validos") != "" {
+		var agregar bson.M = bson.M{}
+		if c.Query("validos") != "" {
+			agregar["$not"] = bson.M{"$regex": constantes.CecosNotValids}
+		} else if c.Query("cliente") != "" {
+			agregar["$regex"] = c.Query("cliente")
+			agregar["$option"] = "im"
+		}
+		busqueda["cliente"] = agregar
 	}
 	if c.Query("estado") != "" {
 		busqueda["estado"] = bson.M{"$regex": c.Query("estado"), "$options": "im"}
@@ -334,11 +341,6 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	}
 	if c.Query("archivado") != "" {
 		busqueda["archivado"] = c.QueryBool("true")
-	}
-	if c.Query("mayores") != "" {
-		orTodo := bson.D{{Key: "cecos.codigo", Value: bson.D{{Key: "$gt", Value: 100}}}}
-
-		busqueda["distribuciones"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
 	}
 	if c.Query("estadoWF") != "" {
 		coll2 := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)

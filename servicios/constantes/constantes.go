@@ -8,6 +8,8 @@ const (
 	PeopleOperation  = "po"
 )
 
+const CecosNotValids = "NNNNN (99999999999)"
+
 var AllRol string = ""
 
 const FormatoFecha = "2006-02-01"
