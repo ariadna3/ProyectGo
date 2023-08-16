@@ -34,7 +34,7 @@ func GetExcelFile(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.PeopleOperation)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
