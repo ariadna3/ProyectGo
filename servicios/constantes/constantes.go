@@ -5,6 +5,7 @@ const (
 	AdminNotRequired = false
 	AnyRol           = ""
 	Admin            = "admin"
+	PeopleOperation  = "po"
 )
 
 var AllRol string = ""
