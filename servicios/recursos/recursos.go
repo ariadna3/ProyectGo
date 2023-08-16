@@ -335,6 +335,76 @@ func UpdateRecurso(c *fiber.Ctx) error {
 	return c.JSON(result)
 }
 
+// insertar recurso
+func PutRecurso(c *fiber.Ctx) error {
+
+	fmt.Println("put de recurso")
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	//obtencion de datos
+	recurso := new(Recursos)
+	if err := c.BodyParser(recurso); err != nil {
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
+	}
+	fmt.Print("obtencion de datos ")
+	fmt.Println(recurso)
+
+	err, idRecurso := elRecursoYaExisteLegajo(recurso.Legajo)
+	if err == nil {
+		return c.Status(fiber.StatusNotFound).SendString("Usuario no encontrado")
+	}
+
+	//setea la fecha
+	recurso.Fecha, _ = time.Parse("02/01/2006", recurso.FechaString)
+
+	//Obtiene el ultimo Id
+	recurso.IdRecurso = idRecurso
+
+	//Obtiene los datos del ceco
+	collCeco := client.Database(constantes.Database).Collection(constantes.CollectionCecos)
+
+	for pos, ceco := range recurso.Rcc {
+		var intVar int
+		var cecoEncontrado Cecos
+		if ceco.CcNum != "" {
+			intVar, err = strconv.Atoi(ceco.CcNum)
+			if err != nil {
+				fmt.Println(err)
+				return c.Status(418).SendString(err.Error())
+			}
+			filter := bson.D{{Key: "codigo", Value: intVar}}
+
+			collCeco.FindOne(context.TODO(), filter).Decode(&cecoEncontrado)
+
+		} else {
+			cecoEncontrado.Cliente = ""
+			cecoEncontrado.Codigo = 0
+			cecoEncontrado.Descripcion = ""
+			cecoEncontrado.IdCecos = 0
+			cecoEncontrado.Proyecto = ""
+		}
+		fmt.Print("Ceco encontrado: ")
+		fmt.Println(cecoEncontrado)
+
+		recurso.Rcc[pos].CcNombre = cecoEncontrado.Cliente
+		recurso.Rcc[pos].CcCliente = cecoEncontrado.Descripcion
+	}
+
+	//Ingresa el recurso
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	eliminarRecursoLegajo(recurso.Legajo)
+	result, err := coll.InsertOne(context.TODO(), recurso)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return c.Status(200).JSON(recurso)
+}
+
 // borrar recurso por id
 func DeleteRecurso(c *fiber.Ctx) error {
 
@@ -425,9 +495,33 @@ func elRecursoYaExiste(email string) (error, int) {
 	return nil, 0
 }
 
+func elRecursoYaExisteLegajo(legajo int) (error, int) {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	filter := bson.D{{Key: "legajo", Value: legajo}}
+
+	cursor, _ := coll.Find(context.TODO(), filter)
+
+	var results []Recursos
+	cursor.All(context.TODO(), &results)
+	if len(results) != 0 {
+		return errors.New("ya existe el usuario"), results[0].IdRecurso
+	}
+	return nil, 0
+}
+
 func eliminarRecurso(email string) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"mail": email})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	return nil
+}
+
+func eliminarRecursoLegajo(legajo int) error {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	result, err := coll.DeleteOne(context.TODO(), bson.M{"legajo": legajo})
 	if err != nil {
 		return err
 	}
