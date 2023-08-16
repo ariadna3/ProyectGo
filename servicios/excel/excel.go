@@ -152,7 +152,7 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row *int) err
 
 	
 	if strings.Contains(novedad.Descripcion, "retroactivo") {
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), "SI")
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), "SI")
 	}
 	*row = *row - 1
 
@@ -172,10 +172,6 @@ func nuevoSueldoMasivo(file *excelize.File, novedad novedades.Novedades, row *in
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", *row), "")
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), fmt.Sprintf("%v", distribucion.Porcentaje) + "%" )
 		*row = *row + 1
-	}
-
-	if strings.Contains(novedad.Descripcion, "retroactivo") {
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), "SI")
 	}
 	*row = *row - 1
 	return nil
