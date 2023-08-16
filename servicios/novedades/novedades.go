@@ -342,6 +342,14 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	if c.Query("archivado") != "" {
 		busqueda["archivado"] = c.QueryBool("true")
 	}
+	if c.Query("validos") != "" {
+		gt100 := bson.D{{Key: "cecos.codigo", Value: bson.D{{Key: "$gt", Value: 100}}}}
+
+		exists := bson.D{{Key: "$exists", Value: true}}
+		elematch := bson.D{{Key: "$elemMatch", Value: gt100}}
+
+		busqueda["distribuciones"] = bson.M{"$or": bson.A{exists, elematch}}
+	}
 	if c.Query("estadoWF") != "" {
 		coll2 := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 		var usuario userGoogle.UserITP
