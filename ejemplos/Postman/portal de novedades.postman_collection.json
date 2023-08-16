@@ -908,6 +908,42 @@
 					"response": []
 				},
 				{
+					"name": "putRecurso",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"legajo\": 1500,\r\n    \"gerente\":\"102020\",\r\n    \"apellido\": \"REY\",\r\n    \"nombre\": \"PALOMA\",\r\n    \"fechaString\": \"11/04/2022\",\r\n    \"mail\": \"prey@itpatagonia.com\",\r\n    \"sueldo\": 150000,\r\n    \"Rcc\": [\r\n        {\r\n            \"CcNum\": \"20\",\r\n            \"CcPorc\": 100.0\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Recurso",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Recurso"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "InsertRecursoPackage",
 					"request": {
 						"auth": {
