@@ -140,20 +140,20 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row *int) err
 			if err != nil {
 				return err
 			}
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", *row), novedad.Descripcion)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", *row), recurso.Legajo)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", *row), recurso.Nombre)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", *row), recurso.Apellido)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), recursoInterno.Importe)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", *row), novedad.IdSecuencial)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", *row), novedad.Descripcion)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", *row), recurso.Legajo)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", *row), recurso.Nombre)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), recurso.Apellido)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), recursoInterno.Importe)
+			if strings.Contains(novedad.Descripcion, "retroactivo") {
+				file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("G%d", *row), "SI")
+			}
 			*row = *row + 1
 		}
 		
 	}
 
-	
-	if strings.Contains(novedad.Descripcion, "retroactivo") {
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), "SI")
-	}
 	*row = *row - 1
 
 	return nil
@@ -166,11 +166,12 @@ func nuevoSueldoMasivo(file *excelize.File, novedad novedades.Novedades, row *in
 	}
 
 	for _, distribucion := range novedad.Distribuciones {
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", *row), novedad.Descripcion)
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", *row), recurso.Legajo)
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", *row), distribucion.Cecos.Cliente)
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", *row), "")
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), fmt.Sprintf("%v", distribucion.Porcentaje) + "%" )
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", *row), novedad.IdSecuencial)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", *row), novedad.Descripcion)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", *row), recurso.Legajo)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", *row), distribucion.Cecos.Cliente)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), "")
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), fmt.Sprintf("%v", distribucion.Porcentaje) + "%" )
 		*row = *row + 1
 	}
 	*row = *row - 1
@@ -183,13 +184,14 @@ func anticipoPrestamo(file *excelize.File, novedad novedades.Novedades, row int,
 		return err
 	}
 
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.Descripcion)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Apellido)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("H%d", row), novedad.ImporteTotal)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("I%d", row), novedad.ImporteTotal/float64(cuotas))
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("J%d", row), cuotas)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Legajo)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("I%d", row), novedad.ImporteTotal)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("J%d", row), novedad.ImporteTotal/float64(cuotas))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("K%d", row), cuotas)
 
 	return nil
 }
@@ -200,11 +202,12 @@ func gimnasio(file *excelize.File, novedad novedades.Novedades, row int) error {
 		return err
 	}
 
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.Descripcion)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Apellido)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("K%d", row), novedad.ImporteTotal)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Legajo)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("L%d", row), novedad.ImporteTotal)
 
 	return nil
 }
@@ -215,11 +218,12 @@ func idioma(file *excelize.File, novedad novedades.Novedades, row int) error {
 		return err
 	}
 
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.Descripcion)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Apellido)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("L%d", row), novedad.ImporteTotal)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Legajo)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("M%d", row), novedad.ImporteTotal)
 
 	return nil
 }
@@ -230,11 +234,12 @@ func tarjetaBeneficio(file *excelize.File, novedad novedades.Novedades, row int)
 		return err
 	}
 
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.Descripcion)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Apellido)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("M%d", row), novedad.ImporteTotal)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Legajo)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("N%d", row), novedad.ImporteTotal)
 
 	return nil
 }
@@ -246,11 +251,12 @@ func licencias(file *excelize.File, novedad novedades.Novedades, row int) error 
 	}
 	diferenciaFechas, _ := strconv.Atoi(novedad.Cantidad)
 
-	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("A%d", row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("B%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("C%d", row), recurso.Apellido)
-	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("D%d", row), novedad.Descripcion)
-	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("E%d", row), diferenciaFechas)
+	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("A%d", row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("B%d", row), recurso.Legajo)
+	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("C%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("D%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("E%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("F%d", row), diferenciaFechas)
 
 	return nil
 }
@@ -260,11 +266,12 @@ func horasExtras(file *excelize.File, novedad novedades.Novedades, row *int) err
 	if err != nil {
 		return err
 	}
-	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("A%d", *row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("B%d", *row), recurso.Apellido)
-	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("C%d", *row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("A%d", *row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("B%d", *row), recurso.Legajo)
+	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("C%d", *row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("D%d", *row), recurso.Nombre)
 	for _, recursoNovedad := range novedad.Recursos {
-		file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("D%d", *row), recursoNovedad.Periodo)
+		file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("E%d", *row), recursoNovedad.Periodo)
 		for _, horasExtrasNovedad := range recursoNovedad.HorasExtras {
 			cell, ok := constantes.HorasExtrasTipos[(horasExtrasNovedad.TipoDia + horasExtrasNovedad.TipoHora)]
 			if ok {
@@ -281,54 +288,57 @@ func horasExtras(file *excelize.File, novedad novedades.Novedades, row *int) err
 func initializeExcel(file *excelize.File) error {
 	// General
 	// Unir celdas de general para sueldos y prestamos
-	file.MergeCell(constantes.PestanaGeneral, "E1", "G1")
-	file.MergeCell(constantes.PestanaGeneral, "H1", "J1")
+	file.MergeCell(constantes.PestanaGeneral, "F1", "H1")
+	file.MergeCell(constantes.PestanaGeneral, "I1", "K1")
 
 	// Ingresar los nombres de las celdas en general
-	file.SetCellValue(constantes.PestanaGeneral, "A2", "TIPO DE NOVEDAD")
-	file.SetCellValue(constantes.PestanaGeneral, "B2", "LEGAJO")
-	file.SetCellValue(constantes.PestanaGeneral, "C2", "APELLIDO")
-	file.SetCellValue(constantes.PestanaGeneral, "D2", "NOMBRE")
-	file.SetCellValue(constantes.PestanaGeneral, "E2", "NUEVO SUELDO")
-	file.SetCellValue(constantes.PestanaGeneral, "F2", "AJUSTE RETROACTIVIDAD")
-	file.SetCellValue(constantes.PestanaGeneral, "G2", "DEVENGAMIENTO")
-	file.SetCellValue(constantes.PestanaGeneral, "H2", "MONTO TOTAL")
-	file.SetCellValue(constantes.PestanaGeneral, "I2", "MONTO CUOTA")
-	file.SetCellValue(constantes.PestanaGeneral, "J2", "TOTAL CUOTAS")
-	file.SetCellValue(constantes.PestanaGeneral, "K2", "MONTO GIMNASIO")
-	file.SetCellValue(constantes.PestanaGeneral, "L2", "MONTO IDIOMA")
-	file.SetCellValue(constantes.PestanaGeneral, "M2", "MONTO TARJETA")
-	file.SetCellValue(constantes.PestanaGeneral, "E1", "NUEVOS SUELDOS")
-	file.SetCellValue(constantes.PestanaGeneral, "H1", "ANTICIPO / PRESTAMO")
-	file.SetCellValue(constantes.PestanaGeneral, "K1", "GYM")
-	file.SetCellValue(constantes.PestanaGeneral, "L1", "IDIOMA")
-	file.SetCellValue(constantes.PestanaGeneral, "M1", "TARJETA BENEFICIO")
+	file.SetCellValue(constantes.PestanaGeneral, "A2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaGeneral, "B2", "TIPO DE NOVEDAD")
+	file.SetCellValue(constantes.PestanaGeneral, "C2", "LEGAJO")
+	file.SetCellValue(constantes.PestanaGeneral, "D2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaGeneral, "E2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaGeneral, "F2", "NUEVO SUELDO")
+	file.SetCellValue(constantes.PestanaGeneral, "G2", "AJUSTE RETROACTIVIDAD")
+	file.SetCellValue(constantes.PestanaGeneral, "H2", "DEVENGAMIENTO")
+	file.SetCellValue(constantes.PestanaGeneral, "I2", "MONTO TOTAL")
+	file.SetCellValue(constantes.PestanaGeneral, "J2", "MONTO CUOTA")
+	file.SetCellValue(constantes.PestanaGeneral, "K2", "TOTAL CUOTAS")
+	file.SetCellValue(constantes.PestanaGeneral, "L2", "MONTO GIMNASIO")
+	file.SetCellValue(constantes.PestanaGeneral, "M2", "MONTO IDIOMA")
+	file.SetCellValue(constantes.PestanaGeneral, "N2", "MONTO TARJETA")
+	file.SetCellValue(constantes.PestanaGeneral, "F1", "NUEVOS SUELDOS")
+	file.SetCellValue(constantes.PestanaGeneral, "I1", "ANTICIPO / PRESTAMO")
+	file.SetCellValue(constantes.PestanaGeneral, "L1", "GYM")
+	file.SetCellValue(constantes.PestanaGeneral, "M1", "IDIOMA")
+	file.SetCellValue(constantes.PestanaGeneral, "N1", "TARJETA BENEFICIO")
 
 	// Horas extras
 	// Unir celdas de horas extras para sueldos y prestamos
-	file.MergeCell(constantes.PestanaHorasExtras, "D1", "H1")
+	file.MergeCell(constantes.PestanaHorasExtras, "E1", "I1")
 
 	// Ingresar los nombres de las celdas en horas extras
-	file.SetCellValue(constantes.PestanaHorasExtras, "A2", "LEGAJO")
-	file.SetCellValue(constantes.PestanaHorasExtras, "B2", "APELLIDO")
-	file.SetCellValue(constantes.PestanaHorasExtras, "C2", "NOMBRE")
-	file.SetCellValue(constantes.PestanaHorasExtras, "D2", "PERIODO")
-	file.SetCellValue(constantes.PestanaHorasExtras, "E2", "AL 50% EXENTAS (CONCEPTO 2212)")
-	file.SetCellValue(constantes.PestanaHorasExtras, "F2", "AL 100% EXENTAS (CONCEPTO 2220)")
-	file.SetCellValue(constantes.PestanaHorasExtras, "G2", "HORAS FERIADO")
-	file.SetCellValue(constantes.PestanaHorasExtras, "H2", "NOCTURNAS AL 50% (CONCEPTO 2213)")
-	file.SetCellValue(constantes.PestanaHorasExtras, "I2", "NOCTURNAS AL 100% (CONCEPTO 2221)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "A2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaHorasExtras, "B2", "LEGAJO")
+	file.SetCellValue(constantes.PestanaHorasExtras, "C2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaHorasExtras, "D2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaHorasExtras, "E2", "PERIODO")
+	file.SetCellValue(constantes.PestanaHorasExtras, "F2", "AL 50% EXENTAS (CONCEPTO 2212)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "G2", "AL 100% EXENTAS (CONCEPTO 2220)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "H2", "HORAS FERIADO")
+	file.SetCellValue(constantes.PestanaHorasExtras, "I2", "NOCTURNAS AL 50% (CONCEPTO 2213)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "J2", "NOCTURNAS AL 100% (CONCEPTO 2221)")
 
 	// Licencias
 	// Unir celdas de licencias para sueldos y prestamos
-	file.MergeCell(constantes.PestanaLicencias, "D1", "E1")
+	file.MergeCell(constantes.PestanaLicencias, "E1", "G1")
 
 	// Ingresar los nombres de las celdas en licencias
-	file.SetCellValue(constantes.PestanaLicencias, "A2", "LEGAJO")
-	file.SetCellValue(constantes.PestanaLicencias, "B2", "APELLIDO")
-	file.SetCellValue(constantes.PestanaLicencias, "C2", "NOMBRE")
-	file.SetCellValue(constantes.PestanaLicencias, "D2", "TIPO")
-	file.SetCellValue(constantes.PestanaLicencias, "E2", "DIAS")
+	file.SetCellValue(constantes.PestanaLicencias, "A2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaLicencias, "B2", "LEGAJO")
+	file.SetCellValue(constantes.PestanaLicencias, "C2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaLicencias, "D2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaLicencias, "E2", "TIPO")
+	file.SetCellValue(constantes.PestanaLicencias, "F2", "DIAS")
 
 	return nil
 }
