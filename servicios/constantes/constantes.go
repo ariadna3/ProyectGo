@@ -8,7 +8,7 @@ const (
 	PeopleOperation  = "po"
 )
 
-const CecosNotValids = "NNNNN (99999999999)"
+const CecosNotValids = "(99999999999)"
 
 var AllRol string = ""
 
