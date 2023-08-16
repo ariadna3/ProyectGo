@@ -180,7 +180,6 @@ func nuevoSueldoMasivo(file *excelize.File, novedad novedades.Novedades, row *in
 		*row = *row + 1
 	}
 	*row = *row - 1
-	}
 	return nil
 }
 
