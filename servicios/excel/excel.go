@@ -43,8 +43,9 @@ func GetExcelFile(c *fiber.Ctx) error {
 	usuarioNotEmpty := bson.D{{Key: "usuario", Value: bson.M{"$ne": ""}}}
 	descripcionExist := bson.D{{Key: "descripcion", Value: bson.M{"$exists": 1}}}
 	descripcionNotEmpty := bson.D{{Key: "descripcion", Value: bson.M{"$ne": ""}}}
+	EstadoNoRechazado := bson.D{{Key: "estado", Value: bson.M{"$ne": constantes.Rechazada}}}
 
-	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty}}
+	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado}}
 	opts := options.Find().SetSort(bson.D{{Key: "descripcion", Value: 1}, {Key: "usuario", Value: 1}})
 
 	cursor, err := coll.Find(context.TODO(), filter, opts)
@@ -115,6 +116,12 @@ func datosExcel(novedadesArr []novedades.Novedades) error {
 		if pasosWorkflow.TipoExcel == constantes.DescHorasExtras {
 			horasExtras(file, item, &rowHorasExtras)
 		}
+		if pasosWorkflow.TipoExcel == constantes.DescPagos {
+			err = pagos(file, item, rowGeneral)
+			if err == nil {
+				rowGeneral = rowGeneral + 1
+			}
+		}
 	}
 
 	// guardar archivo
@@ -151,7 +158,7 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row *int) err
 			}
 			*row = *row + 1
 		}
-		
+
 	}
 
 	*row = *row - 1
@@ -171,7 +178,7 @@ func nuevoSueldoMasivo(file *excelize.File, novedad novedades.Novedades, row *in
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", *row), recurso.Legajo)
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", *row), distribucion.Cecos.Cliente)
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), "")
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), fmt.Sprintf("%v", distribucion.Porcentaje) + "%" )
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), fmt.Sprintf("%v", distribucion.Porcentaje)+"%")
 		*row = *row + 1
 	}
 	*row = *row - 1
@@ -282,6 +289,22 @@ func horasExtras(file *excelize.File, novedad novedades.Novedades, row *int) err
 		}
 		*row = *row + 1
 	}
+	return nil
+}
+
+func pagos(file *excelize.File, novedad novedades.Novedades, row int) error {
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
+	if err != nil {
+		return err
+	}
+
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), recurso.Legajo)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), novedad.ImporteTotal)
+
 	return nil
 }
 
