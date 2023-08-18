@@ -48,6 +48,7 @@ const (
 	DescAnticipo          = "Anticipo"
 	DescPrestamo          = "Prestamo"
 	DescLicencia          = "Licencia"
+	DescPagos             = "Pagos"
 )
 
 var HorasExtrasTipos = map[string]string{
