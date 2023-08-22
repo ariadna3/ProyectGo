@@ -353,7 +353,7 @@ func PutRecurso(c *fiber.Ctx) error {
 	fmt.Print("obtencion de datos ")
 	fmt.Println(recurso)
 
-	err, idRecurso := elRecursoYaExisteLegajo(recurso.Legajo)
+	err, idRecurso := elRecursoYaExiste(recurso.Mail)
 	if err == nil {
 		return c.Status(fiber.StatusNotFound).SendString("Usuario no encontrado")
 	}
