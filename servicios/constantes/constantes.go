@@ -52,13 +52,13 @@ const (
 )
 
 var HorasExtrasTipos = map[string]string{
-	"50%diurno":       "E",
-	"100%diurno":      "F",
-	"50%nocturno":     "H",
-	"100%nocturno":    "I",
-	"feriadonocturno": "G",
-	"feriadodiurno":   "G",
-	"feriado":         "G",
+	"50%diurno":       "F",
+	"100%diurno":      "G",
+	"50%nocturno":     "I",
+	"100%nocturno":    "J",
+	"feriadonocturno": "H",
+	"feriadodiurno":   "H",
+	"feriado":         "H",
 }
 
 const (
