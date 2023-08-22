@@ -317,7 +317,7 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	if c.Query("comentarios") != "" {
 		busqueda["comentarios"] = bson.M{"$regex": c.Query("comentarios"), "$options": "im"}
 	}
-	if c.Query("cliente") != "" || c.Query("validos") != "" {
+	if c.Query("cliente") != "" {
 		busqueda["cliente"] = bson.M{"$regex": c.Query("cliente"), "$options": "im"}
 	}
 	if c.Query("estado") != "" {
@@ -336,10 +336,10 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 		busqueda["archivado"] = c.QueryBool("true")
 	}
 	if c.Query("validos") != "" {
-		gt100 := bson.E{Key: "cecos.codigo", Value: bson.D{{Key: "$gt", Value: 100}}}
+		gt100 := bson.D{{Key: "cecos.codigo", Value: bson.D{{Key: "$gt", Value: 100}}}}
 
-		clienteValido := bson.E{Key: "cliente", Value: bson.E{Key: "$not",Value: bson.E{Key: "$regex",Value: constantes.CecosNotValids}}}
-		elematch := bson.E{Key: "distribuciones", Value: bson.E{Key: "$elemMatch", Value: gt100}}
+		clienteValido := bson.D{{Key: "cliente", Value: bson.D{{Key: "$not",Value: bson.D{{Key: "$regex",Value: constantes.CecosNotValids}}}}}}
+		elematch := bson.D{{Key: "distribuciones", Value: bson.D{{Key: "$elemMatch", Value: gt100}}}}
 //{$or:[{cliente:{$not:{$regex: "(99999999999)"}}},{distribuciones:{$elemMatch:{"cecos.codigo":{$gt:100}}}}],cliente:{$exists:1}}
 		busqueda["$or"] = bson.A{clienteValido, elematch}
 	}
