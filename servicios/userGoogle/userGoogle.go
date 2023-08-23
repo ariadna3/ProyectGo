@@ -191,7 +191,7 @@ func ValidacionDeUsuarioPropio(obligatorioAdministrador bool, rolEsperado string
 		return errors.New("el usuario o token inexistente"), "401"
 	}
 
-	if obligatorioAdministrador && usuario.EsAdministrador == false {
+	if obligatorioAdministrador && !usuario.EsAdministrador {
 		return errors.New("el usuario no tiene permiso para esta acción, no es administrador"), "403"
 	}
 	if rolEsperado != "" {
@@ -260,7 +260,7 @@ func InsertUserITP(c *fiber.Ctx) error {
 	//obtiene los datos
 	var userITP UserITP
 	if err := c.BodyParser(&userITP); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
@@ -388,14 +388,14 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 			codigoError, _ := strconv.Atoi(email)
 			return c.Status(codigoError).SendString(err.Error())
 		}
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 
 	userITP := new(UserITP)
 	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
 	if err2 != nil {
-		return c.Status(404).SendString("usuario no encontrado")
+		return c.Status(fiber.StatusNotFound).SendString("usuario no encontrado")
 	}
 	filter := bson.D{{Key: "email", Value: email}}
 	update := bson.D{{Key: "$set", Value: bson.D{{Key: "token", Value: tokenString}}}}
@@ -413,7 +413,7 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	userITPWithRecursosData.Rol = userITP.Rol
 	idObjectHash, err := hashPassword(recurso.IdObject.Hex())
 	if err != nil {
-		return c.Status(401).SendString(err.Error())
+		return c.Status(fiber.StatusUnauthorized).SendString(err.Error())
 	}
 	userITPWithRecursosData.IdEncripted = idObjectHash
 	userITPWithRecursosData.IdSecuencial = recurso.IdRecurso
@@ -440,18 +440,18 @@ func GetUserITPAll(c *fiber.Ctx) error {
 			codigoError, _ := strconv.Atoi(codigo)
 			return c.Status(codigoError).SendString(err.Error())
 		}
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 
 	//obtener los usuarios
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var usuarios []UserITPSafe
 	if err = cursor.All(context.Background(), &usuarios); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	return c.Status(200).JSON(usuarios)
 }
@@ -489,7 +489,7 @@ func DeleteUserITP(c *fiber.Ctx) error {
 	emailDelete := c.Params("email")
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"email": emailDelete})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
 	return c.Status(200).SendString("usuario eliminado")
@@ -516,7 +516,7 @@ func UpdateUserITP(c *fiber.Ctx) error {
 	}
 	usuario := new(UserITP)
 	if err := c.BodyParser(usuario); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
 

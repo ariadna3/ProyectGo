@@ -8,20 +8,25 @@ const (
 	PeopleOperation  = "po"
 )
 
+const CecosNotValids = "(99999999999)"
+
 var AllRol string = ""
 
 const FormatoFecha = "2006-02-01"
 
 const Database = "portalDeNovedades"
+const CollectionPasosWorkflow = "pasosWorkflow"
+const CollectionProveedor = "proveedores"
+const CollectionActividad = "actividades"
+const CollectionNovedad = "novedades"
+const CollectionRecurso = "recursos"
+const CollectionUserITP = "usersITP"
+const CollectionCecos = "centroDeCostos"
 
 const (
-	CollectionPasosWorkflow = "pasosWorkflow"
-	CollectionProveedor     = "proveedores"
-	CollectionActividad     = "actividades"
-	CollectionNovedad       = "novedades"
-	CollectionRecurso       = "recursos"
-	CollectionUserITP       = "usersITP"
-	CollectionCecos         = "centroDeCostos"
+	SheetGeneral    = "General"
+	SheetHorasExtra = "Horas extra"
+	SheetLicencias  = "Licencias"
 )
 
 const (

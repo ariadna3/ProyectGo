@@ -9,19 +9,20 @@ import (
 	"strings"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
-
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/proyectoNovedades/servicios/constantes"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/userGoogle"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var client *mongo.Client
+var novedad novedades.Novedades
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
 	client = clientMongo
@@ -31,6 +32,7 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 // Crear excel
 func GetExcelFile(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
+
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.PeopleOperation)
 	if error != nil {
@@ -38,6 +40,9 @@ func GetExcelFile(c *fiber.Ctx) error {
 	}
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+
 	// {$and: [{descripcion:{$exists:1}}, {descripcion:{$ne:""}}, {usuario:{$exists:1}},{usuario:{$ne: ""}}]}
 	usuarioExist := bson.D{{Key: "usuario", Value: bson.M{"$exists": 1}}}
 	usuarioNotEmpty := bson.D{{Key: "usuario", Value: bson.M{"$ne": ""}}}
@@ -48,21 +53,22 @@ func GetExcelFile(c *fiber.Ctx) error {
 	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado}}
 	opts := options.Find().SetSort(bson.D{{Key: "descripcion", Value: 1}, {Key: "usuario", Value: 1}})
 
-	cursor, err := coll.Find(context.TODO(), filter, opts)
+	cursor, err = coll.Find(context.TODO(), filter, opts)
+
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var novedades []novedades.Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	err = datosExcel(novedades)
+
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
 	}
-
-	return c.Status(fiber.StatusOK).SendFile(os.Getenv("EXCEL_FILE"))
+	return c.SendFile(os.Getenv("EXCEL_FILE"))
 }
 
 // ingresar datos a un excel
@@ -127,7 +133,6 @@ func datosExcel(novedadesArr []novedades.Novedades) error {
 		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
 		return err
 	}
-
 	return nil
 }
 

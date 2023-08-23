@@ -212,6 +212,7 @@ func main() {
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 		app.Post("/Recurso/Package", recursos.InsertRecursoPackage)
 		app.Patch("/Recurso/:id/*", recursos.UpdateRecurso)
+		app.Put("/Recurso", recursos.PutRecurso)
 		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser

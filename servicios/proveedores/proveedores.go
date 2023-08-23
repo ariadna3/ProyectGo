@@ -56,7 +56,7 @@ func InsertProveedor(c *fiber.Ctx) error {
 	// obtencion de datos
 	proveedor := new(Proveedores)
 	if err := c.BodyParser(proveedor); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
 	// obtiene el ultimo id
@@ -84,7 +84,7 @@ func InsertProveedor(c *fiber.Ctx) error {
 	// inserta el proveedor
 	result, err := coll.InsertOne(context.TODO(), proveedor)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
 	return c.Status(200).JSON(proveedor)
@@ -103,7 +103,7 @@ func InsertProveedoresPackage(c *fiber.Ctx) error {
 	//obtencion de datos
 	packageProveedores := new(PackageOfProveedores)
 	if err := c.BodyParser(packageProveedores); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 	fmt.Print("obtencion de datos ")
 	fmt.Println(packageProveedores)
@@ -125,11 +125,11 @@ func GetProveedor(c *fiber.Ctx) error {
 	cursor, err := coll.Find(context.TODO(), bson.M{"idProveedor": idNumber})
 	fmt.Println(coll)
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var proveedor []Proveedores
 	if err = cursor.All(context.Background(), &proveedor); err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	return c.Status(200).JSON(proveedor)
 }
@@ -146,11 +146,11 @@ func GetProveedorAll(c *fiber.Ctx) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	var proveedor []Proveedores
 	if err = cursor.All(context.Background(), &proveedor); err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 
 	return c.Status(200).JSON(proveedor)
@@ -169,9 +169,12 @@ func DeleteProveedor(c *fiber.Ctx) error {
 	idNumber, _ := strconv.Atoi(c.Params("id"))
 	result, err := coll.DeleteOne(context.TODO(), bson.M{"idProveedor": idNumber})
 	if err != nil {
-		return c.Status(404).SendString(err.Error())
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	if result.DeletedCount == 0 {
+		return c.Status(fiber.StatusNotFound).SendString("No se encontro ningun usuario")
+	}
 	return c.Status(200).SendString("proveedor eliminado")
 }
 
