@@ -396,7 +396,7 @@ func PutRecurso(c *fiber.Ctx) error {
 
 	//Ingresa el recurso
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
-	eliminarRecursoLegajo(recurso.Legajo)
+	eliminarRecurso(recurso.Mail)
 	result, err := coll.InsertOne(context.TODO(), recurso)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString(err.Error())
