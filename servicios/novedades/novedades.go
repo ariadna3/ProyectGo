@@ -338,9 +338,9 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 	if c.Query("validos") != "" {
 		gt100 := bson.D{{Key: "cecos.codigo", Value: bson.D{{Key: "$gt", Value: 100}}}}
 
-		clienteValido := bson.D{{Key: "cliente", Value: bson.D{{Key: "$not",Value: bson.D{{Key: "$regex",Value: constantes.CecosNotValids}}}}}}
+		clienteValido := bson.D{{Key: "cliente", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$regex", Value: constantes.CecosNotValids}}}}}, {Key: "cliente", Value: bson.D{{Key: "$exists", Value: 1}, {Key: "$ne", Value: ""}}}}
 		elematch := bson.D{{Key: "distribuciones", Value: bson.D{{Key: "$elemMatch", Value: gt100}}}}
-//{$or:[{cliente:{$not:{$regex: "(99999999999)"}}},{distribuciones:{$elemMatch:{"cecos.codigo":{$gt:100}}}}],cliente:{$exists:1}}
+		//{$or:[{cliente:{$not:{$regex: "(99999999999)"}}},{distribuciones:{$elemMatch:{"cecos.codigo":{$gt:100}}}}],cliente:{$exists:1}}
 		busqueda["$or"] = bson.A{clienteValido, elematch}
 	}
 	if c.Query("estadoWF") != "" {
