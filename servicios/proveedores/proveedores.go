@@ -172,6 +172,9 @@ func DeleteProveedor(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	if result.DeletedCount == 0 {
+		return c.Status(fiber.StatusNotFound).SendString("No se encontro ningun usuario")
+	}
 	return c.Status(200).SendString("proveedor eliminado")
 }
 
