@@ -216,7 +216,31 @@ func GetRecurso(c *fiber.Ctx) error {
 	return c.Status(200).JSON(recurso)
 }
 
-// obtener todos los recursos del mismo centro de costos
+// obtener los empleados de un gerente
+func GetRecursosEmployeeOfAManager(c *fiber.Ctx) error {
+	fmt.Println("Employees of a manager")
+	// validar el token
+	error, codigo, email := userGoogle.Authorization(c.Get("Authorization"), adminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	var recurso RecursosWithID
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "mail", Value: email}}).Decode(&recurso)
+	if err != nil {
+		fmt.Print(err)
+		return c.Status(fiber.StatusNotFound).SendString("No encontrado")
+	}
+	listaSetEmpleados := agregarEmpleados(strconv.Itoa(recurso.Legajo), make(map[string]Recursos))
+	var listaEmpleados []Recursos
+	for _, empleado := range listaSetEmpleados {
+		listaEmpleados = append(listaEmpleados, empleado)
+	}
+	return c.JSON(listaEmpleados)
+}
+
+// obtener todos los recursos del gerente
 func GetRecursoSameManager(c *fiber.Ctx) error {
 
 	fmt.Println("withSameManager")
@@ -604,4 +628,40 @@ func ingresarPaqueteDeRecursos(paqueteDeRecursos PackageOfRecursos) {
 		// terminar ejecucion del recurso actual y avisar
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedIDs...)
+}
+
+func obtenerEmpleadosDeUnGerente(gerente string) map[string]Recursos {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+
+	//Obtiene el ultimo Id
+	filter := bson.D{{Key: "gerente", Value: gerente},{Key: "gerente", Value: bson.D{{Key: "$exists", Value: 1}}}, {Key: "gerente", Value: bson.D{{Key: "$ne", Value: ""}}}}
+	opts := options.Find().SetSort(bson.D{{Key: "idRecurso", Value: -1}})
+
+	cursor, _ := coll.Find(context.TODO(), filter, opts)
+
+	var results []Recursos
+	cursor.All(context.TODO(), &results)
+	var legajosEmpleados = make(map[string]Recursos)
+	for _, recurso := range(results){
+		legajosEmpleados[strconv.Itoa(recurso.Legajo)] = recurso
+	}
+	return legajosEmpleados
+}
+
+func agregarEmpleados(gerente string, listaEmpleadosCompleta map[string]Recursos) (map[string]Recursos) {
+	listaEmpleados := obtenerEmpleadosDeUnGerente(gerente)
+	for key, value := range listaEmpleadosCompleta {
+		listaEmpleados[key] = value
+	}
+	if len(listaEmpleados) == len(listaEmpleadosCompleta) {
+		return listaEmpleados
+	} else {
+		for empleado, _ := range obtenerEmpleadosDeUnGerente(gerente) {
+			nuevaListaEmpleados := agregarEmpleados(empleado, listaEmpleados)
+			for nuevoEmpleadoKey, nuevoEmpleadoValue := range nuevaListaEmpleados {
+				listaEmpleados[nuevoEmpleadoKey] = nuevoEmpleadoValue
+			}
+		}
+	}
+	return listaEmpleados
 }

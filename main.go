@@ -209,6 +209,7 @@ func main() {
 		app.Get("/Recurso/*", recursos.GetRecursoFilter)
 		app.Get("/RecursoFiltered", recursos.GetRecursoSameManager)
 		app.Get("/RecursoFiltered/Cecos", recursos.GetRecursoSameCecos)
+		app.Get("/RecursoFiltered/Manager", recursos.GetRecursosEmployeeOfAManager)
 		app.Delete("/Recurso/:id", recursos.DeleteRecurso)
 		app.Post("/Recurso/Package", recursos.InsertRecursoPackage)
 		app.Patch("/Recurso/:id/*", recursos.UpdateRecurso)
