@@ -834,9 +834,21 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 
 	//comprueba que el usuario sea el autorizado
 	aprobador := novedad.Workflow[len(novedad.Workflow)-1].Aprobador
-	err, _, _ = userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
 
-	if strconv.Itoa(recurso.Legajo) != aprobador && err != nil {
+	//1- comprobacion por grupo
+	errGrupo, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
+
+	//2- comprobacion por soporte
+	comprobacionSop := false
+	if os.Getenv("APROVE_ROL") != ""{
+		errSop, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, os.Getenv("APROVE_ROL"))
+		if errSop == nil {
+			comprobacionSop = (aprobador == recurso.Gerente)
+		}
+	}
+	
+
+	if strconv.Itoa(recurso.Legajo) != aprobador && errGrupo != nil && !comprobacionSop {
 		return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
 	}
 
@@ -896,8 +908,19 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 
 	//comprueba que el usuario sea el autorizado
 	aprobador := novedad.Workflow[len(novedad.Workflow)-1].Aprobador
-	err, _, _ = userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
-	if strconv.Itoa(recurso.Legajo) != aprobador && err != nil {
+	//1- comprobacion por grupo
+	errGrupo, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
+
+	//2- comprobacion por soporte
+	comprobacionSop := false
+	if os.Getenv("APROVE_ROL") != ""{
+		errSop, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, os.Getenv("APROVE_ROL"))
+		if errSop == nil {
+			comprobacionSop = (aprobador == recurso.Gerente)
+		}
+	}
+
+	if strconv.Itoa(recurso.Legajo) != aprobador && errGrupo != nil && !comprobacionSop {
 		return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
 	}
 
