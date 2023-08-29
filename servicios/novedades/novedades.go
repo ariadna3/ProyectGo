@@ -355,16 +355,30 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusNotFound).SendString("Gerente no encontrado")
 		}
 		if c.Query("estadoWF") == "all" {
+			soporte := bson.D{{Key: "aprobador", Value: recurso.Gerente}}
 			mail := bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}}
 			grupo := bson.D{{Key: "aprobador", Value: usuario.Rol}}
 			orTodo := bson.D{{Key: "$or", Value: bson.A{mail, grupo}}}
+			if (os.Getenv("APROVE_ROL") != ""){
+				errorSop, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, os.Getenv("APROVE_ROL"))
+				if errorSop == nil {
+					orTodo = bson.D{{Key: "$or", Value: bson.A{mail, grupo, soporte}}}
+				}
+			}
 
 			busqueda["workflow"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
 		} else {
 			estadoWFRegex := bson.M{"$regex": c.Query("estadoWF"), "$options": "im"}
 			andMail := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}}
 			andGrupo := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: estadoWFRegex}}}}}
+			andSoporte := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: recurso.Gerente}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}}
 			orTodo := bson.D{{Key: "$or", Value: bson.A{andMail, andGrupo}}}
+			if (os.Getenv("APROVE_ROL") != ""){
+				errorSop, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, os.Getenv("APROVE_ROL"))
+				if errorSop == nil {
+					orTodo = bson.D{{Key: "$or", Value: bson.A{andMail, andGrupo, andSoporte}}}
+				}
+			}
 
 			busqueda["workflow"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
 		}
@@ -834,9 +848,21 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 
 	//comprueba que el usuario sea el autorizado
 	aprobador := novedad.Workflow[len(novedad.Workflow)-1].Aprobador
-	err, _, _ = userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
 
-	if strconv.Itoa(recurso.Legajo) != aprobador && err != nil {
+	//1- comprobacion por grupo
+	errGrupo, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
+
+	//2- comprobacion por soporte
+	comprobacionSop := false
+	if os.Getenv("APROVE_ROL") != ""{
+		errSop, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, os.Getenv("APROVE_ROL"))
+		if errSop == nil {
+			comprobacionSop = (aprobador == recurso.Gerente)
+		}
+	}
+	
+
+	if strconv.Itoa(recurso.Legajo) != aprobador && errGrupo != nil && !comprobacionSop {
 		return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
 	}
 
@@ -896,8 +922,19 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 
 	//comprueba que el usuario sea el autorizado
 	aprobador := novedad.Workflow[len(novedad.Workflow)-1].Aprobador
-	err, _, _ = userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
-	if strconv.Itoa(recurso.Legajo) != aprobador && err != nil {
+	//1- comprobacion por grupo
+	errGrupo, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, aprobador)
+
+	//2- comprobacion por soporte
+	comprobacionSop := false
+	if os.Getenv("APROVE_ROL") != ""{
+		errSop, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, os.Getenv("APROVE_ROL"))
+		if errSop == nil {
+			comprobacionSop = (aprobador == recurso.Gerente)
+		}
+	}
+
+	if strconv.Itoa(recurso.Legajo) != aprobador && errGrupo != nil && !comprobacionSop {
 		return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
 	}
 
