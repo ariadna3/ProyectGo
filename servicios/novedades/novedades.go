@@ -355,30 +355,59 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusNotFound).SendString("Gerente no encontrado")
 		}
 		if c.Query("estadoWF") == "all" {
-			soporte := bson.D{{Key: "aprobador", Value: recurso.Gerente}}
-			mail := bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}}
-			grupo := bson.D{{Key: "aprobador", Value: usuario.Rol}}
-			orTodo := bson.D{{Key: "$or", Value: bson.A{mail, grupo}}}
-			if (os.Getenv("APROVE_ROL") != ""){
+			responsables := bson.A{}
+			var orTodo bson.D = bson.D{}
+			if c.Query("responsableWF") != ""{
+				responsablesArray := strings.Split(c.Query("responsableWF"), "|")
+				if contieneElArray(responsablesArray, "soporte"){
+					responsables = append(responsables, bson.D{{Key: "aprobador", Value: recurso.Gerente}})
+				}
+				if contieneElArray(responsablesArray, "gerente"){
+					responsables = append(responsables, bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}})
+				}
+				if contieneElArray(responsablesArray, "grupo"){
+					responsables = append(responsables, bson.D{{Key: "aprobador", Value: usuario.Rol}})
+				}
+			} else {
+				soporte := bson.D{{Key: "aprobador", Value: recurso.Gerente}}
+				mail := bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}}
+				grupo := bson.D{{Key: "aprobador", Value: usuario.Rol}}
 				errorSop, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, os.Getenv("APROVE_ROL"))
+				responsables = bson.A{mail, grupo}
 				if errorSop == nil {
-					orTodo = bson.D{{Key: "$or", Value: bson.A{mail, grupo, soporte}}}
+					responsables = bson.A{mail, grupo, soporte}
 				}
 			}
+			
+			orTodo = bson.D{{Key: "$or", Value: responsables}}
 
 			busqueda["workflow"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
 		} else {
 			estadoWFRegex := bson.M{"$regex": c.Query("estadoWF"), "$options": "im"}
-			andMail := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}}
-			andGrupo := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: estadoWFRegex}}}}}
-			andSoporte := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: recurso.Gerente}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}}
-			orTodo := bson.D{{Key: "$or", Value: bson.A{andMail, andGrupo}}}
-			if (os.Getenv("APROVE_ROL") != ""){
+			responsables := bson.A{}
+			if c.Query("responsableWF") != ""{
+				responsablesArray := strings.Split(c.Query("responsableWF"), "|")
+				if contieneElArray(responsablesArray, "soporte"){
+					responsables = append(responsables, bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: recurso.Gerente}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}})
+				}
+				if contieneElArray(responsablesArray, "gerente"){
+					responsables = append(responsables, bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}})
+				}
+				if contieneElArray(responsablesArray, "grupo"){
+					responsables = append(responsables, bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: estadoWFRegex}}}}})
+				}
+			} else {
+				andMail := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}}
+				andGrupo := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: estadoWFRegex}}}}}
+				andSoporte := bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: recurso.Gerente}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}}
 				errorSop, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, os.Getenv("APROVE_ROL"))
+				responsables = bson.A{andMail, andGrupo}
 				if errorSop == nil {
-					orTodo = bson.D{{Key: "$or", Value: bson.A{andMail, andGrupo, andSoporte}}}
+					responsables = bson.A{andMail, andGrupo, andSoporte}
 				}
 			}
+			
+			orTodo := bson.D{{Key: "$or", Value: responsables}}
 
 			busqueda["workflow"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
 		}
@@ -1315,4 +1344,13 @@ func ingresarPaqueteDeCecos(paqueteDeCecos PackageOfCecos) {
 		// terminar ejecucion del recurso actual y avisar
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedIDs...)
+}
+
+func contieneElArray(arrayBuscador []string, buscado string) bool{
+	for _, encontrado := range arrayBuscador {
+		if encontrado == buscado {
+			return true
+		}
+	}
+	return false
 }
