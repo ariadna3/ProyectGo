@@ -81,8 +81,8 @@ type Cecos struct {
 // fecha de ingreso
 func GetFecha(c *fiber.Ctx) error {
 	var fecha []string
-	currentTime := time.Now()
-	for i := 12; i >= 0; i-- {
+	currentTime := time.Now().AddDate(0, 1, 0)
+	for i := 24; i >= 0; i-- {
 		anio := strconv.Itoa(currentTime.Year())
 		mes := strconv.Itoa(int(currentTime.Month()))
 		fecha = append(fecha, mes+"-"+anio)
@@ -634,7 +634,7 @@ func obtenerEmpleadosDeUnGerente(gerente string) map[string]Recursos {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 
 	//Obtiene el ultimo Id
-	filter := bson.D{{Key: "gerente", Value: gerente},{Key: "gerente", Value: bson.D{{Key: "$exists", Value: 1}}}, {Key: "gerente", Value: bson.D{{Key: "$ne", Value: ""}}}}
+	filter := bson.D{{Key: "gerente", Value: gerente}, {Key: "gerente", Value: bson.D{{Key: "$exists", Value: 1}}}, {Key: "gerente", Value: bson.D{{Key: "$ne", Value: ""}}}}
 	opts := options.Find().SetSort(bson.D{{Key: "idRecurso", Value: -1}})
 
 	cursor, _ := coll.Find(context.TODO(), filter, opts)
@@ -642,13 +642,13 @@ func obtenerEmpleadosDeUnGerente(gerente string) map[string]Recursos {
 	var results []Recursos
 	cursor.All(context.TODO(), &results)
 	var legajosEmpleados = make(map[string]Recursos)
-	for _, recurso := range(results){
+	for _, recurso := range results {
 		legajosEmpleados[strconv.Itoa(recurso.Legajo)] = recurso
 	}
 	return legajosEmpleados
 }
 
-func agregarEmpleados(gerente string, listaEmpleadosCompleta map[string]Recursos) (map[string]Recursos) {
+func agregarEmpleados(gerente string, listaEmpleadosCompleta map[string]Recursos) map[string]Recursos {
 	listaEmpleados := obtenerEmpleadosDeUnGerente(gerente)
 	for key, value := range listaEmpleadosCompleta {
 		listaEmpleados[key] = value
