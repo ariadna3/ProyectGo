@@ -13,6 +13,7 @@ const CecosNotValids = "(99999999999)"
 var AllRol string = ""
 
 const FormatoFecha = "2006-02-01"
+const FormatoFechaProvicional = "2006-01-02"
 
 const Database = "portalDeNovedades"
 const CollectionPasosWorkflow = "pasosWorkflow"

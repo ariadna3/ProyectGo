@@ -247,52 +247,6 @@
 					"response": []
 				},
 				{
-					"name": "GetNovedadPendientes",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "Dis",
-									"value": "",
-									"type": "default"
-								}
-							],
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/Pendiente/Novedad",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"Pendiente",
-								"Novedad"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "GetFiltro",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -730,13 +684,24 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/Excel/Novedad",
+							"raw": "{{url}}/Excel/Novedad/?fechaDesde=2023-07-13&fechaHasta=2024-08-21",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Excel",
-								"Novedad"
+								"Novedad",
+								""
+							],
+							"query": [
+								{
+									"key": "fechaDesde",
+									"value": "2023-07-13"
+								},
+								{
+									"key": "fechaHasta",
+									"value": "2024-08-21"
+								}
 							]
 						}
 					},
@@ -1021,6 +986,46 @@
 					"response": []
 				},
 				{
+					"name": "GetRecurso Copy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Recurso/425",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Recurso",
+								"425"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GetRecursoFilter",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -1145,7 +1150,7 @@
 					"response": []
 				},
 				{
-					"name": "GetRecursoHash",
+					"name": "GetRecursoEmployeeOfAManager",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -1172,12 +1177,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/HashRecurso/30",
+							"raw": "{{url}}/RecursoFilted/30",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"HashRecurso",
+								"RecursoFilted",
 								"30"
 							]
 						}

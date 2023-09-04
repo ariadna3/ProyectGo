@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/gofiber/fiber/v2"
@@ -63,7 +64,7 @@ func GetExcelFile(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
-	err = datosExcel(novedades)
+	err = datosExcel(novedades, c.Query("fechaDesde"), c.Query("fechaHasta"))
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
@@ -72,7 +73,7 @@ func GetExcelFile(c *fiber.Ctx) error {
 }
 
 // ingresar datos a un excel
-func datosExcel(novedadesArr []novedades.Novedades) error {
+func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta string) error {
 
 	// Abrir archivo de excel
 	os.Remove("EXCEL_FILE")
@@ -86,6 +87,9 @@ func datosExcel(novedadesArr []novedades.Novedades) error {
 	var rowLicencias int = 3
 
 	for _, item := range novedadesArr {
+		if !verificacionNovedad(item, fechaDesde, fechaHasta){
+			continue
+		}
 		var pasosWorkflow novedades.PasosWorkflow
 		coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
 		err := coll.FindOne(context.TODO(), bson.M{"tipo": item.Descripcion}).Decode(&pasosWorkflow)
@@ -382,4 +386,32 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaLicencias, "F2", "DIAS")
 
 	return nil
+}
+
+func verificacionNovedad(novedad novedades.Novedades, fechaDesde string, fechaHasta string) bool {
+	if novedad.Fecha != ""{
+		fechaNovedad, err := time.Parse(constantes.FormatoFechaProvicional, novedad.Fecha)
+		if err != nil {
+			return false
+		}
+		if fechaDesde != ""{
+			fechaDesdeTime, err := time.Parse(constantes.FormatoFechaProvicional, fechaDesde)
+			if err != nil {
+				return false
+			}
+			if fechaDesdeTime.After(fechaNovedad) {
+				return false
+			}
+		}
+		if fechaHasta != ""{
+			fechaHastaTime, err := time.Parse(constantes.FormatoFechaProvicional, fechaHasta)
+			if err != nil {
+				return false
+			}
+			if fechaHastaTime.Before(fechaNovedad) {
+				return false
+			}
+		}
+	}
+	return true
 }
