@@ -1774,6 +1774,59 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete Archivo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Archivo",
+									"value": "portal de novedades.postman_collection.json",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/Archivos/Novedad/Adjuntos/93/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Archivos",
+								"Novedad",
+								"Adjuntos",
+								"93",
+								""
+							],
+							"query": [
+								{
+									"key": "archivo",
+									"value": "8j49rdpjarr51.webp",
+									"disabled": true
+								},
+								{
+									"key": "pos",
+									"value": "0",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
