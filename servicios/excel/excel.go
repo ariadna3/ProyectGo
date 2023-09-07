@@ -81,13 +81,15 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 	file.SetSheetName("Sheet1", constantes.PestanaGeneral)
 	file.NewSheet(constantes.PestanaHorasExtras)
 	file.NewSheet(constantes.PestanaLicencias)
+	file.NewSheet(constantes.PestanaNovedades)
 	initializeExcel(file)
 	var rowGeneral int = 3
 	var rowHorasExtras int = 3
 	var rowLicencias int = 3
+	var rowNovedades int = 3
 
 	for _, item := range novedadesArr {
-		if !verificacionNovedad(item, fechaDesde, fechaHasta){
+		if !verificacionNovedad(item, fechaDesde, fechaHasta) {
 			continue
 		}
 		var pasosWorkflow novedades.PasosWorkflow
@@ -129,6 +131,11 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 		if pasosWorkflow.TipoExcel == constantes.DescPagos {
 			pagos(file, item, &rowGeneral)
 		}
+		err = allNovedades(file, item, rowNovedades)
+		if err == nil {
+			rowNovedades = rowNovedades + 1
+		}
+
 	}
 
 	// guardar archivo
@@ -330,6 +337,20 @@ func pagos(file *excelize.File, novedad novedades.Novedades, row *int) error {
 	return nil
 }
 
+func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) error {
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
+	if err != nil {
+		return err
+	}
+
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("A%d", row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", row), recurso.Apellido)
+
+	return nil
+}
+
 func initializeExcel(file *excelize.File) error {
 	// General
 	// Unir celdas de general para sueldos y prestamos
@@ -385,16 +406,21 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaLicencias, "E2", "TIPO")
 	file.SetCellValue(constantes.PestanaLicencias, "F2", "DIAS")
 
+	// Todas las Novedades
+	file.SetCellValue(constantes.PestanaNovedades, "A2", "ID")
+	file.SetCellValue(constantes.PestanaNovedades, "B2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaNovedades, "C2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaNovedades, "D2", "APELLIDO")
 	return nil
 }
 
 func verificacionNovedad(novedad novedades.Novedades, fechaDesde string, fechaHasta string) bool {
-	if novedad.Fecha != ""{
+	if novedad.Fecha != "" {
 		fechaNovedad, err := time.Parse(constantes.FormatoFechaProvicional, novedad.Fecha)
 		if err != nil {
 			return false
 		}
-		if fechaDesde != ""{
+		if fechaDesde != "" {
 			fechaDesdeTime, err := time.Parse(constantes.FormatoFechaProvicional, fechaDesde)
 			if err != nil {
 				return false
@@ -403,7 +429,7 @@ func verificacionNovedad(novedad novedades.Novedades, fechaDesde string, fechaHa
 				return false
 			}
 		}
-		if fechaHasta != ""{
+		if fechaHasta != "" {
 			fechaHastaTime, err := time.Parse(constantes.FormatoFechaProvicional, fechaHasta)
 			if err != nil {
 				return false
