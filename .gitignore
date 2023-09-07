@@ -1,7 +1,7 @@
 .env
 archivosSubidos/
 email.txt
-.xlsx
+*.xlsx
 
 go.mod
 go.sum
