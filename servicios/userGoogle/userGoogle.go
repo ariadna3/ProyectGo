@@ -19,7 +19,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"golang.org/x/crypto/bcrypt"
 )
 
 const adminRequired = true
@@ -55,7 +54,6 @@ type UserITPWithRecursosData struct {
 	Email           string `bson:"email"`
 	EsAdministrador bool   `bson:"esAdministrador"`
 	Rol             string `bson:"rol"`
-	IdEncripted     string
 	IdSecuencial    int
 	Legajo          int
 }
@@ -208,11 +206,6 @@ func ValidacionDeUsuarioPropio(obligatorioAdministrador bool, rolEsperado string
 	}
 
 	return nil, usuario.Email
-}
-
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
 }
 
 func Authorization(authHeader string, administrationRequired bool, rolRequired string) (error, int, string) {
@@ -411,11 +404,6 @@ func GetSelfUserITP(c *fiber.Ctx) error {
 	userITPWithRecursosData.Email = email
 	userITPWithRecursosData.EsAdministrador = userITP.EsAdministrador
 	userITPWithRecursosData.Rol = userITP.Rol
-	idObjectHash, err := hashPassword(recurso.IdObject.Hex())
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).SendString(err.Error())
-	}
-	userITPWithRecursosData.IdEncripted = idObjectHash
 	userITPWithRecursosData.IdSecuencial = recurso.IdRecurso
 	userITPWithRecursosData.Legajo = recurso.Legajo
 
@@ -464,6 +452,24 @@ func GetInternUserITP(email string) (error, UserITP) {
 		return err, usuario
 	}
 	return nil, usuario
+}
+
+func GetPermisos(c *fiber.Ctx) error {
+	err, codigo, email := Authorization(c.Get("Authorization"), constantes.AdminRequired, constantes.AnyRol)
+	if err != nil {
+		return c.Status(codigo).SendString(err.Error())
+	}
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionUserITP)
+
+	userITP := new(UserITP)
+	err2 := coll.FindOne(context.TODO(), bson.M{"email": email}).Decode(&userITP)
+	if err2 != nil {
+		return c.Status(fiber.StatusNotFound).SendString("usuario no encontrado")
+	}
+	var dato = map[string][]int{
+		"roles": constantes.Permisos[userITP.Rol],
+	}
+	return c.JSON(dato)
 }
 
 func DeleteUserITP(c *fiber.Ctx) error {

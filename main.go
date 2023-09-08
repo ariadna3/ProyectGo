@@ -215,7 +215,6 @@ func main() {
 		app.Post("/Recurso/Package", recursos.InsertRecursoPackage)
 		app.Patch("/Recurso/:id/*", recursos.UpdateRecurso)
 		app.Put("/Recurso", recursos.PutRecurso)
-		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser
 		app.Post("/user", userGoogle.InsertUserITP)
@@ -224,6 +223,7 @@ func main() {
 		app.Delete("user/:email", userGoogle.DeleteUserITP)
 		app.Patch("/user", userGoogle.UpdateUserITP)
 		app.Get("/users", userGoogle.GetUserITPAll)
+		app.Get("/Permisos", userGoogle.GetPermisos)
 
 	} else {
 		fmt.Println("Problema al conectarse con mongo")
