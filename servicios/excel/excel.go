@@ -340,14 +340,35 @@ func pagos(file *excelize.File, novedad novedades.Novedades, row *int) error {
 
 func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) error {
 	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+
+	periodo := bson.D{{Key: "periodo", Value: bson.M{"$ne": constantes.Periodo}}}
+
+	filter := bson.M{"$and": bson.A{periodo}}
+
+	cursor, err := coll.Find(context.TODO(), filter)
+
+	fecha := bson.D{{Key: "fechaDesde", Value: bson.M{"$ne": novedad.FechaDesde}}, {Key: "fechaHasta", Value: bson.M{"$ne": novedad.FechaHasta}}}
+
+	filterR := bson.M{"$and": bson.A{fecha}}
+
+	cursor, err = coll.Find(context.TODO(), filterR)
+
+	var novedades []novedades.Novedades
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+	}
+
 	if err != nil {
 		return err
 	}
 
 	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("A%d", row), novedad.IdSecuencial)
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", row), novedad.Descripcion)
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", row), novedad.Fecha)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("E%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("F%d", row), novedad.Periodo)
 
 	return nil
 }
@@ -409,9 +430,11 @@ func initializeExcel(file *excelize.File) error {
 
 	// Todas las Novedades
 	file.SetCellValue(constantes.PestanaNovedades, "A2", "ID")
-	file.SetCellValue(constantes.PestanaNovedades, "B2", "NOVEDAD")
-	file.SetCellValue(constantes.PestanaNovedades, "C2", "NOMBRE")
-	file.SetCellValue(constantes.PestanaNovedades, "D2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaNovedades, "B2", "FECHA")
+	file.SetCellValue(constantes.PestanaNovedades, "C2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaNovedades, "D2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaNovedades, "E2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaNovedades, "F2", "PERIODO")
 	return nil
 }
 
