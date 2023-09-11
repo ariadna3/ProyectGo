@@ -344,9 +344,11 @@ func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) err
 	}
 
 	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("A%d", row), novedad.IdSecuencial)
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", row), novedad.Descripcion)
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", row), novedad.Fecha)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("E%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("F%d", row), novedad.Periodo)
 
 	return nil
 }
@@ -408,9 +410,11 @@ func initializeExcel(file *excelize.File) error {
 
 	// Todas las Novedades
 	file.SetCellValue(constantes.PestanaNovedades, "A2", "ID")
-	file.SetCellValue(constantes.PestanaNovedades, "B2", "NOVEDAD")
-	file.SetCellValue(constantes.PestanaNovedades, "C2", "NOMBRE")
-	file.SetCellValue(constantes.PestanaNovedades, "D2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaNovedades, "B2", "FECHA")
+	file.SetCellValue(constantes.PestanaNovedades, "C2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaNovedades, "D2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaNovedades, "E2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaNovedades, "F2", "PERIODO")
 	return nil
 }
 
