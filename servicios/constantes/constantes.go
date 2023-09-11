@@ -38,6 +38,11 @@ const (
 )
 
 const (
+	Periodo = "periodo"
+	Fecha   = "fecha"
+)
+
+const (
 	Pendiente = "pendiente"
 	Aceptada  = "aceptada"
 	Rechazada = "rechazada"
