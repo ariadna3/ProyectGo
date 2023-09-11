@@ -35,6 +35,8 @@ const (
 	PestanaLicencias   = "Licencias"
 	PestanaHorasExtras = "Horas extras"
 	PestanaNovedades   = "Novedades"
+	PestanaPagoProvedores   = "PProvedores"
+
 )
 
 const (

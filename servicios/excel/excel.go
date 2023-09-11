@@ -95,6 +95,7 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 		var pasosWorkflow novedades.PasosWorkflow
 		coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
 		err := coll.FindOne(context.TODO(), bson.M{"tipo": item.Descripcion}).Decode(&pasosWorkflow)
+		
 		if pasosWorkflow.TipoExcel == constantes.DescAnticipo {
 			err = anticipoPrestamo(file, item, rowGeneral, 1)
 			if err == nil {
@@ -440,4 +441,53 @@ func verificacionNovedad(novedad novedades.Novedades, fechaDesde string, fechaHa
 		}
 	}
 	return true
+}
+
+func GetExcelPP(c *fiber.Ctx) error {
+	fmt.Println("GetExcelFile")
+
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	var novedades []novedades.Novedades
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+
+	err := coll.FindOne(context.TODO(), bson.M{"tipo": "PP"}).Decode(&novedad)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString("novedad no encontrada")
+	}
+
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
+	}
+
+	err = ExcelPP(novedades, c.Query("fechaDesde"), c.Query("fechaHasta"))
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
+	}
+	return c.SendFile(os.Getenv("EXCEL_FILE"))
+}
+
+// ingresar datos a un excel
+func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta string) error {
+
+	// Abrir archivo de excel
+	os.Remove("EXCELPP_FILE")
+	file := excelize.NewFile()
+	file.SetSheetName("Sheet1", constantes.PestanaPagoProvedores)
+	initializeExcel(file)
+
+	// guardar archivo
+	err := file.SaveAs(os.Getenv("EXCELPP_FILE"))
+	if err != nil {
+		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
+		return err
+	}
+	return nil
 }
