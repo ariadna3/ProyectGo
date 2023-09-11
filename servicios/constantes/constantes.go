@@ -38,7 +38,8 @@ const (
 )
 
 const (
-	Periodo = "Periodo"
+	Periodo = "periodo"
+	Fecha   = "fecha"
 )
 
 const (

@@ -342,16 +342,20 @@ func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) err
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 
-	Periodo := bson.D{{Key: "periodo", Value: bson.M{"$ne": constantes.Periodo}}}
+	periodo := bson.D{{Key: "periodo", Value: bson.M{"$ne": constantes.Periodo}}}
 
-	filter := bson.M{"$and": bson.A{Periodo}}
-	// opts := options.Find().SetSort(bson.D{{Key: "mes", Value: 1}, {Key: "usuario", Value: 1}})
+	filter := bson.M{"$and": bson.A{periodo}}
 
 	cursor, err := coll.Find(context.TODO(), filter)
 
+	fecha := bson.D{{Key: "fechaDesde", Value: bson.M{"$ne": novedad.FechaDesde}}, {Key: "fechaHasta", Value: bson.M{"$ne": novedad.FechaHasta}}}
+
+	filterR := bson.M{"$and": bson.A{fecha}}
+
+	cursor, err = coll.Find(context.TODO(), filterR)
+
 	var novedades []novedades.Novedades
 	if err = cursor.All(context.Background(), &novedades); err != nil {
-		return err
 	}
 
 	if err != nil {
