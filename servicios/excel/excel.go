@@ -50,8 +50,9 @@ func GetExcelFile(c *fiber.Ctx) error {
 	descripcionExist := bson.D{{Key: "descripcion", Value: bson.M{"$exists": 1}}}
 	descripcionNotEmpty := bson.D{{Key: "descripcion", Value: bson.M{"$ne": ""}}}
 	EstadoNoRechazado := bson.D{{Key: "estado", Value: bson.M{"$ne": constantes.Rechazada}}}
+	periodo := bson.D{{Key: "periodo", Value: bson.M{"$exists": constantes.Periodo}}}
 
-	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado}}
+	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado, periodo}}
 	opts := options.Find().SetSort(bson.D{{Key: "descripcion", Value: 1}, {Key: "usuario", Value: 1}})
 
 	cursor, err = coll.Find(context.TODO(), filter, opts)
@@ -350,25 +351,6 @@ func pagos(file *excelize.File, novedad novedades.Novedades, row *int) error {
 
 func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) error {
 	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
-
-	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
-
-	periodo := bson.D{{Key: "periodo", Value: bson.M{"$ne": constantes.Periodo}}}
-
-	filter := bson.M{"$and": bson.A{periodo}}
-
-	cursor, err := coll.Find(context.TODO(), filter)
-
-	fecha := bson.D{{Key: "fechaDesde", Value: bson.M{"$ne": novedad.FechaDesde}}, {Key: "fechaHasta", Value: bson.M{"$ne": novedad.FechaHasta}}}
-
-	filterR := bson.M{"$and": bson.A{fecha}}
-
-	cursor, err = coll.Find(context.TODO(), filterR)
-
-	var novedades []novedades.Novedades
-	if err = cursor.All(context.Background(), &novedades); err != nil {
-	}
-
 	if err != nil {
 		return err
 	}
@@ -485,14 +467,13 @@ func GetExcelPP(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(error.Error())
 	}
 
-	var novedades []novedades.Novedades
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
-
 	err := coll.FindOne(context.TODO(), bson.M{"tipo": "PP"}).Decode(&novedad)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString("novedad no encontrada")
 	}
 
+	var novedades []novedades.Novedades
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	
 	if err = cursor.All(context.Background(), &novedades); err != nil {
@@ -511,7 +492,7 @@ func GetExcelPP(c *fiber.Ctx) error {
 func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta string) error {
 
 	// Abrir archivo de excel
-	os.Remove("EXCELPP_FILE")
+	os.Remove(os.Getenv("EXCELPP_FILE"))
 	file := excelize.NewFile()
 	file.SetSheetName("Sheet1", constantes.PestanaPagoProvedores)
 	initializeExcel(file)
