@@ -173,7 +173,8 @@ func main() {
 		app.Get("/Novedad/:id", novedades.GetNovedades)
 		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
-
+		
+		//Excel
 		app.Get("/Excel/Novedad/*", excel.GetExcelFile)
 		app.Get("/Excel/PagoProveedores/*", excel.GetExcelPP)
 

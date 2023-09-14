@@ -31,10 +31,10 @@ const (
 )
 
 const (
-	PestanaGeneral     = "General"
-	PestanaLicencias   = "Licencias"
-	PestanaHorasExtras = "Horas extras"
-	PestanaNovedades   = "Novedades"
+	PestanaGeneral    		= "General"
+	PestanaLicencias   		= "Licencias"
+	PestanaHorasExtras		= "Horas extras"
+	PestanaNovedades  		= "Novedades"
 	PestanaPagoProvedores   = "PProvedores"
 
 )
