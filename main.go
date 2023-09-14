@@ -175,7 +175,8 @@ func main() {
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
 		app.Get("/Excel/Novedad/*", excel.GetExcelFile)
-		app.Get("/Excel/PagoProvedores/", excel.GetExcelPP)
+		app.Get("/Excel/PagoProveedores/*", excel.GetExcelPP)
+
 
 		//Workflow novedad
 		app.Post("/Workflow", novedades.InsertWorkFlow)
