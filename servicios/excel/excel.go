@@ -476,6 +476,8 @@ func verificacionNovedad(novedad novedades.Novedades, fechaDesde string, fechaHa
 	return true
 }
 
+
+// Crear excel
 func GetExcelPP(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
 
@@ -486,6 +488,7 @@ func GetExcelPP(c *fiber.Ctx) error {
 	}
 
 	var novedades []novedades.Novedades
+
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 
 	err := coll.FindOne(context.TODO(), bson.M{"tipo": "PP"}).Decode(&novedad)
@@ -499,21 +502,26 @@ func GetExcelPP(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
+
 	err = ExcelPP(novedades, c.Query("fechaDesde"), c.Query("fechaHasta"))
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
 	}
-	return c.SendFile(os.Getenv("EXCEL_FILE"))
+
+	return c.SendFile(os.Getenv("EXCELPP_FILE"))
+
 }
 
 // ingresar datos a un excel
 func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta string) error {
 
 	// Abrir archivo de excel
-	os.Remove("EXCELPP_FILE")
+
+	os.Remove(os.Getenv("EXCELPP_FILE"))
 	file := excelize.NewFile()
 	file.SetSheetName("Sheet1", constantes.PestanaPagoProvedores)
+
 	initializeExcel(file)
 
 	// guardar archivo
@@ -523,4 +531,5 @@ func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta s
 		return err
 	}
 	return nil
+
 }
