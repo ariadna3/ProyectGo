@@ -16,6 +16,7 @@ import (
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/userGoogle"
+	"github.com/proyectoNovedades/servicios/proveedores"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -427,6 +428,15 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaNovedades, "D2", "NOMBRE")
 	file.SetCellValue(constantes.PestanaNovedades, "E2", "APELLIDO")
 	file.SetCellValue(constantes.PestanaNovedades, "F2", "PERIODO")
+	// Ingresar los nombres de las celdas en proveedores
+	file.SetCellValue(constantes.PestanaPagoProvedores, "A2", "FECHA")
+	file.SetCellValue(constantes.PestanaPagoProvedores, "B2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaPagoProvedores, "C2", "ESTADO")
+	file.SetCellValue(constantes.PestanaPagoProvedores, "D2", "PROVEEDOR")
+	file.SetCellValue(constantes.PestanaPagoProvedores, "E2", "COD PROV")
+	file.SetCellValue(constantes.PestanaPagoProvedores, "F2", "RAZON SOCIAL")
+	file.SetCellValue(constantes.PestanaPagoProvedores, "G2", "IMPORTE TOTAL")
+	file.SetCellValue(constantes.PestanaPagoProvedores, "H2", "PERIODO")
 	return nil
 }
 
@@ -462,7 +472,7 @@ func GetExcelPP(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.Admin)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -485,7 +495,7 @@ func GetExcelPP(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
 	}
-	return c.SendFile(os.Getenv("EXCEL_FILE"))
+	return c.SendFile(os.Getenv("EXCELPP_FILE"))
 }
 
 // ingresar datos a un excel
@@ -496,12 +506,46 @@ func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta s
 	file := excelize.NewFile()
 	file.SetSheetName("Sheet1", constantes.PestanaPagoProvedores)
 	initializeExcel(file)
+	var rowPagoProveedores int = 3
 
-	// guardar archivo
-	err := file.SaveAs(os.Getenv("EXCELPP_FILE"))
-	if err != nil {
-		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
-		return err
+	for _, item := range novedadesArr {
+		if !verificacionNovedad(item, fechaDesde, fechaHasta) {
+			continue
+		}
+		var pasosWorkflow novedades.PasosWorkflow
+		coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
+		err := coll.FindOne(context.TODO(), bson.M{"tipo": item.Descripcion}).Decode(&pasosWorkflow)
+		err = pagoProveedores(file, item, &rowPagoProveedores)
+		if err == nil {
+			rowPagoProveedores ++
+		}
 	}
+			// guardar archivo
+		err := file.SaveAs(os.Getenv("EXCELPP_FILE"))
+		if err != nil {
+			log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
+			return err
+		}
+		return nil
+		
+}
+
+func pagoProveedores(file *excelize.File, novedad novedades.Novedades, row *int) error {
+	err, proveedor := proveedores.obtenerProveedores()
+    if err != nil {
+        // Maneja el error si es necesario
+        return err
+    }
+	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("A%d", *row), novedad.Fecha)
+	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("B%d", *row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("C%d", *row), novedad.Estado)
+	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("D%d", *row), novedad.Proveedor)
+	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("E%d", *row), proveedor.CodProv)
+	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("F%d", *row), proveedor.RazonSocial)
+	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("G%d", *row), novedad.ImporteTotal)
+	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("F%d", *row), novedad.Usuario)
+	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("G%d", *row), novedad.Comentarios)
+	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("H%d", *row), novedad.Periodo)
+
 	return nil
 }
