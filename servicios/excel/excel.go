@@ -14,6 +14,7 @@ import (
 
 	"github.com/proyectoNovedades/servicios/constantes"
 	"github.com/proyectoNovedades/servicios/novedades"
+	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/userGoogle"
 
@@ -24,6 +25,7 @@ import (
 
 var client *mongo.Client
 var novedad novedades.Novedades
+var proveedor proveedores.Proveedores
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
 	client = clientMongo
@@ -435,7 +437,9 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaPagoProvedores, "E2", "COD PROV")
 	file.SetCellValue(constantes.PestanaPagoProvedores, "F2", "RAZON SOCIAL")
 	file.SetCellValue(constantes.PestanaPagoProvedores, "G2", "IMPORTE TOTAL")
-	file.SetCellValue(constantes.PestanaPagoProvedores, "H2", "PERIODO")
+	file.SetCellValue(constantes.PestanaPagoProvedores, "H2", "USUARIO")
+	file.SetCellValue(constantes.PestanaPagoProvedores, "I2", "COMENTARIOS")
+	file.SetCellValue(constantes.PestanaPagoProvedores, "J2", "PERIODO")
 	return nil
 }
 
@@ -467,17 +471,17 @@ func verificacionNovedad(novedad novedades.Novedades, fechaDesde string, fechaHa
 	return true
 }
 
-/*func GetExcelPP(c *fiber.Ctx) error {
+func GetExcelPP(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
 
 	// validar el token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.Admin)
-	if error != nil {
-		return c.Status(codigo).SendString(error.Error())
+	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if err != nil {
+		return c.Status(codigo).SendString(err.Error())
 	}
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
-	err := coll.FindOne(context.TODO(), bson.M{"tipo": "PP"}).Decode(&novedad)
+	err = coll.FindOne(context.TODO(), bson.M{"tipo": "PP"}).Decode(&novedad)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString("novedad no encontrada")
 	}
@@ -494,6 +498,7 @@ func verificacionNovedad(novedad novedades.Novedades, fechaDesde string, fechaHa
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
 	}
+
 	return c.SendFile(os.Getenv("EXCELPP_FILE"))
 }
 
@@ -506,7 +511,6 @@ func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta s
 	file.SetSheetName("Sheet1", constantes.PestanaPagoProvedores)
 	initializeExcel(file)
 	var rowPagoProveedores int = 3
-
 	for _, item := range novedadesArr {
 		if !verificacionNovedad(item, fechaDesde, fechaHasta) {
 			continue
@@ -514,37 +518,45 @@ func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta s
 		var pasosWorkflow novedades.PasosWorkflow
 		coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
 		err := coll.FindOne(context.TODO(), bson.M{"tipo": item.Descripcion}).Decode(&pasosWorkflow)
-		err = pagoProveedores(file, item, &rowPagoProveedores)
+		err = pagoProveedores(file, item, rowPagoProveedores)
 		if err == nil {
 			rowPagoProveedores ++
 		}
-	}
+	}	
 			// guardar archivo
-		err := file.SaveAs(os.Getenv("EXCELPP_FILE"))
-		if err != nil {
-			log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
-			return err
-		}
+		if err := file.SaveAs(os.Getenv("EXCELPP_FILE")); err != nil {
+		log.Printf("No se pudo guardar el archivo de Excel: %s", err.Error())
+		return err
+	}
 		return nil
 		
 }
 
-func pagoProveedores(file *excelize.File, novedad novedades.Novedades, row *int) error {
-	err, proveedor := proveedores.obtenerProveedores()
+func pagoProveedores(file *excelize.File, novedad novedades.Novedades, row int) error {
+    proveedor, err := proveedores.ObtenerProveedores(0, 0, novedad.Proveedor)
     if err != nil {
         // Maneja el error si es necesario
         return err
     }
-	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("A%d", *row), novedad.Fecha)
-	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("B%d", *row), novedad.IdSecuencial)
-	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("C%d", *row), novedad.Estado)
-	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("D%d", *row), novedad.Proveedor)
-	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("E%d", *row), proveedor.CodProv)
-	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("F%d", *row), proveedor.RazonSocial)
-	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("G%d", *row), novedad.ImporteTotal)
-	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("F%d", *row), novedad.Usuario)
-	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("G%d", *row), novedad.Comentarios)
-	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("H%d", *row), novedad.Periodo)
 
-	return nil
-}*/
+    cellMappings := map[string]interface{}{
+        fmt.Sprintf("A%d", row): novedad.Fecha,
+        fmt.Sprintf("B%d", row): novedad.IdSecuencial,
+        fmt.Sprintf("C%d", row): novedad.Estado,
+        fmt.Sprintf("D%d", row): novedad.Proveedor,
+        fmt.Sprintf("E%d", row): proveedor.CodProv,
+        fmt.Sprintf("F%d", row): proveedor.RazonSocial,
+        fmt.Sprintf("G%d", row): novedad.ImporteTotal,
+        fmt.Sprintf("H%d", row): novedad.Usuario,
+        fmt.Sprintf("I%d", row): novedad.Comentarios,
+        fmt.Sprintf("J%d", row): novedad.Periodo,
+    }
+
+    for cell, value := range cellMappings {
+        file.SetCellValue(constantes.PestanaPagoProvedores, cell, value)
+    }
+
+    return nil
+}
+
+
