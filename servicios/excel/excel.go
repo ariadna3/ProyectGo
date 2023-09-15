@@ -16,7 +16,6 @@ import (
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/userGoogle"
-	"github.com/proyectoNovedades/servicios/proveedores"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -468,7 +467,7 @@ func verificacionNovedad(novedad novedades.Novedades, fechaDesde string, fechaHa
 	return true
 }
 
-func GetExcelPP(c *fiber.Ctx) error {
+/*func GetExcelPP(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
 
 	// validar el token
@@ -548,4 +547,4 @@ func pagoProveedores(file *excelize.File, novedad novedades.Novedades, row *int)
 	file.SetCellValue(constantes.PestanaPagoProvedores, fmt.Sprintf("H%d", *row), novedad.Periodo)
 
 	return nil
-}
+}*/

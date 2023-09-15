@@ -248,6 +248,6 @@ func ingresarPaqueteDeProveedores(paqueteDeProveedores PackageOfProveedores) {
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedIDs...)
 }
 
-func obtenerProveedores(razonSocial string) error {
+/*func obtenerProveedores(razonSocial string) error {
 
-}
+}*/
