@@ -178,7 +178,7 @@ func main() {
 		app.Get("/Excel/Novedad/*", excel.GetExcelFile)
 		app.Get("/Excel/PagoProveedores/*", excel.GetExcelPP)
 
-    //Workflow novedad
+   		//Workflow novedad
 		app.Post("/Workflow", novedades.InsertWorkFlow)
 		app.Get("/Aprobar/Novedad/:id", novedades.AprobarWorkflow)
 		app.Get("/Rechazar/Novedad/:id", novedades.RechazarWorkflow)
