@@ -2,6 +2,7 @@
 archivosSubidos/
 email.txt
 *.xlsx
+*.bat
 
 go.mod
 go.sum
