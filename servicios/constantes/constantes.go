@@ -31,12 +31,11 @@ const (
 )
 
 const (
-	PestanaGeneral    		= "General"
-	PestanaLicencias   		= "Licencias"
-	PestanaHorasExtras		= "Horas extras"
-	PestanaNovedades  		= "Novedades"
-	PestanaPagoProvedores   = "PProvedores"
-
+	PestanaGeneral        = "General"
+	PestanaLicencias      = "Licencias"
+	PestanaHorasExtras    = "Horas extras"
+	PestanaNovedades      = "Novedades"
+	PestanaPagoProvedores = "PProvedores"
 )
 
 const (
@@ -73,6 +72,23 @@ var HorasExtrasTipos = map[string]string{
 	"feriadonocturno": "H",
 	"feriadodiurno":   "H",
 	"feriado":         "H",
+}
+
+var Permisos = map[string][]int{
+	"admin":           []int{1, 2, 3},
+	"po":              []int{1, 2, 3},
+	"servicios":       []int{1, 2, 3},
+	"ta":              []int{1, 2, 3},
+	"comercial":       []int{1, 2, 3},
+	"comunicaciones":  []int{1, 2, 3},
+	"marketing":       []int{1, 2, 3},
+	"externos":        []int{1, 2, 3},
+	"board":           []int{1, 2, 3},
+	"sustentabilidad": []int{1, 2, 3},
+	"cultura":         []int{1, 2, 3},
+	"comercialSop":    []int{1, 2, 3},
+	"serviciosSop":    []int{1, 2, 3},
+	"":                []int{1, 2, 3},
 }
 
 const (

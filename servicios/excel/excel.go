@@ -471,6 +471,8 @@ func verificacionNovedad(novedad novedades.Novedades, fechaDesde string, fechaHa
 	return true
 }
 
+// Crear excel
+
 func GetExcelPP(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
 
@@ -482,11 +484,13 @@ func GetExcelPP(c *fiber.Ctx) error {
 
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
 	err = coll.FindOne(context.TODO(), bson.M{"tipo": "PP"}).Decode(&novedad)
+
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString("novedad no encontrada")
 	}
 
 	var novedades []novedades.Novedades
+
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	
 	if err = cursor.All(context.Background(), &novedades); err != nil {
@@ -558,5 +562,3 @@ func pagoProveedores(file *excelize.File, novedad novedades.Novedades, row int) 
 
     return nil
 }
-
-
