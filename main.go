@@ -173,12 +173,12 @@ func main() {
 		app.Get("/Novedad/:id", novedades.GetNovedades)
 		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
-		
+
 		//Excel
-		app.Get("/Excel/Novedad/*", excel.GetExcelFile)
+		app.Get("/Excel/Novedad", excel.GetExcelFile)
 		app.Get("/Excel/PagoProveedores/*", excel.GetExcelPP)
 
-   		//Workflow novedad
+		//Workflow novedad
 		app.Post("/Workflow", novedades.InsertWorkFlow)
 		app.Get("/Aprobar/Novedad/:id", novedades.AprobarWorkflow)
 		app.Get("/Rechazar/Novedad/:id", novedades.RechazarWorkflow)
@@ -217,6 +217,7 @@ func main() {
 		app.Post("/Recurso/Package", recursos.InsertRecursoPackage)
 		app.Patch("/Recurso/:id/*", recursos.UpdateRecurso)
 		app.Put("/Recurso", recursos.PutRecurso)
+		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
 
 		//GoogleUser
 		app.Post("/user", userGoogle.InsertUserITP)
@@ -225,7 +226,6 @@ func main() {
 		app.Delete("user/:email", userGoogle.DeleteUserITP)
 		app.Patch("/user", userGoogle.UpdateUserITP)
 		app.Get("/users", userGoogle.GetUserITPAll)
-		app.Get("/Permisos", userGoogle.GetPermisos)
 
 	} else {
 		fmt.Println("Problema al conectarse con mongo")
