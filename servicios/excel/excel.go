@@ -98,7 +98,7 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 		var pasosWorkflow novedades.PasosWorkflow
 		coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
 		err := coll.FindOne(context.TODO(), bson.M{"tipo": item.Descripcion}).Decode(&pasosWorkflow)
-		
+
 		if pasosWorkflow.TipoExcel == constantes.DescAnticipo {
 			err = anticipoPrestamo(file, item, rowGeneral, 1)
 			if err == nil {
@@ -470,7 +470,6 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaNuevoCeco, "G2", "IMPORTE TARJETA")
 	file.SetCellValue(constantes.PestanaNuevoCeco, "H2", "PERIODO")
 
-	
 	return nil
 }
 
@@ -523,7 +522,7 @@ func GetExcelPP(c *fiber.Ctx) error {
 	var novedades []novedades.Novedades
 
 	cursor, err := coll.Find(context.TODO(), bson.M{})
-	
+
 	if err = cursor.All(context.Background(), &novedades); err != nil {
 		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
@@ -555,43 +554,43 @@ func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta s
 		err := coll.FindOne(context.TODO(), bson.M{"tipo": item.Descripcion}).Decode(&pasosWorkflow)
 		err = pagoProveedores(file, item, rowPagoProveedores)
 		if err == nil {
-			rowPagoProveedores ++
+			rowPagoProveedores++
 		}
-	}	
-			// guardar archivo
-		if err := file.SaveAs(os.Getenv("EXCELPP_FILE")); err != nil {
+	}
+	// guardar archivo
+	if err := file.SaveAs(os.Getenv("EXCELPP_FILE")); err != nil {
 		log.Printf("No se pudo guardar el archivo de Excel: %s", err.Error())
 		return err
 	}
-		return nil
-		
+	return nil
+
 }
 
 func pagoProveedores(file *excelize.File, novedad novedades.Novedades, row int) error {
-    proveedor, err := proveedores.ObtenerProveedores(0, 0, novedad.Proveedor)
-    if err != nil {
-        // Maneja el error si es necesario
-        return err
-    }
+	proveedor, err := proveedores.ObtenerProveedores(0, 0, novedad.Proveedor)
+	if err != nil {
+		// Maneja el error si es necesario
+		return err
+	}
 
-    cellMappings := map[string]interface{}{
-        fmt.Sprintf("A%d", row): novedad.Fecha,
-        fmt.Sprintf("B%d", row): novedad.IdSecuencial,
-        fmt.Sprintf("C%d", row): novedad.Estado,
-        fmt.Sprintf("D%d", row): novedad.Proveedor,
-        fmt.Sprintf("E%d", row): proveedor.CodProv,
-        fmt.Sprintf("F%d", row): proveedor.RazonSocial,
-        fmt.Sprintf("G%d", row): novedad.ImporteTotal,
-        fmt.Sprintf("H%d", row): novedad.Usuario,
-        fmt.Sprintf("I%d", row): novedad.Comentarios,
-        fmt.Sprintf("J%d", row): novedad.Periodo,
-    }
+	cellMappings := map[string]interface{}{
+		fmt.Sprintf("A%d", row): novedad.Fecha,
+		fmt.Sprintf("B%d", row): novedad.IdSecuencial,
+		fmt.Sprintf("C%d", row): novedad.Estado,
+		fmt.Sprintf("D%d", row): novedad.Proveedor,
+		fmt.Sprintf("E%d", row): proveedor.CodProv,
+		fmt.Sprintf("F%d", row): proveedor.RazonSocial,
+		fmt.Sprintf("G%d", row): novedad.ImporteTotal,
+		fmt.Sprintf("H%d", row): novedad.Usuario,
+		fmt.Sprintf("I%d", row): novedad.Comentarios,
+		fmt.Sprintf("J%d", row): novedad.Periodo,
+	}
 
-    for cell, value := range cellMappings {
-        file.SetCellValue(constantes.PestanaPagoProvedores, cell, value)
-    }
+	for cell, value := range cellMappings {
+		file.SetCellValue(constantes.PestanaPagoProvedores, cell, value)
+	}
 
-    return nil
+	return nil
 }
 func GetExcelAdmin(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
@@ -611,10 +610,14 @@ func GetExcelAdmin(c *fiber.Ctx) error {
 	descripcionExist := bson.D{{Key: "descripcion", Value: bson.M{"$exists": 1}}}
 	descripcionNotEmpty := bson.D{{Key: "descripcion", Value: bson.M{"$ne": ""}}}
 	EstadoNoRechazado := bson.D{{Key: "estado", Value: bson.M{"$ne": constantes.Rechazada}}}
-	periodo := bson.D{{Key: "periodo", Value: bson.M{"$exists": 1}}}
 
-	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado, periodo}}
+	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado}}
 	opts := options.Find().SetSort(bson.D{{Key: "descripcion", Value: 1}, {Key: "usuario", Value: 1}})
+
+	if c.Query("periodo") != "" {
+		periodo := bson.D{{Key: "periodo", Value: c.Query("periodo")}}
+		filter = bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado, periodo}}
+	}
 
 	cursor, err = coll.Find(context.TODO(), filter, opts)
 	if err != nil {
@@ -656,7 +659,7 @@ func excelAdmin(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 		var pasosWorkflow novedades.PasosWorkflow
 		coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
 		err := coll.FindOne(context.TODO(), bson.M{"tipo": item.Descripcion}).Decode(&pasosWorkflow)
-		
+
 		if pasosWorkflow.TipoExcel == constantes.FactServicios {
 			err = factServicios(file, item, rowFactServicios)
 			if err == nil {
@@ -696,48 +699,6 @@ func factServicios(file *excelize.File, novedad novedades.Novedades, row int) er
 	if err != nil {
 		return err
 	}
-		cellMappings := map[string]interface{}{
-		fmt.Sprintf("A%d", row): novedad.Fecha,
-		fmt.Sprintf("B%d", row): novedad.IdSecuencial,
-		fmt.Sprintf("C%d", row): novedad.Descripcion,
-		fmt.Sprintf("D%d", row): recurso.Legajo,
-		fmt.Sprintf("E%d", row): recurso.Nombre,
-		fmt.Sprintf("F%d", row): recurso.Apellido,
-		fmt.Sprintf("N%d", row): novedad.ImporteTotal,
-		fmt.Sprintf("P%d", row): novedad.Periodo,
-	}	
-	for cell, value := range cellMappings {
-        file.SetCellValue(constantes.PestanaFactServicios, cell, value)
-    }
-	return nil
-}
- func rendCostos(file *excelize.File, novedad novedades.Novedades, row int) error {
-	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
-	if err != nil {
-		return err
-	}
-		cellMappings := map[string]interface{}{
-		fmt.Sprintf("A%d", row): novedad.Fecha,
-		fmt.Sprintf("B%d", row): novedad.IdSecuencial,
-		fmt.Sprintf("C%d", row): novedad.Descripcion,
-		fmt.Sprintf("D%d", row): recurso.Legajo,
-		fmt.Sprintf("E%d", row): recurso.Nombre,
-		fmt.Sprintf("F%d", row): recurso.Apellido,
-		fmt.Sprintf("N%d", row): novedad.ImporteTotal,
-		fmt.Sprintf("P%d", row): novedad.Periodo,
-		}
-	for cell, value := range cellMappings {
-        file.SetCellValue(constantes.PestanaRendCostos, cell, value)
-    }
-
-	return nil
-}
- func nuevoCeco(file *excelize.File, novedad novedades.Novedades, row int) error {
-	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
-	if err != nil {
-		return err
-	}
-	
 	cellMappings := map[string]interface{}{
 		fmt.Sprintf("A%d", row): novedad.Fecha,
 		fmt.Sprintf("B%d", row): novedad.IdSecuencial,
@@ -747,10 +708,52 @@ func factServicios(file *excelize.File, novedad novedades.Novedades, row int) er
 		fmt.Sprintf("F%d", row): recurso.Apellido,
 		fmt.Sprintf("N%d", row): novedad.ImporteTotal,
 		fmt.Sprintf("P%d", row): novedad.Periodo,
-		}
+	}
 	for cell, value := range cellMappings {
-        file.SetCellValue(constantes.PestanaNuevoCeco, cell, value)
-    }
+		file.SetCellValue(constantes.PestanaFactServicios, cell, value)
+	}
+	return nil
+}
+func rendCostos(file *excelize.File, novedad novedades.Novedades, row int) error {
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
+	if err != nil {
+		return err
+	}
+	cellMappings := map[string]interface{}{
+		fmt.Sprintf("A%d", row): novedad.Fecha,
+		fmt.Sprintf("B%d", row): novedad.IdSecuencial,
+		fmt.Sprintf("C%d", row): novedad.Descripcion,
+		fmt.Sprintf("D%d", row): recurso.Legajo,
+		fmt.Sprintf("E%d", row): recurso.Nombre,
+		fmt.Sprintf("F%d", row): recurso.Apellido,
+		fmt.Sprintf("N%d", row): novedad.ImporteTotal,
+		fmt.Sprintf("P%d", row): novedad.Periodo,
+	}
+	for cell, value := range cellMappings {
+		file.SetCellValue(constantes.PestanaRendCostos, cell, value)
+	}
+
+	return nil
+}
+func nuevoCeco(file *excelize.File, novedad novedades.Novedades, row int) error {
+	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
+	if err != nil {
+		return err
+	}
+
+	cellMappings := map[string]interface{}{
+		fmt.Sprintf("A%d", row): novedad.Fecha,
+		fmt.Sprintf("B%d", row): novedad.IdSecuencial,
+		fmt.Sprintf("C%d", row): novedad.Descripcion,
+		fmt.Sprintf("D%d", row): recurso.Legajo,
+		fmt.Sprintf("E%d", row): recurso.Nombre,
+		fmt.Sprintf("F%d", row): recurso.Apellido,
+		fmt.Sprintf("N%d", row): novedad.ImporteTotal,
+		fmt.Sprintf("P%d", row): novedad.Periodo,
+	}
+	for cell, value := range cellMappings {
+		file.SetCellValue(constantes.PestanaNuevoCeco, cell, value)
+	}
 
 	return nil
 }
