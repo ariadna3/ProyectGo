@@ -52,10 +52,14 @@ func GetExcelFile(c *fiber.Ctx) error {
 	descripcionExist := bson.D{{Key: "descripcion", Value: bson.M{"$exists": 1}}}
 	descripcionNotEmpty := bson.D{{Key: "descripcion", Value: bson.M{"$ne": ""}}}
 	EstadoNoRechazado := bson.D{{Key: "estado", Value: bson.M{"$ne": constantes.Rechazada}}}
-	periodo := bson.D{{Key: "periodo", Value: bson.M{"$exists": constantes.Periodo}}}
 
-	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado, periodo}}
+	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado}}
 	opts := options.Find().SetSort(bson.D{{Key: "descripcion", Value: 1}, {Key: "usuario", Value: 1}})
+
+	if c.Query("periodo") != "" {
+		periodo := bson.D{{Key: "periodo", Value: c.Query("periodo")}}
+		filter = bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado, periodo}}
+	}
 
 	cursor, err = coll.Find(context.TODO(), filter, opts)
 
@@ -353,18 +357,19 @@ func pagos(file *excelize.File, novedad novedades.Novedades, row *int) error {
 
 func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) error {
 	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
+
 	if err != nil {
 		return err
-
-		file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("A%d", row), novedad.Fecha)
-		file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
-		file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", row), novedad.Descripcion)
-		file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", row), recurso.Nombre)
-		file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("E%d", row), recurso.Apellido)
-		file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("F%d", row), novedad.Periodo)
-
-		return nil
 	}
+
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("A%d", row), novedad.Fecha)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("E%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("F%d", row), novedad.Periodo)
+
+	return nil
 }
 
 func initializeExcel(file *excelize.File) error {
