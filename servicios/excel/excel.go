@@ -339,7 +339,7 @@ func pagos(file *excelize.File, novedad novedades.Novedades, row *int) error {
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), recurso.Apellido)
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("G%d", *row), novedad.ImporteTotal)
 			if strings.Contains(novedad.Descripcion, "retroactivo") {
-				file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("G%d", *row), "SI")
+				file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("H%d", *row), "SI")
 			}
 			*row = *row + 1
 		}
@@ -440,7 +440,36 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaPagoProvedores, "H2", "USUARIO")
 	file.SetCellValue(constantes.PestanaPagoProvedores, "I2", "COMENTARIOS")
 	file.SetCellValue(constantes.PestanaPagoProvedores, "J2", "PERIODO")
-	// Ingresar los nombres de las celdas en proveedores
+	// Ingresar los nombres de las celdas en facturacion de servicios
+	file.SetCellValue(constantes.PestanaFactServicios, "A2", "FECHA")
+	file.SetCellValue(constantes.PestanaFactServicios, "B2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaFactServicios, "C2", "TIPO DE NOVEDAD")
+	file.SetCellValue(constantes.PestanaFactServicios, "D2", "LEGAJO")
+	file.SetCellValue(constantes.PestanaFactServicios, "E2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaFactServicios, "F2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaFactServicios, "G2", "IMPORTE TARJETA")
+	file.SetCellValue(constantes.PestanaFactServicios, "H2", "PERIODO")
+
+	// Ingresar los nombres de las celdas en rendicion de costos
+	file.SetCellValue(constantes.PestanaRendCostos, "A2", "FECHA")
+	file.SetCellValue(constantes.PestanaRendCostos, "B2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaRendCostos, "C2", "TIPO DE NOVEDAD")
+	file.SetCellValue(constantes.PestanaRendCostos, "D2", "LEGAJO")
+	file.SetCellValue(constantes.PestanaRendCostos, "E2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaRendCostos, "F2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaRendCostos, "G2", "IMPORTE TARJETA")
+	file.SetCellValue(constantes.PestanaRendCostos, "H2", "PERIODO")
+
+	// Ingresar los nombres de las celdas en nuevo ceco
+	file.SetCellValue(constantes.PestanaNuevoCeco, "A2", "FECHA")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "B2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "C2", "TIPO DE NOVEDAD")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "D2", "LEGAJO")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "E2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "F2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "G2", "IMPORTE TARJETA")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "H2", "PERIODO")
+
 	
 	return nil
 }
