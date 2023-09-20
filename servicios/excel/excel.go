@@ -571,32 +571,6 @@ func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta s
 
 }
 
-func pagoProveedores(file *excelize.File, novedad novedades.Novedades, row int) error {
-	proveedor, err := proveedores.ObtenerProveedores(0, 0, novedad.Proveedor)
-	if err != nil {
-		// Maneja el error si es necesario
-		return err
-	}
-
-	cellMappings := map[string]interface{}{
-		fmt.Sprintf("A%d", row): novedad.Fecha,
-		fmt.Sprintf("B%d", row): novedad.IdSecuencial,
-		fmt.Sprintf("C%d", row): novedad.Estado,
-		fmt.Sprintf("D%d", row): novedad.Proveedor,
-		fmt.Sprintf("E%d", row): proveedor.CodProv,
-		fmt.Sprintf("F%d", row): proveedor.RazonSocial,
-		fmt.Sprintf("G%d", row): novedad.ImporteTotal,
-		fmt.Sprintf("H%d", row): novedad.Usuario,
-		fmt.Sprintf("I%d", row): novedad.Comentarios,
-		fmt.Sprintf("J%d", row): novedad.Periodo,
-	}
-
-	for cell, value := range cellMappings {
-		file.SetCellValue(constantes.PestanaPagoProvedores, cell, value)
-	}
-
-	return nil
-}
 func GetExcelAdmin(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
 
