@@ -1,8 +1,10 @@
 {
 	"info": {
-		"_postman_id": "c26f90a5-2fe5-4973-b0d3-490cfeb11d7d",
+		"_postman_id": "e4407f17-b204-4400-80c5-92985adfbc5c",
 		"name": "portal de novedades",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6631533",
+		"_collection_link": "https://lively-comet-798410.postman.co/workspace/Trabajo~67b715c2-b873-4078-90da-d16754eef985/collection/6631533-e4407f17-b204-4400-80c5-92985adfbc5c?action=share&source=collection_link&creator=6631533"
 	},
 	"item": [
 		{
@@ -187,12 +189,7 @@
 									"value": "",
 									"type": "default"
 								}
-							],
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{url}}/Novedad/639",
@@ -266,12 +263,7 @@
 						"header": [],
 						"body": {
 							"mode": "formdata",
-							"formdata": [],
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"formdata": []
 						},
 						"url": {
 							"raw": "{{url}}/Novedad/?estadoWF=aceptada",
@@ -564,12 +556,7 @@
 									"value": "",
 									"type": "default"
 								}
-							],
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{url}}/Aprobar/Novedad/639",
@@ -611,12 +598,7 @@
 									"value": "",
 									"type": "default"
 								}
-							],
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{url}}/Rechazar/Novedad/639",
@@ -701,6 +683,41 @@
 								{
 									"key": "fechaHasta",
 									"value": "2024-08-21"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetExcelAdministracion",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Excel/Admin/?periodo=04-2023",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Excel",
+								"Admin",
+								""
+							],
+							"query": [
+								{
+									"key": "periodo",
+									"value": "04-2023"
 								}
 							]
 						}
@@ -1512,12 +1529,7 @@
 									"value": "true",
 									"type": "default"
 								}
-							],
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{url}}/user",

@@ -31,6 +31,13 @@ const (
 )
 
 const (
+<<<<<<< HEAD
+	PestanaGeneral        = "General"
+	PestanaLicencias      = "Licencias"
+	PestanaHorasExtras    = "Horas extras"
+	PestanaNovedades      = "Novedades"
+	PestanaPagoProvedores = "PProvedores"
+=======
 	PestanaGeneral    		= "General"
 	PestanaLicencias   		= "Licencias"
 	PestanaHorasExtras		= "Horas extras"
@@ -40,6 +47,7 @@ const (
 	PestanaRendCostos 		= "Rendicion de costos"
 	PestanaNuevoCeco	    = "Nuevo cecos"
 	PestanaFactHorasExtras	= "Fact. de Horas extras"
+>>>>>>> feature/ExcelT
 )
 
 const (
