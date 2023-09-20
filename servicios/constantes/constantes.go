@@ -37,7 +37,7 @@ const (
 	PestanaNovedades  		= "Novedades"
 	PestanaPagoProvedores   = "PProvedores"
 	PestanaFactServicios	= "Fact. de Servicios"
-	PestanaRendCostos 		= "Rendicion de costos"
+	PestanaRendGastos 		= "Rendicion de gastos"
 	PestanaNuevoCeco	    = "Nuevo cecos"
 	PestanaFactHorasExtras	= "Fact. de Horas extras"
 )
@@ -67,8 +67,8 @@ const (
 	DescLicencia          = "Licencia"
 	DescPagos             = "Pagos"
 	FactServicios		  = "Facturacion de serivicio" 
-	RendCostos			  = "Rendicion de costo"
-	nuevoCeco			  = "Nuevo ceco"
+	RendGastos			  = "Rendicion de gastos"
+	NuevoCeco			  = "Nuevo ceco"
 )
 
 var HorasExtrasTipos = map[string]string{

@@ -445,26 +445,56 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaPagoProvedores, "H2", "USUARIO")
 	file.SetCellValue(constantes.PestanaPagoProvedores, "I2", "COMENTARIOS")
 	file.SetCellValue(constantes.PestanaPagoProvedores, "J2", "PERIODO")
-	// Ingresar los nombres de las celdas en facturacion de servicios
+	// Facturacion de servicios
+	// Unir celdas de Facturacion de servicios
+	file.MergeCell(constantes.PestanaFactServicios, "D1", "F1")
+	file.MergeCell(constantes.PestanaFactServicios, "H1", "L1")
+	// Ingresar los nombres de las celdas de Facturacion de servicios
 	file.SetCellValue(constantes.PestanaFactServicios, "A2", "FECHA")
 	file.SetCellValue(constantes.PestanaFactServicios, "B2", "NOVEDAD")
 	file.SetCellValue(constantes.PestanaFactServicios, "C2", "TIPO DE NOVEDAD")
 	file.SetCellValue(constantes.PestanaFactServicios, "D2", "LEGAJO")
 	file.SetCellValue(constantes.PestanaFactServicios, "E2", "NOMBRE")
 	file.SetCellValue(constantes.PestanaFactServicios, "F2", "APELLIDO")
-	file.SetCellValue(constantes.PestanaFactServicios, "G2", "IMPORTE TARJETA")
-	file.SetCellValue(constantes.PestanaFactServicios, "H2", "PERIODO")
-
-	// Ingresar los nombres de las celdas en rendicion de costos
-	file.SetCellValue(constantes.PestanaRendCostos, "A2", "FECHA")
-	file.SetCellValue(constantes.PestanaRendCostos, "B2", "NOVEDAD")
-	file.SetCellValue(constantes.PestanaRendCostos, "C2", "TIPO DE NOVEDAD")
-	file.SetCellValue(constantes.PestanaRendCostos, "D2", "LEGAJO")
-	file.SetCellValue(constantes.PestanaRendCostos, "E2", "NOMBRE")
-	file.SetCellValue(constantes.PestanaRendCostos, "F2", "APELLIDO")
-	file.SetCellValue(constantes.PestanaRendCostos, "G2", "IMPORTE TARJETA")
-	file.SetCellValue(constantes.PestanaRendCostos, "H2", "PERIODO")
-
+	file.SetCellValue(constantes.PestanaFactServicios, "G2", "CLIENTE")
+	file.SetCellValue(constantes.PestanaFactServicios, "H2", "CONCEPTO")
+	file.SetCellValue(constantes.PestanaFactServicios, "I2", "PERIODO")
+	file.SetCellValue(constantes.PestanaFactServicios, "J2", "IMPORTE TOTAL")
+	file.SetCellValue(constantes.PestanaFactServicios, "K2", "ESTADO")
+	file.SetCellValue(constantes.PestanaFactServicios, "L2", "MOTIVO")
+	file.SetCellValue(constantes.PestanaFactServicios, "M2", "PROVEEDOR")
+	file.SetCellValue(constantes.PestanaFactServicios, "N2", "COMENTARIOS")
+	file.SetCellValue(constantes.PestanaFactServicios, "D1", "USUARIO")
+	file.SetCellValue(constantes.PestanaFactServicios, "H1", "CONCEPTO DE FACTURACIÓN")
+	// Rendicion de gastos
+	// Unir celdas de Rendicion de gastos
+	file.MergeCell(constantes.PestanaRendGastos, "D1", "F1")
+	file.MergeCell(constantes.PestanaRendGastos, "G1", "H1")
+	file.MergeCell(constantes.PestanaRendGastos, "I1", "M1")
+	// Ingresar los nombres de las celdas de Rendicion de gastos
+	file.SetCellValue(constantes.PestanaRendGastos, "A2", "FECHA")
+	file.SetCellValue(constantes.PestanaRendGastos, "B2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaRendGastos, "C2", "TIPO DE NOVEDAD")
+	file.SetCellValue(constantes.PestanaRendGastos, "D2", "LEGAJO")
+	file.SetCellValue(constantes.PestanaRendGastos, "E2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaRendGastos, "F2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaRendGastos, "G2", "PROVEEDOR")
+	file.SetCellValue(constantes.PestanaRendGastos, "H2", "CONTACTO")
+	file.SetCellValue(constantes.PestanaRendGastos, "I2", "CONCEPTO")
+	file.SetCellValue(constantes.PestanaRendGastos, "J2", "PERIODO")
+	file.SetCellValue(constantes.PestanaRendGastos, "K2", "IMPORTE TOTAL")
+	file.SetCellValue(constantes.PestanaRendGastos, "L2", "ESTADO")
+	file.SetCellValue(constantes.PestanaRendGastos, "M2", "PRIORIDAD")
+	file.SetCellValue(constantes.PestanaRendGastos, "N2", "CLIENTE")
+	file.SetCellValue(constantes.PestanaRendGastos, "O2", "COMENTARIOS")
+	file.SetCellValue(constantes.PestanaRendGastos, "D1", "USUARIO")
+	file.SetCellValue(constantes.PestanaRendGastos, "G1", "PROVEEDOR")
+	file.SetCellValue(constantes.PestanaRendGastos, "I1", "CONCEPTO DE FACTURACIÓN")
+	// Centro de costos
+	// Unir celdas de centros de costos
+	file.MergeCell(constantes.PestanaNuevoCeco, "D1", "F1")
+	file.MergeCell(constantes.PestanaNuevoCeco, "G1", "H1")
+	file.MergeCell(constantes.PestanaNuevoCeco, "I1", "M1")
 	// Ingresar los nombres de las celdas en nuevo ceco
 	file.SetCellValue(constantes.PestanaNuevoCeco, "A2", "FECHA")
 	file.SetCellValue(constantes.PestanaNuevoCeco, "B2", "NOVEDAD")
@@ -472,8 +502,18 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaNuevoCeco, "D2", "LEGAJO")
 	file.SetCellValue(constantes.PestanaNuevoCeco, "E2", "NOMBRE")
 	file.SetCellValue(constantes.PestanaNuevoCeco, "F2", "APELLIDO")
-	file.SetCellValue(constantes.PestanaNuevoCeco, "G2", "IMPORTE TARJETA")
-	file.SetCellValue(constantes.PestanaNuevoCeco, "H2", "PERIODO")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "G2", "PROVEEDOR")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "H2", "CONTACTO")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "I2", "CONCEPTO")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "J2", "PERIODO")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "K2", "IMPORTE TOTAL")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "L2", "ESTADO")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "M2", "PRIORIDAD")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "N2", "CLIENTE")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "O2", "COMENTARIOS")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "D1", "USUARIO")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "G1", "PROVEEDOR")
+	file.SetCellValue(constantes.PestanaNuevoCeco, "I1", "CONCEPTO DE FACTURACIÓN")
 
 	return nil
 }
@@ -621,12 +661,12 @@ func excelAdmin(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 	os.Remove(os.Getenv("EXCEL_FILE_ADMIN"))
 	file := excelize.NewFile()
 	file.SetSheetName("Sheet1", constantes.PestanaFactServicios)
-	file.NewSheet(constantes.PestanaRendCostos)
+	file.NewSheet(constantes.PestanaRendGastos)
 	file.NewSheet(constantes.PestanaNuevoCeco)
 	file.NewSheet(constantes.PestanaHorasExtras)
 	initializeExcel(file)
 	var rowFactServicios int = 3
-	var rowRendCostos int = 3
+	var rowRendGastos int = 3
 	var rowNuevoCeco int = 3
 	var rowHorasExtras int = 3
 
@@ -644,10 +684,10 @@ func excelAdmin(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 				rowFactServicios++
 			}
 		}
-		if pasosWorkflow.TipoExcel == constantes.RendCostos {
-			err = rendCostos(file, item, rowRendCostos)
+		if pasosWorkflow.TipoExcel == constantes.RendGastos {
+			err = rendGastos(file, item, rowRendGastos)
 			if err == nil {
-				rowRendCostos++
+				rowRendGastos++
 			}
 		}
 		if pasosWorkflow.TipoExcel == constantes.DescHorasExtras {
@@ -683,15 +723,21 @@ func factServicios(file *excelize.File, novedad novedades.Novedades, row int) er
 		fmt.Sprintf("D%d", row): recurso.Legajo,
 		fmt.Sprintf("E%d", row): recurso.Nombre,
 		fmt.Sprintf("F%d", row): recurso.Apellido,
-		fmt.Sprintf("N%d", row): novedad.ImporteTotal,
+		fmt.Sprintf("N%d", row): novedad.Cliente,
+		fmt.Sprintf("P%d", row): novedad.ConceptoDeFacturacion,
 		fmt.Sprintf("P%d", row): novedad.Periodo,
+		fmt.Sprintf("N%d", row): novedad.ImporteTotal,
+		fmt.Sprintf("P%d", row): novedad.Estado,
+		fmt.Sprintf("N%d", row): novedad.Motivo,
+		fmt.Sprintf("P%d", row): novedad.Proveedor,
+		fmt.Sprintf("P%d", row): novedad.Comentarios,
 	}
 	for cell, value := range cellMappings {
 		file.SetCellValue(constantes.PestanaFactServicios, cell, value)
 	}
 	return nil
 }
-func rendCostos(file *excelize.File, novedad novedades.Novedades, row int) error {
+func rendGastos(file *excelize.File, novedad novedades.Novedades, row int) error {
 	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
 		return err
@@ -703,11 +749,18 @@ func rendCostos(file *excelize.File, novedad novedades.Novedades, row int) error
 		fmt.Sprintf("D%d", row): recurso.Legajo,
 		fmt.Sprintf("E%d", row): recurso.Nombre,
 		fmt.Sprintf("F%d", row): recurso.Apellido,
-		fmt.Sprintf("N%d", row): novedad.ImporteTotal,
-		fmt.Sprintf("P%d", row): novedad.Periodo,
+		fmt.Sprintf("G%d", row): novedad.Proveedor,
+		fmt.Sprintf("H%d", row): novedad.Contacto,
+		fmt.Sprintf("I%d", row): novedad.ConceptoDeFacturacion,
+		fmt.Sprintf("J%d", row): novedad.Periodo,
+		fmt.Sprintf("K%d", row): novedad.ImporteTotal,
+		fmt.Sprintf("L%d", row): novedad.Estado,
+		fmt.Sprintf("M%d", row): novedad.Prioridad,
+		fmt.Sprintf("N%d", row): novedad.Cliente,
+		fmt.Sprintf("O%d", row): novedad.Comentarios,
 	}
 	for cell, value := range cellMappings {
-		file.SetCellValue(constantes.PestanaRendCostos, cell, value)
+		file.SetCellValue(constantes.PestanaRendGastos, cell, value)
 	}
 
 	return nil
@@ -725,8 +778,15 @@ func nuevoCeco(file *excelize.File, novedad novedades.Novedades, row int) error 
 		fmt.Sprintf("D%d", row): recurso.Legajo,
 		fmt.Sprintf("E%d", row): recurso.Nombre,
 		fmt.Sprintf("F%d", row): recurso.Apellido,
-		fmt.Sprintf("N%d", row): novedad.ImporteTotal,
-		fmt.Sprintf("P%d", row): novedad.Periodo,
+		fmt.Sprintf("G%d", row): novedad.Proveedor,
+		fmt.Sprintf("H%d", row): novedad.Contacto,
+		fmt.Sprintf("I%d", row): novedad.ConceptoDeFacturacion,
+		fmt.Sprintf("J%d", row): novedad.Periodo,
+		fmt.Sprintf("K%d", row): novedad.ImporteTotal,
+		fmt.Sprintf("L%d", row): novedad.Estado,
+		fmt.Sprintf("M%d", row): novedad.Prioridad,
+		fmt.Sprintf("N%d", row): novedad.Cliente,
+		fmt.Sprintf("O%d", row): novedad.Comentarios,
 	}
 	for cell, value := range cellMappings {
 		file.SetCellValue(constantes.PestanaNuevoCeco, cell, value)

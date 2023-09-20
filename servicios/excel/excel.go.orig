@@ -358,10 +358,6 @@ func pagos(file *excelize.File, novedad novedades.Novedades, row *int) error {
 
 func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) error {
 	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
-<<<<<<< HEAD
-
-=======
->>>>>>> feature/ExcelT
 	if err != nil {
 		return err
 	}
@@ -450,8 +446,6 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaPagoProvedores, "H2", "USUARIO")
 	file.SetCellValue(constantes.PestanaPagoProvedores, "I2", "COMENTARIOS")
 	file.SetCellValue(constantes.PestanaPagoProvedores, "J2", "PERIODO")
-<<<<<<< HEAD
-=======
 	// Ingresar los nombres de las celdas en facturacion de servicios
 	file.SetCellValue(constantes.PestanaFactServicios, "A2", "FECHA")
 	file.SetCellValue(constantes.PestanaFactServicios, "B2", "NOVEDAD")
@@ -482,7 +476,6 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaNuevoCeco, "G2", "IMPORTE TARJETA")
 	file.SetCellValue(constantes.PestanaNuevoCeco, "H2", "PERIODO")
 
->>>>>>> feature/ExcelT
 	return nil
 }
 
@@ -520,11 +513,7 @@ func GetExcelPP(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
 
 	// validar el token
-<<<<<<< HEAD
-	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
-=======
 	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.Admin)
->>>>>>> feature/ExcelT
 	if err != nil {
 		return c.Status(codigo).SendString(err.Error())
 	}
@@ -609,8 +598,6 @@ func pagoProveedores(file *excelize.File, novedad novedades.Novedades, row int) 
 
 	return nil
 }
-<<<<<<< HEAD
-=======
 func GetExcelAdmin(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFile")
 
@@ -776,4 +763,3 @@ func nuevoCeco(file *excelize.File, novedad novedades.Novedades, row int) error 
 
 	return nil
 }
->>>>>>> feature/ExcelT
