@@ -180,7 +180,7 @@ func main() {
 		app.Get("/Excel/Admin/*", excel.GetExcelAdmin)
 
 
-    //Workflow novedad
+    	//Workflow novedad
 		app.Post("/Workflow", novedades.InsertWorkFlow)
 		app.Get("/Aprobar/Novedad/:id", novedades.AprobarWorkflow)
 		app.Get("/Rechazar/Novedad/:id", novedades.RechazarWorkflow)
