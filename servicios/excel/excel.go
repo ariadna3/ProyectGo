@@ -32,9 +32,9 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 	userGoogle.ConnectMongoDb(client)
 }
 
-// Crear excel
+// Crear excel po
 func GetExcelFile(c *fiber.Ctx) error {
-	fmt.Println("GetExcelFile")
+	fmt.Println("GetExcelFilePeopleOperation")
 
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.PeopleOperation)
@@ -52,13 +52,15 @@ func GetExcelFile(c *fiber.Ctx) error {
 	descripcionExist := bson.D{{Key: "descripcion", Value: bson.M{"$exists": 1}}}
 	descripcionNotEmpty := bson.D{{Key: "descripcion", Value: bson.M{"$ne": ""}}}
 	EstadoNoRechazado := bson.D{{Key: "estado", Value: bson.M{"$ne": constantes.Rechazada}}}
+	TiposDePeopleOperation := bson.D{{Key: "tipo", Value: bson.M{"$regex": "RH|NP|PB"}}}
+	IgnorarDescripcion := bson.D{{Key: "descripcion", Value: bson.M{"$ne": "Alta beneficios"}}}
 
-	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado}}
+	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado, TiposDePeopleOperation, IgnorarDescripcion}}
 	opts := options.Find().SetSort(bson.D{{Key: "descripcion", Value: 1}, {Key: "usuario", Value: 1}})
 
 	if c.Query("periodo") != "" {
 		periodo := bson.D{{Key: "periodo", Value: c.Query("periodo")}}
-		filter = bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado, periodo}}
+		filter = bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado, TiposDePeopleOperation, IgnorarDescripcion, periodo}}
 	}
 
 	cursor, err = coll.Find(context.TODO(), filter, opts)
@@ -71,12 +73,93 @@ func GetExcelFile(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
+	fmt.Print(len(novedades))
+	fmt.Println(" novedades found")
+
 	err = datosExcel(novedades, c.Query("fechaDesde"), c.Query("fechaHasta"))
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
 	}
 	return c.SendFile(os.Getenv("EXCEL_FILE"))
+}
+
+// Crear excel
+
+func GetExcelPP(c *fiber.Ctx) error {
+	fmt.Println("GetExcelFile")
+
+	// validar el token
+	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.Admin)
+	if err != nil {
+		return c.Status(codigo).SendString(err.Error())
+	}
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+	err = coll.FindOne(context.TODO(), bson.M{"tipo": "PP"}).Decode(&novedad)
+
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString("novedad no encontrada")
+	}
+
+	var novedades []novedades.Novedades
+
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
+	}
+
+	err = ExcelPP(novedades, c.Query("fechaDesde"), c.Query("fechaHasta"))
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
+	}
+
+	return c.SendFile(os.Getenv("EXCELPP_FILE"))
+}
+
+func GetExcelAdmin(c *fiber.Ctx) error {
+	fmt.Println("GetExcelFile")
+
+	// validar el token
+	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.Admin)
+	if err != nil {
+		return c.Status(codigo).SendString(err.Error())
+	}
+	//buscar todo en mongo y filtrarlo por los datos que necesitamos validados
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	// {$and: [{descripcion:{$exists:1}}, {descripcion:{$ne:""}}, {usuario:{$exists:1}},{usuario:{$ne: ""}}]}
+	usuarioExist := bson.D{{Key: "usuario", Value: bson.M{"$exists": 1}}}
+	usuarioNotEmpty := bson.D{{Key: "usuario", Value: bson.M{"$ne": ""}}}
+	descripcionExist := bson.D{{Key: "descripcion", Value: bson.M{"$exists": 1}}}
+	descripcionNotEmpty := bson.D{{Key: "descripcion", Value: bson.M{"$ne": ""}}}
+	EstadoNoRechazado := bson.D{{Key: "estado", Value: bson.M{"$ne": constantes.Rechazada}}}
+
+	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado}}
+	opts := options.Find().SetSort(bson.D{{Key: "descripcion", Value: 1}, {Key: "usuario", Value: 1}})
+
+	if c.Query("periodo") != "" {
+		periodo := bson.D{{Key: "periodo", Value: c.Query("periodo")}}
+		filter = bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado, periodo}}
+	}
+
+	cursor, err = coll.Find(context.TODO(), filter, opts)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+
+	var novedades []novedades.Novedades
+	if err = cursor.All(context.Background(), &novedades); err != nil {
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
+	}
+
+	err = excelAdmin(novedades, c.Query("fechaDesde"), c.Query("fechaHasta"))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
+	}
+	return c.SendFile(os.Getenv("EXCEL_FILE_ADMIN"))
 }
 
 // ingresar datos a un excel
@@ -111,15 +194,9 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 		}
 		if pasosWorkflow.TipoExcel == constantes.DescSueldoNuevo {
 			err = nuevoSueldo(file, item, &rowGeneral)
-			if err == nil {
-				rowGeneral = rowGeneral + 1
-			}
 		}
 		if pasosWorkflow.TipoExcel == constantes.DescSueldoNuevoMasivo {
 			err = nuevoSueldoMasivo(file, item, &rowGeneral)
-			if err == nil {
-				rowGeneral = rowGeneral + 1
-			}
 		}
 		if pasosWorkflow.TipoExcel == constantes.DescLicencia {
 			err = licencias(file, item, rowLicencias)
@@ -139,7 +216,7 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 		if pasosWorkflow.TipoExcel == constantes.DescPagos {
 			pagos(file, item, &rowGeneral)
 		}
-		err = allNovedades(file, item, rowNovedades)
+		err, rowNovedades = allNovedades(file, item, rowNovedades)
 		if err == nil {
 			rowNovedades = rowNovedades + 1
 		}
@@ -184,8 +261,6 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row *int) err
 
 	}
 
-	*row = *row - 1
-
 	return nil
 }
 
@@ -206,7 +281,6 @@ func nuevoSueldoMasivo(file *excelize.File, novedad novedades.Novedades, row *in
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("P%d", *row), novedad.Periodo)
 		*row = *row + 1
 	}
-	*row = *row - 1
 	return nil
 }
 
@@ -342,6 +416,7 @@ func pagos(file *excelize.File, novedad novedades.Novedades, row *int) error {
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), recurso.Nombre)
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), recurso.Apellido)
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("G%d", *row), novedad.ImporteTotal)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("P%d", *row), novedad.Periodo)
 			if strings.Contains(novedad.Descripcion, "retroactivo") {
 				file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("H%d", *row), "SI")
 			}
@@ -350,25 +425,68 @@ func pagos(file *excelize.File, novedad novedades.Novedades, row *int) error {
 
 	}
 
-	*row = *row - 1
-
 	return nil
 }
 
-func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) error {
+func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) (error, int) {
 	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
-		return err
+		return err, row
+	}
+	if len(novedad.Recursos) == 0 {
+		novedad.Recursos = append(novedad.Recursos, novedades.RecursosNovedades{Recurso: recurso.Nombre + " " + recurso.Apellido})
 	}
 
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("A%d", row), novedad.Fecha)
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", row), novedad.Descripcion)
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("E%d", row), recurso.Apellido)
-	file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("F%d", row), novedad.Periodo)
+	for _, recursoInterno := range novedad.Recursos {
+		var rowStop int = row
+		if novedad.IdSecuencial == 723 {
+			fmt.Print("stop")
+		}
+		for index, distribucion := range novedad.Distribuciones {
+			rowStop = row + index
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("A%d", rowStop), novedad.Fecha)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", rowStop), novedad.IdSecuencial)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", rowStop), novedad.Tipo)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", rowStop), novedad.Descripcion)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("E%d", rowStop), recurso.Nombre)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("F%d", rowStop), recurso.Apellido)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("G%d", rowStop), novedad.Periodo)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("H%d", rowStop), novedad.Fecha)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("I%d", rowStop), novedad.Hora)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("J%d", rowStop), novedad.FechaDesde)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("K%d", rowStop), novedad.FechaHasta)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("L%d", rowStop), novedad.Cantidad)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("M%d", rowStop), novedad.ImporteTotal)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("N%d", rowStop), novedad.Comentarios)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("O%d", rowStop), novedad.Estado)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("S%d", rowStop), distribucion.Cecos.Descripcion)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("T%d", rowStop), distribucion.Porcentaje)
+		}
+		if rowStop == row {
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("A%d", row), novedad.Fecha)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", row), novedad.Tipo)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", row), novedad.Descripcion)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("E%d", row), recurso.Nombre)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("F%d", row), recurso.Apellido)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("G%d", row), novedad.Periodo)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("H%d", row), novedad.Fecha)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("I%d", row), novedad.Hora)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("J%d", row), novedad.FechaDesde)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("K%d", row), novedad.FechaHasta)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("L%d", row), novedad.Cantidad)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("M%d", row), novedad.ImporteTotal)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("N%d", row), novedad.Comentarios)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("O%d", row), novedad.Estado)
+		}
+		file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("P%d", row), recursoInterno.Recurso)
+		file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("Q%d", row), recursoInterno.Importe)
+		file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("R%d", row), recursoInterno.Periodo)
+		row = rowStop + 1
+	}
+	row--
 
-	return nil
+	return nil, row
 }
 
 func initializeExcel(file *excelize.File) error {
@@ -431,9 +549,23 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaNovedades, "A2", "FECHA")
 	file.SetCellValue(constantes.PestanaNovedades, "B2", "NOVEDAD")
 	file.SetCellValue(constantes.PestanaNovedades, "C2", "TIPO DE NOVEDAD")
-	file.SetCellValue(constantes.PestanaNovedades, "D2", "NOMBRE")
-	file.SetCellValue(constantes.PestanaNovedades, "E2", "APELLIDO")
-	file.SetCellValue(constantes.PestanaNovedades, "F2", "PERIODO")
+	file.SetCellValue(constantes.PestanaNovedades, "D2", "DESCRIPCION")
+	file.SetCellValue(constantes.PestanaNovedades, "E2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaNovedades, "F2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaNovedades, "G2", "PERIODO")
+	file.SetCellValue(constantes.PestanaNovedades, "H2", "FECHA")
+	file.SetCellValue(constantes.PestanaNovedades, "I2", "HORA")
+	file.SetCellValue(constantes.PestanaNovedades, "J2", "FECHA DESDE")
+	file.SetCellValue(constantes.PestanaNovedades, "K2", "FECHA HASTA")
+	file.SetCellValue(constantes.PestanaNovedades, "L2", "CANTIDAD")
+	file.SetCellValue(constantes.PestanaNovedades, "M2", "IMPORTE TOTAL")
+	file.SetCellValue(constantes.PestanaNovedades, "N2", "COMENTARIOS")
+	file.SetCellValue(constantes.PestanaNovedades, "O2", "ESTADO")
+	file.SetCellValue(constantes.PestanaNovedades, "P2", "RECURSO")
+	file.SetCellValue(constantes.PestanaNovedades, "Q2", "IMPORTE")
+	file.SetCellValue(constantes.PestanaNovedades, "R2", "PERIODO")
+	file.SetCellValue(constantes.PestanaNovedades, "S2", "CENTRO DE COSTOS")
+	file.SetCellValue(constantes.PestanaNovedades, "T2", "PORCENTAJE")
 	// Ingresar los nombres de las celdas en proveedores
 	file.SetCellValue(constantes.PestanaPagoProvedores, "A2", "FECHA")
 	file.SetCellValue(constantes.PestanaPagoProvedores, "B2", "NOVEDAD")
@@ -546,41 +678,6 @@ func verificacionNovedad(novedad novedades.Novedades, fechaDesde string, fechaHa
 	return true
 }
 
-// Crear excel
-
-func GetExcelPP(c *fiber.Ctx) error {
-	fmt.Println("GetExcelFile")
-
-	// validar el token
-	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.Admin)
-	if err != nil {
-		return c.Status(codigo).SendString(err.Error())
-	}
-
-	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
-	err = coll.FindOne(context.TODO(), bson.M{"tipo": "PP"}).Decode(&novedad)
-
-	if err != nil {
-		return c.Status(fiber.StatusNotFound).SendString("novedad no encontrada")
-	}
-
-	var novedades []novedades.Novedades
-
-	cursor, err := coll.Find(context.TODO(), bson.M{})
-
-	if err = cursor.All(context.Background(), &novedades); err != nil {
-		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
-	}
-
-	err = ExcelPP(novedades, c.Query("fechaDesde"), c.Query("fechaHasta"))
-
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
-	}
-
-	return c.SendFile(os.Getenv("EXCELPP_FILE"))
-}
-
 // ingresar datos a un excel
 func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta string) error {
 
@@ -609,49 +706,6 @@ func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta s
 	}
 	return nil
 
-}
-
-func GetExcelAdmin(c *fiber.Ctx) error {
-	fmt.Println("GetExcelFile")
-
-	// validar el token
-	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.Admin)
-	if err != nil {
-		return c.Status(codigo).SendString(err.Error())
-	}
-	//buscar todo en mongo y filtrarlo por los datos que necesitamos validados
-	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
-	cursor, err := coll.Find(context.TODO(), bson.M{})
-	// {$and: [{descripcion:{$exists:1}}, {descripcion:{$ne:""}}, {usuario:{$exists:1}},{usuario:{$ne: ""}}]}
-	usuarioExist := bson.D{{Key: "usuario", Value: bson.M{"$exists": 1}}}
-	usuarioNotEmpty := bson.D{{Key: "usuario", Value: bson.M{"$ne": ""}}}
-	descripcionExist := bson.D{{Key: "descripcion", Value: bson.M{"$exists": 1}}}
-	descripcionNotEmpty := bson.D{{Key: "descripcion", Value: bson.M{"$ne": ""}}}
-	EstadoNoRechazado := bson.D{{Key: "estado", Value: bson.M{"$ne": constantes.Rechazada}}}
-
-	filter := bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado}}
-	opts := options.Find().SetSort(bson.D{{Key: "descripcion", Value: 1}, {Key: "usuario", Value: 1}})
-
-	if c.Query("periodo") != "" {
-		periodo := bson.D{{Key: "periodo", Value: c.Query("periodo")}}
-		filter = bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado, periodo}}
-	}
-
-	cursor, err = coll.Find(context.TODO(), filter, opts)
-	if err != nil {
-		return c.Status(fiber.StatusNotFound).SendString(err.Error())
-	}
-
-	var novedades []novedades.Novedades
-	if err = cursor.All(context.Background(), &novedades); err != nil {
-		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
-	}
-
-	err = excelAdmin(novedades, c.Query("fechaDesde"), c.Query("fechaHasta"))
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
-	}
-	return c.SendFile(os.Getenv("EXCEL_FILE_ADMIN"))
 }
 
 // ingresar datos a un excel

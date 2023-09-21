@@ -31,15 +31,15 @@ const (
 )
 
 const (
-	PestanaGeneral    		= "General"
-	PestanaLicencias   		= "Licencias"
-	PestanaHorasExtras		= "Horas extras"
-	PestanaNovedades  		= "Novedades"
-	PestanaPagoProvedores   = "PProvedores"
-	PestanaFactServicios	= "Fact. de Servicios"
-	PestanaRendGastos 		= "Rendicion de gastos"
-	PestanaNuevoCeco	    = "Nuevo cecos"
-	PestanaFactHorasExtras	= "Fact. de Horas extras"
+	PestanaGeneral         = "General"
+	PestanaLicencias       = "Licencias"
+	PestanaHorasExtras     = "Horas extras"
+	PestanaNovedades       = "Novedades"
+	PestanaPagoProvedores  = "PProvedores"
+	PestanaFactServicios   = "Fact. de Servicios"
+	PestanaRendGastos      = "Rendicion de gastos"
+	PestanaNuevoCeco       = "Nuevo cecos"
+	PestanaFactHorasExtras = "Fact. de Horas extras"
 )
 
 const (
@@ -66,19 +66,19 @@ const (
 	DescPrestamo          = "Prestamo"
 	DescLicencia          = "Licencia"
 	DescPagos             = "Pagos"
-	FactServicios		  = "Facturacion de serivicio" 
-	RendGastos			  = "Rendicion de gastos"
-	NuevoCeco			  = "Nuevo ceco"
+	FactServicios         = "Facturacion de serivicio"
+	RendGastos            = "Rendicion de gastos"
+	NuevoCeco             = "Nuevo ceco"
 )
 
 var HorasExtrasTipos = map[string]string{
-	"50%diurno":       "F",
-	"100%diurno":      "G",
-	"50%nocturno":     "I",
-	"100%nocturno":    "J",
-	"feriadonocturno": "H",
-	"feriadodiurno":   "H",
-	"feriado":         "H",
+	"50%diurno":       "G",
+	"100%diurno":      "H",
+	"50%nocturno":     "J",
+	"100%nocturno":    "K",
+	"feriadonocturno": "I",
+	"feriadodiurno":   "I",
+	"feriado":         "I",
 }
 
 var Permisos = map[string][]int{
