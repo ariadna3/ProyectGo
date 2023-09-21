@@ -275,8 +275,8 @@ func nuevoSueldo(file *excelize.File, novedad novedades.Novedades, row *int) err
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", *row), novedad.IdSecuencial)
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", *row), novedad.Descripcion)
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", *row), recurso.Legajo)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), recurso.Nombre)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), recurso.Apellido)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), utf8_decode(recurso.Nombre))
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), utf8_decode(recurso.Apellido))
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("G%d", *row), recursoInterno.Importe)
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("P%d", *row), novedad.Periodo)
 			if strings.Contains(novedad.Descripcion, "retroactivo") {
@@ -319,8 +319,8 @@ func anticipoPrestamo(file *excelize.File, novedad novedades.Novedades, row int,
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), novedad.Descripcion)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), utf8_decode(recurso.Nombre))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), utf8_decode(recurso.Apellido))
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("J%d", row), novedad.ImporteTotal)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("K%d", row), novedad.ImporteTotal/float64(cuotas))
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("L%d", row), cuotas)
@@ -337,8 +337,8 @@ func gimnasio(file *excelize.File, novedad novedades.Novedades, row int) error {
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), novedad.Descripcion)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), utf8_decode(recurso.Nombre))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), utf8_decode(recurso.Apellido))
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("M%d", row), novedad.ImporteTotal)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("P%d", row), novedad.Periodo)
 
@@ -354,8 +354,8 @@ func idioma(file *excelize.File, novedad novedades.Novedades, row int) error {
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), novedad.Descripcion)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), utf8_decode(recurso.Nombre))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), utf8_decode(recurso.Apellido))
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("N%d", row), novedad.ImporteTotal)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("P%d", row), novedad.Periodo)
 
@@ -371,8 +371,8 @@ func tarjetaBeneficio(file *excelize.File, novedad novedades.Novedades, row int)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), novedad.Descripcion)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), utf8_decode(recurso.Nombre))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), utf8_decode(recurso.Apellido))
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("O%d", row), novedad.ImporteTotal)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("P%d", row), novedad.Periodo)
 
@@ -388,8 +388,8 @@ func licencias(file *excelize.File, novedad novedades.Novedades, row int) error 
 	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("A%d", row), novedad.Fecha)
 	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
 	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("C%d", row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("D%d", row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("E%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("D%d", row), utf8_decode(recurso.Nombre))
+	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("E%d", row), utf8_decode(recurso.Apellido))
 	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("F%d", row), novedad.Descripcion)
 	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("G%d", row), diferenciaFechas)
 	file.SetCellValue(constantes.PestanaLicencias, fmt.Sprintf("H%d", row), novedad.Periodo)
@@ -405,8 +405,8 @@ func horasExtras(file *excelize.File, novedad novedades.Novedades, row *int) err
 	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("A%d", *row), recurso.Fecha)
 	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("B%d", *row), novedad.IdSecuencial)
 	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("C%d", *row), recurso.Legajo)
-	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("D%d", *row), recurso.Nombre)
-	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("E%d", *row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("D%d", *row), utf8_decode(recurso.Nombre))
+	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("E%d", *row), utf8_decode(recurso.Apellido))
 	for _, recursoNovedad := range novedad.Recursos {
 		file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("F%d", *row), recursoNovedad.Periodo)
 		for _, horasExtrasNovedad := range recursoNovedad.HorasExtras {
@@ -439,8 +439,8 @@ func pagos(file *excelize.File, novedad novedades.Novedades, row *int) error {
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", *row), novedad.IdSecuencial)
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", *row), novedad.Descripcion)
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", *row), recurso.Legajo)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), recurso.Nombre)
-			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), recurso.Apellido)
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", *row), utf8_decode(recurso.Nombre))
+			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", *row), utf8_decode(recurso.Apellido))
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("G%d", *row), novedad.ImporteTotal)
 			file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("P%d", *row), novedad.Periodo)
 			if strings.Contains(novedad.Descripcion, "retroactivo") {
@@ -474,8 +474,8 @@ func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) (er
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", rowStop), novedad.IdSecuencial)
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", rowStop), novedad.Tipo)
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", rowStop), novedad.Descripcion)
-			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("E%d", rowStop), recurso.Nombre)
-			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("F%d", rowStop), recurso.Apellido)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("E%d", rowStop), utf8_decode(recurso.Nombre))
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("F%d", rowStop), utf8_decode(recurso.Apellido))
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("G%d", rowStop), novedad.Periodo)
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("H%d", rowStop), novedad.Fecha)
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("I%d", rowStop), novedad.Hora)
@@ -493,8 +493,8 @@ func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) (er
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("C%d", row), novedad.Tipo)
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("D%d", row), novedad.Descripcion)
-			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("E%d", row), recurso.Nombre)
-			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("F%d", row), recurso.Apellido)
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("E%d", row), utf8_decode(recurso.Nombre))
+			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("F%d", row), utf8_decode(recurso.Apellido))
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("G%d", row), novedad.Periodo)
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("H%d", row), novedad.Fecha)
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("I%d", row), novedad.Hora)
@@ -592,6 +592,10 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaNovedades, "R2", "PERIODO")
 	file.SetCellValue(constantes.PestanaNovedades, "S2", "CENTRO DE COSTOS")
 	file.SetCellValue(constantes.PestanaNovedades, "T2", "PORCENTAJE")
+	return nil
+}
+
+func initializeExcelAdmin(file *excelize.File) error {
 	// Ingresar los nombres de las celdas en proveedores
 	file.SetCellValue(constantes.PestanaPagoProvedores, "A2", "FECHA")
 	file.SetCellValue(constantes.PestanaPagoProvedores, "B2", "NOVEDAD")
@@ -711,7 +715,7 @@ func ExcelPP(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta s
 	os.Remove(os.Getenv("EXCELPP_FILE"))
 	file := excelize.NewFile()
 	file.SetSheetName("Sheet1", constantes.PestanaPagoProvedores)
-	initializeExcel(file)
+	initializeExcelAdmin(file)
 	var rowPagoProveedores int = 3
 	for _, item := range novedadesArr {
 		if !verificacionNovedad(item, fechaDesde, fechaHasta) {
@@ -744,7 +748,7 @@ func excelAdmin(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 	file.NewSheet(constantes.PestanaRendGastos)
 	file.NewSheet(constantes.PestanaNuevoCeco)
 	file.NewSheet(constantes.PestanaHorasExtras)
-	initializeExcel(file)
+	initializeExcelAdmin(file)
 	var rowFactServicios int = 3
 	var rowRendGastos int = 3
 	var rowNuevoCeco int = 3
@@ -900,4 +904,12 @@ func pagoProveedores(file *excelize.File, novedad novedades.Novedades, row int) 
 	}
 
 	return nil
+}
+
+func utf8_decode(str string) string {
+	var result string
+	for i := range str {
+		result += string(str[i])
+	}
+	return result
 }
