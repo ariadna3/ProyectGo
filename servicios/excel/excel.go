@@ -36,6 +36,9 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 func GetExcelFile(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFilePeopleOperation")
 
+	fechaDesde := c.Query("fechaDesde")
+	fechaHasta := c.Query("fechaHasta")
+
 	// validar el token
 	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.PeopleOperation)
 	if error != nil {
@@ -59,7 +62,22 @@ func GetExcelFile(c *fiber.Ctx) error {
 	opts := options.Find().SetSort(bson.D{{Key: "descripcion", Value: 1}, {Key: "usuario", Value: 1}})
 
 	if c.Query("periodo") != "" {
-		periodo := bson.D{{Key: "periodo", Value: c.Query("periodo")}}
+		var periodoFormato string
+		if len(c.Query("periodo")) == 6 {
+			periodoFormato = "0" + c.Query("periodo")
+		} else {
+			periodoFormato = c.Query("periodo")
+		}
+		periodoFormatoFechaDesde, err := time.Parse("01-2006", periodoFormato)
+		periodoFormatoFechaHasta := periodoFormatoFechaDesde.AddDate(0, 1, 0)
+		if err == nil {
+			fechaDesde = periodoFormatoFechaDesde.Format(constantes.FormatoFechaProvicional)
+			fechaHasta = periodoFormatoFechaHasta.Format(constantes.FormatoFechaProvicional)
+			fmt.Println(fechaDesde, fechaHasta)
+		} else {
+			fmt.Println(err)
+		}
+		periodo := bson.D{{Key: "$or", Value: bson.A{bson.D{{Key: "periodo", Value: c.Query("periodo")}}, bson.D{{Key: "periodo", Value: ""}}}}}
 		filter = bson.M{"$and": bson.A{usuarioExist, usuarioNotEmpty, descripcionExist, descripcionNotEmpty, EstadoNoRechazado, TiposDePeopleOperation, IgnorarDescripcion, periodo}}
 	}
 
@@ -76,7 +94,9 @@ func GetExcelFile(c *fiber.Ctx) error {
 	fmt.Print(len(novedades))
 	fmt.Println(" novedades found")
 
-	err = datosExcel(novedades, c.Query("fechaDesde"), c.Query("fechaHasta"))
+	seBuscaPorPeriodo := c.Query("periodo") != ""
+
+	err = datosExcel(novedades, fechaDesde, fechaHasta, seBuscaPorPeriodo)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
@@ -163,7 +183,7 @@ func GetExcelAdmin(c *fiber.Ctx) error {
 }
 
 // ingresar datos a un excel
-func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta string) error {
+func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta string, periodo bool) error {
 
 	// Abrir archivo de excel
 	os.Remove("EXCEL_FILE")
@@ -180,7 +200,13 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 
 	for _, item := range novedadesArr {
 		if !verificacionNovedad(item, fechaDesde, fechaHasta) {
-			continue
+			if periodo {
+				if item.Periodo == "" {
+					continue
+				}
+			} else {
+				continue
+			}
 		}
 		var pasosWorkflow novedades.PasosWorkflow
 		coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
