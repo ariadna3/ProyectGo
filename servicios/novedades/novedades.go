@@ -951,6 +951,17 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 		if err.Error() == FinalDeLosPasos {
 			novedad.Estado = constantes.Aceptada
 			enviarMailWorkflow(novedad)
+
+			//Lo ejecuta si es una licencia
+			//Hay que saber que tipo de licencia es
+
+			/*UpdateVacaciones()
+			[
+				"vacaciones comunes": 0
+				"vacaciones comunes": 0
+				"vacaciones comunes": 0
+				"anio": 2023
+			]*/
 		}
 	}
 	//crea el filtro

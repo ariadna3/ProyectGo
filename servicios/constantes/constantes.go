@@ -65,8 +65,9 @@ const (
 	DescAnticipo          = "Anticipo"
 	DescPrestamo          = "Prestamo"
 	DescLicencia          = "Licencia"
+	DescTarjetaBeneficios = "Tarjeta de beneficios"
 	DescPagos             = "Pagos"
-	FactServicios         = "Facturacion de serivicio"
+	FactServicios         = "Facturacion de servicio"
 	RendGastos            = "Rendicion de gastos"
 	NuevoCeco             = "Nuevo ceco"
 )

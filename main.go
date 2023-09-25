@@ -26,6 +26,7 @@ import (
 	"io/ioutil"
 	"net/smtp"
 	"os"
+	"time"
 )
 
 type Actividades struct {
@@ -152,6 +153,10 @@ func main() {
 	connectedWithMongo := createConnectionWithMongo()
 	connectedWithSql := createConnectionWithMysql()
 
+	alarmVacations := createAlarm(9, 25)
+	go alarmSetVacations(alarmVacations)
+	fmt.Print("Alarma de vacaciones seteada para el dia: " + alarmVacations.String() + "\n")
+
 	if connectedWithMongo {
 
 		fmt.Println("Conectado con mongo")
@@ -173,7 +178,7 @@ func main() {
 		app.Get("/Novedad/:id", novedades.GetNovedades)
 		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
-		
+
 		//Excel
 		app.Get("/Excel/Novedad/*", excel.GetExcelFile)
 		app.Get("/Excel/PagoProveedores/*", excel.GetExcelPP)
@@ -218,6 +223,7 @@ func main() {
 		app.Post("/Recurso/Package", recursos.InsertRecursoPackage)
 		app.Patch("/Recurso/:id/*", recursos.UpdateRecurso)
 		app.Put("/Recurso", recursos.PutRecurso)
+		app.Patch("/Vacaciones/:id", recursos.UpdateVacaciones)
 
 		//GoogleUser
 		app.Post("/user", userGoogle.InsertUserITP)
@@ -322,4 +328,27 @@ func pruebaConexionEmail() error {
 		return nil
 	}
 	return nil
+}
+
+func createAlarm(month int, day int) time.Time {
+	m := time.Month(month)
+	alarm := time.Date(time.Now().Year(), m, day, 20, 0, 0, 0, time.FixedZone("Buenos Aires", -3*60*60))
+	if alarm.Before(time.Now()) {
+		alarm = time.Date(time.Now().AddDate(1, 0, 0).Year(), m, day, 20, 0, 0, 0, time.FixedZone("Buenos Aires", -3*60*60))
+	}
+	return alarm
+}
+
+func alarmSetVacations(alarm time.Time) {
+	ticker1 := time.NewTicker(24 * time.Hour)
+	for c := range ticker1.C {
+		if alarm.Before(c) {
+			err := recursos.InsertVacacionesThisYear()
+			if err != nil {
+				fmt.Println(err)
+			}
+			alarm = alarm.AddDate(1, 0, 0)
+			fmt.Print("Alarma de vacaciones seteada para el dia: " + alarm.String() + "\n")
+		}
+	}
 }

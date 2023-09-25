@@ -236,6 +236,12 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 				rowGeneral = rowGeneral + 1
 			}
 		}
+		if pasosWorkflow.TipoExcel == constantes.DescTarjetaBeneficios {
+			err = tarjetaBeneficio(file, item, rowGeneral)
+			if err == nil {
+				rowGeneral = rowGeneral + 1
+			}
+		}
 		if pasosWorkflow.TipoExcel == constantes.DescHorasExtras {
 			horasExtras(file, item, &rowHorasExtras)
 		}
