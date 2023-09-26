@@ -6,6 +6,7 @@ import (
 	"github.com/proyectoNovedades/servicios/actividades"
 	"github.com/proyectoNovedades/servicios/constantes"
 	"github.com/proyectoNovedades/servicios/excel"
+	"github.com/proyectoNovedades/servicios/freelances"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
@@ -225,6 +226,13 @@ func main() {
 		app.Put("/Recurso", recursos.PutRecurso)
 		app.Patch("/Vacaciones/:id", recursos.UpdateVacaciones)
 
+		//Freelances
+		app.Post("/Freelance", freelances.InsertFreelance)
+		app.Get("/Freelance/:id", freelances.GetFreelance)
+		app.Get("/Freelance", freelances.GetFreelancesList)
+		app.Delete("/Freelance/:id", freelances.DeleteFreelance)
+		app.Put("/Freelance", freelances.UpdateFreelance)
+
 		//GoogleUser
 		app.Post("/user", userGoogle.InsertUserITP)
 		app.Get("/user", userGoogle.GetSelfUserITP)
@@ -275,6 +283,7 @@ func createConnectionWithMongo() bool {
 		recursos.ConnectMongoDb(client)
 		userGoogle.ConnectMongoDb(client)
 		excel.ConnectMongoDb(client)
+		freelances.ConnectMongoDb(client)
 		return true
 	}
 	return false

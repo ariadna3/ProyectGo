@@ -1280,6 +1280,60 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "IngresoDeVacaciones",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Vacaciones",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Vacaciones"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateVacaciones",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"CantidadComun\": 1,\r\n    \"CantidadPatagonian\": 0,\r\n    \"CantidadOtros\": 0,\r\n    \"Anio\": 2023\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Vacaciones/1641",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Vacaciones",
+								"1641"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1835,6 +1889,166 @@
 									"value": "0",
 									"disabled": true
 								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "freelances",
+			"item": [
+				{
+					"name": "GetFreelance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Freelance/5",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Freelance",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetFreelancesList",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Freelance",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Freelance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InsertFreelance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\t\"idFreelance\": 1,\r\n\t\t\"nroFreelance\": 1,\r\n\t\t\"cuit\": 1,\r\n\t\t\"apellido\": \"apellido\",\r\n\t\t\"nombre\": \"nombre\",\r\n\t\t\"fechaIngreso\": \"2021-01-01T00:00:00Z\",\r\n\t\t\"nomina\": \"nomina\",\r\n\t\t\"gerente\": 1,\r\n\t\t\"vertical\": \"vertical\",\r\n\t\t\"horasMen\": 1,\r\n\t\t\"cargo\": \"cargo\",\r\n\t\t\"facturaMondo\": 1,\r\n\t\t\"facturaDesde\": \"2021-01-01T00:00:00Z\",\r\n\t\t\"facturaADCuit\": 1,\r\n\t\t\"facturaADMonto\": 1,\r\n\t\t\"facturaADDesde\": \"2021-01-01T00:00:00Z\",\r\n\t\t\"b21Monto\": 1,\r\n\t\t\"b21Desde\": \"2021-01-01T00:00:00Z\",\r\n\t\t\"comentario\": \"comentario\",\r\n\t\t\"habilitado\": \"habilitado\",\r\n\t\t\"fechaBaja\": \"2021-01-01T00:00:00Z\",\r\n\t\t\"cecos\": 1,\r\n\t\t\"cecosDesc\": \"cecosDesc\",\r\n\t\t\"telefono\": \"telefono\",\r\n\t\t\"emailLaboral\": \"emailLaboral\",\r\n\t\t\"emailPersonal\": \"emailPersonal\",\r\n\t\t\"fechaNacimiento\": \"2021-01-01T00:00:00Z\",\r\n\t\t\"genero\": \"genero\",\r\n\t\t\"nacionalidad\": \"nacionalidad\",\r\n\t\t\"domCalle\": \"domCalle\",\r\n\t\t\"domNumero\": 1,\r\n\t\t\"domPiso\": 1,\r\n\t\t\"domDepto\": \"domDepto\",\r\n\t\t\"domLocalidad\": \"domLocalidad\",\r\n\t\t\"domProvincia\": \"domProvincia\"\r\n\t}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Freelance",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Freelance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateFreelance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\t\"idFreelance\": 1,\r\n\t\t\"nroFreelance\": 2,\r\n\t\t\"cuit\": 2,\r\n\t\t\"apellido\": \"apellido\",\r\n\t\t\"nombre\": \"nombre\",\r\n\t\t\"fechaIngreso\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"nomina\": \"nomina\",\r\n\t\t\"gerente\": 2,\r\n\t\t\"vertical\": \"vertical\",\r\n\t\t\"horasMen\": 2,\r\n\t\t\"cargo\": \"cargo\",\r\n\t\t\"facturaMondo\": 2,\r\n\t\t\"facturaDesde\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"facturaADCuit\": 2,\r\n\t\t\"facturaADMonto\": 2,\r\n\t\t\"facturaADDesde\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"b21Monto\": 2,\r\n\t\t\"b21Desde\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"comentario\": \"comentario\",\r\n\t\t\"habilitado\": \"habilitado\",\r\n\t\t\"fechaBaja\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"cecos\": 2,\r\n\t\t\"cecosDesc\": \"cecosDesc\",\r\n\t\t\"telefono\": \"telefono\",\r\n\t\t\"emailLaboral\": \"emailLaboral\",\r\n\t\t\"emailPersonal\": \"emailPersonal\",\r\n\t\t\"fechaNacimiento\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"genero\": \"genero\",\r\n\t\t\"nacionalidad\": \"nacionalidad\",\r\n\t\t\"domCalle\": \"domCalle\",\r\n\t\t\"domNumero\": 2,\r\n\t\t\"domPiso\": 2,\r\n\t\t\"domDepto\": \"domDepto\",\r\n\t\t\"domLocalidad\": \"domLocalidad\",\r\n\t\t\"domProvincia\": \"domProvincia\"\r\n\t}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Freelance",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Freelance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteFreelance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Freelance/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Freelance",
+								"1"
 							]
 						}
 					},
