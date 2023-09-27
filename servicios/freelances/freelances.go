@@ -26,7 +26,7 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 type Freelances struct {
 	IdFreelance     int       `bson:"idFreelance"`
 	NroFreelance    int       `bson:"nroFreelance"`
-	CUIT            int       `bson:"cuit"`
+	CUIT            string    `bson:"cuit"`
 	Apellido        string    `bson:"apellido"`
 	Nombre          string    `bson:"nombre"`
 	FechaIngreso    time.Time `bson:"fechaIngreso"`
@@ -37,7 +37,7 @@ type Freelances struct {
 	Cargo           string    `bson:"cargo"`
 	FacturaMonto    float64   `bson:"facturaMondo"`
 	FacturaDesde    time.Time `bson:"facturaDesde"`
-	FacturaADCuit   int       `bson:"facturaADCuit"`
+	FacturaADCuit   string    `bson:"facturaADCuit"`
 	FacturaADMonto  float64   `bson:"facturaADMonto"`
 	FacturaADDesde  time.Time `bson:"facturaADDesde"`
 	B21Monto        float64   `bson:"b21Monto"`
@@ -61,6 +61,7 @@ type Freelances struct {
 }
 
 type Rcc struct {
+	CcId         int     `bson:"ccId"`
 	CcNum        int     `bson:"ccNum"`
 	CcPorcentaje float32 `bson:"ccPorcentaje"`
 	CcNombre     string  `bson:"ccNombre"`
