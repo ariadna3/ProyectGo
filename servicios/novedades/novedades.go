@@ -638,6 +638,58 @@ func UpdateFileAdd(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).SendString("Subidos archivos correctamente")
 }
 
+func UpdateFile(c *fiber.Ctx) error {
+	fmt.Println("put de novedad adjuntos")
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	//obtener el id del recurso
+	id := c.Params("id")
+	idNovedad, _ := strconv.Atoi(id)
+
+	//obtencion de datos de la base de datos
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+	var novedad Novedades
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "idSecuencial", Value: idNovedad}}).Decode(&novedad)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+
+	// eliminar los archivos de adjuntos de la carpeta
+	for _, adjunto := range novedad.Adjuntos {
+		direccionArchivo := os.Getenv("FOLDER_FILE") + "/" + (strconv.Itoa(novedad.IdSecuencial) + adjunto)
+		os.Remove(direccionArchivo)
+	}
+
+	// obtener los archivos
+	form, err := c.MultipartForm()
+	if err != nil {
+		return c.Status(fiber.StatusNoContent).SendString("archivo no encontrado")
+	} else {
+		for _, fileHeaders := range form.File {
+			for _, fileHeader := range fileHeaders {
+				fmt.Println(fileHeader)
+				novedad.Adjuntos = append(novedad.Adjuntos, fileHeader.Filename)
+				c.SaveFile(fileHeader, os.Getenv("FOLDER_FILE")+"/"+id+fileHeader.Filename)
+			}
+		}
+	}
+
+	// actualiza los adjuntos
+	filter := bson.D{{Key: "idSecuencial", Value: idNovedad}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "adjuntos", Value: novedad.Adjuntos}}}}
+
+	_, err = coll.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+
+	return c.Status(fiber.StatusOK).SendString("Subidos archivos correctamente")
+}
+
 // Eliminar archivos a una notificacion
 func DeleteFile(c *fiber.Ctx) error {
 	// validar el token
