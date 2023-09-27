@@ -45,8 +45,7 @@ type Freelances struct {
 	Comentario      string    `bson:"comentario"`
 	Habilitado      string    `bson:"habilitado"`
 	FechaBaja       time.Time `bson:"fechaBaja"`
-	Cecos           int       `bson:"cecos"`
-	CecosDesc       string    `bson:"cecosDesc"`
+	Cecos           []Rcc     `bson:"cecos"`
 	Telefono        string    `bson:"telefono"`
 	EmailLaboral    string    `bson:"emailLaboral"`
 	EmailPersonal   string    `bson:"emailPersonal"`
@@ -59,6 +58,13 @@ type Freelances struct {
 	DomDepto        string    `bson:"domDepto"`
 	DomLocalidad    string    `bson:"domLocalidad"`
 	DomProvincia    string    `bson:"domProvincia"`
+}
+
+type Rcc struct {
+	CcNum        int     `bson:"ccNum"`
+	CcPorcentaje float32 `bson:"ccPorcentaje"`
+	CcNombre     string  `bson:"ccNombre"`
+	CcCliente    string  `bson:"ccCliente"`
 }
 
 func InsertFreelance(c *fiber.Ctx) error {
