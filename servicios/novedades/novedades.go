@@ -1004,16 +1004,16 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 			novedad.Estado = constantes.Aceptada
 			enviarMailWorkflow(novedad)
 
-			//Lo ejecuta si es una licencia
-			//Hay que saber que tipo de licencia es
+			if strings.Contains(constantes.DescripcionLicenciasComunes, novedad.Descripcion) {
+				// Crear vacaciones y setearlas
+				vacaciones := new(recursos.Vacaciones)
+				vacaciones.CantidadComun = 0
+				vacaciones.CantidadPatagonian = 0
+				vacaciones.CantidadOtros = 0
+				vacaciones.Anio = 0
 
-			/*UpdateVacaciones()
-			[
-				"vacaciones comunes": 0
-				"vacaciones comunes": 0
-				"vacaciones comunes": 0
-				"anio": 2023
-			]*/
+				//recursos.UseVacaciones(novedad.IdSecuencial, *vacaciones)
+			}
 		}
 	}
 	//crea el filtro

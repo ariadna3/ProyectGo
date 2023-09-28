@@ -103,3 +103,9 @@ var Permisos = map[string][]int{
 const (
 	AceptarCambiosRecursos = "gerente,mail,fechaString"
 )
+
+const (
+	DescripcionLicenciasComunes     = "Licencia comun"
+	DescripcionLicenciasPatagonians = "Licencia Patagonians"
+	DescripcionLicenciasOtras       = "Licencia otras"
+)
