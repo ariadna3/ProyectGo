@@ -625,6 +625,7 @@ func freelanceInsert(file *excelize.File, freelance freelances.Freelances, row i
 		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AK%d", row+quantityOfCecos), ceco.CcPorcentaje)
 		quantityOfCecos++
 	}
+	quantityOfCecos--
 
 	return nil, quantityOfCecos
 }
