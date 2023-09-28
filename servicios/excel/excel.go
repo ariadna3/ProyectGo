@@ -193,6 +193,9 @@ func GetFreelancesListExcel(c *fiber.Ctx) error {
 	}
 
 	err, userGoogle := userGoogle.GetInternUserITP(email)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionFreelance)
 	filter := bson.D{}
 	if userGoogle.Rol != constantes.Board {
@@ -308,9 +311,9 @@ func ingresarDatosExcelFreelance(freelancesList []freelances.Freelances) error {
 
 	var RowGeneral int = 3
 	for _, item := range freelancesList {
-		err = freelanceInsert(file, item, RowGeneral)
+		err, rows := freelanceInsert(file, item, RowGeneral)
 		if err == nil {
-			RowGeneral = RowGeneral + 1
+			RowGeneral = RowGeneral + 1 + rows
 		}
 	}
 
@@ -580,7 +583,8 @@ func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) (er
 	return nil, row
 }
 
-func freelanceInsert(file *excelize.File, freelance freelances.Freelances, row int) error {
+func freelanceInsert(file *excelize.File, freelance freelances.Freelances, row int) (error, int) {
+	var quantityOfCecos int = 0
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), freelance.IdFreelance)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), freelance.NroFreelance)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), freelance.CUIT)
@@ -614,8 +618,15 @@ func freelanceInsert(file *excelize.File, freelance freelances.Freelances, row i
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AE%d", row), freelance.DomDepto)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AF%d", row), freelance.DomLocalidad)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AG%d", row), freelance.DomProvincia)
+	for _, ceco := range freelance.Cecos {
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AH%d", row+quantityOfCecos), ceco.CcNum)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AI%d", row+quantityOfCecos), ceco.CcCliente)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AJ%d", row+quantityOfCecos), ceco.CcNombre)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AK%d", row+quantityOfCecos), ceco.CcPorcentaje)
+		quantityOfCecos++
+	}
 
-	return nil
+	return nil, quantityOfCecos
 }
 
 func initializeExcel(file *excelize.File) error {
@@ -733,6 +744,10 @@ func initializeExcelFreelances(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaGeneral, "AE2", "DOMICILIO DEPARTAMENTO")
 	file.SetCellValue(constantes.PestanaGeneral, "AF2", "DOMICILIO LOCALIDAD")
 	file.SetCellValue(constantes.PestanaGeneral, "AG2", "DOMICILIO PROVINCIA")
+	file.SetCellValue(constantes.PestanaGeneral, "AH2", "CECO NUMERO")
+	file.SetCellValue(constantes.PestanaGeneral, "AI2", "CECO CLIENTE")
+	file.SetCellValue(constantes.PestanaGeneral, "AJ2", "CECO NOMBRE")
+	file.SetCellValue(constantes.PestanaGeneral, "AK2", "CECO PORCENTAJE")
 
 	return nil
 }
