@@ -13,6 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/proyectoNovedades/servicios/constantes"
+	"github.com/proyectoNovedades/servicios/freelances"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
@@ -107,7 +108,7 @@ func GetExcelFile(c *fiber.Ctx) error {
 // Crear excel
 
 func GetExcelPP(c *fiber.Ctx) error {
-	fmt.Println("GetExcelFile")
+	fmt.Println("GetExcelFilePP")
 
 	// validar el token
 	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.Admin)
@@ -140,7 +141,7 @@ func GetExcelPP(c *fiber.Ctx) error {
 }
 
 func GetExcelAdmin(c *fiber.Ctx) error {
-	fmt.Println("GetExcelFile")
+	fmt.Println("GetExcelFileAdministration")
 
 	// validar el token
 	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.Admin)
@@ -180,6 +181,32 @@ func GetExcelAdmin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
 	}
 	return c.SendFile(os.Getenv("EXCEL_FILE_ADMIN"))
+}
+
+func GetFreelancesListExcel(c *fiber.Ctx) error {
+	fmt.Println("GetFreelancesListExcel")
+
+	// validar el token
+	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if err != nil {
+		return c.Status(codigo).SendString(err.Error())
+	}
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionFreelance)
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{Key: "idFreelance", Value: 1}})
+	cursor, _ := coll.Find(context.Background(), filter, opts)
+	var results []freelances.Freelances
+	err = cursor.All(context.Background(), &results)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+
+	err = ingresarDatosExcelFreelance(results)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
+	}
+	return c.SendFile(os.Getenv("EXCEL_FILE_FREELANCE"))
 }
 
 // ingresar datos a un excel
@@ -257,6 +284,34 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 
 	// guardar archivo
 	err := file.SaveAs(os.Getenv("EXCEL_FILE"))
+	if err != nil {
+		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+func ingresarDatosExcelFreelance(freelancesList []freelances.Freelances) error {
+	// Abrir archivo de excel
+	os.Remove("EXCEL_FILE_FREELANCE")
+	file := excelize.NewFile()
+	file.SetSheetName("Sheet1", constantes.PestanaGeneral)
+
+	err := initializeExcelFreelances(file)
+	if err != nil {
+		return err
+	}
+
+	var RowGeneral int = 3
+	for _, item := range freelancesList {
+		err = freelanceInsert(file, item, RowGeneral)
+		if err == nil {
+			RowGeneral = RowGeneral + 1
+		}
+	}
+
+	// guardar archivo
+	err = file.SaveAs(os.Getenv("EXCEL_FILE_FREELANCE"))
 	if err != nil {
 		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
 		return err
@@ -521,6 +576,44 @@ func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) (er
 	return nil, row
 }
 
+func freelanceInsert(file *excelize.File, freelance freelances.Freelances, row int) error {
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), freelance.IdFreelance)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), freelance.NroFreelance)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("C%d", row), freelance.CUIT)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("D%d", row), utf8_decode(freelance.Nombre))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), utf8_decode(freelance.Apellido))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), freelance.FechaIngreso.Format(constantes.FormatoFecha))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("G%d", row), freelance.Nomina)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("H%d", row), freelance.Gerente)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("I%d", row), freelance.Vertical)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("J%d", row), freelance.HorasMen)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("K%d", row), freelance.Cargo)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("L%d", row), freelance.FacturaMonto)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("M%d", row), freelance.FacturaDesde.Format(constantes.FormatoFecha))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("N%d", row), freelance.FacturaADCuit)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("O%d", row), freelance.FacturaADMonto)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("P%d", row), freelance.FacturaADDesde.Format(constantes.FormatoFecha))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("Q%d", row), freelance.B21Monto)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("R%d", row), freelance.B21Desde.Format(constantes.FormatoFecha))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("S%d", row), freelance.Comentario)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("T%d", row), freelance.Habilitado)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("U%d", row), freelance.FechaBaja.Format(constantes.FormatoFecha))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("V%d", row), freelance.Telefono)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("W%d", row), freelance.EmailLaboral)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("X%d", row), freelance.EmailPersonal)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("Y%d", row), freelance.FechaNacimiento.Format(constantes.FormatoFecha))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("Z%d", row), freelance.Genero)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AA%d", row), freelance.Nacionalidad)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AB%d", row), freelance.DomCalle)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AC%d", row), freelance.DomNumero)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AD%d", row), freelance.DomPiso)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AE%d", row), freelance.DomDepto)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AF%d", row), freelance.DomLocalidad)
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AG%d", row), freelance.DomProvincia)
+
+	return nil
+}
+
 func initializeExcel(file *excelize.File) error {
 	// General
 	// Unir celdas de general para sueldos y prestamos
@@ -598,6 +691,45 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaNovedades, "R2", "PERIODO")
 	file.SetCellValue(constantes.PestanaNovedades, "S2", "CENTRO DE COSTOS")
 	file.SetCellValue(constantes.PestanaNovedades, "T2", "PORCENTAJE")
+	return nil
+}
+
+func initializeExcelFreelances(file *excelize.File) error {
+	file.SetCellValue(constantes.PestanaGeneral, "A2", "ID")
+	file.SetCellValue(constantes.PestanaGeneral, "B2", "NRO FL")
+	file.SetCellValue(constantes.PestanaGeneral, "C2", "CUIT")
+	file.SetCellValue(constantes.PestanaGeneral, "D2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaGeneral, "E2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaGeneral, "F2", "FECHA DE INGRESO")
+	file.SetCellValue(constantes.PestanaGeneral, "G2", "NOMINA")
+	file.SetCellValue(constantes.PestanaGeneral, "H2", "GERENTE")
+	file.SetCellValue(constantes.PestanaGeneral, "I2", "VERTICAL")
+	file.SetCellValue(constantes.PestanaGeneral, "J2", "HORAS MEN")
+	file.SetCellValue(constantes.PestanaGeneral, "K2", "CARGO")
+	file.SetCellValue(constantes.PestanaGeneral, "L2", "FACTURA MONTO")
+	file.SetCellValue(constantes.PestanaGeneral, "M2", "FACTURA DESDE")
+	file.SetCellValue(constantes.PestanaGeneral, "N2", "FACTURA AD CUIT")
+	file.SetCellValue(constantes.PestanaGeneral, "O2", "FACTURA AD MONTO")
+	file.SetCellValue(constantes.PestanaGeneral, "P2", "FACTURA AD DESDE")
+	file.SetCellValue(constantes.PestanaGeneral, "Q2", "B21 MONTO")
+	file.SetCellValue(constantes.PestanaGeneral, "R2", "B21 DESDE")
+	file.SetCellValue(constantes.PestanaGeneral, "S2", "COMENTARIO")
+	file.SetCellValue(constantes.PestanaGeneral, "T2", "HABILITADO")
+	file.SetCellValue(constantes.PestanaGeneral, "U2", "FECHA DE BAJA")
+	//file.SetCellValue(constantes.PestanaGeneral, "V2", "CECOS")
+	file.SetCellValue(constantes.PestanaGeneral, "V2", "TELEFONO")
+	file.SetCellValue(constantes.PestanaGeneral, "W2", "EMAIL LABORAL")
+	file.SetCellValue(constantes.PestanaGeneral, "X2", "EMAIL PERSONAL")
+	file.SetCellValue(constantes.PestanaGeneral, "Y2", "FECHA DE NACIMIENTO")
+	file.SetCellValue(constantes.PestanaGeneral, "Z2", "GENERO")
+	file.SetCellValue(constantes.PestanaGeneral, "AA2", "NACIONALIDAD")
+	file.SetCellValue(constantes.PestanaGeneral, "AB2", "DOMICILIO CALLE")
+	file.SetCellValue(constantes.PestanaGeneral, "AC2", "DOMICILIO NUMERO")
+	file.SetCellValue(constantes.PestanaGeneral, "AD2", "DOMICILIO PISO")
+	file.SetCellValue(constantes.PestanaGeneral, "AE2", "DOMICILIO DEPARTAMENTO")
+	file.SetCellValue(constantes.PestanaGeneral, "AF2", "DOMICILIO LOCALIDAD")
+	file.SetCellValue(constantes.PestanaGeneral, "AG2", "DOMICILIO PROVINCIA")
+
 	return nil
 }
 
