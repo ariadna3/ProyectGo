@@ -187,13 +187,17 @@ func GetFreelancesListExcel(c *fiber.Ctx) error {
 	fmt.Println("GetFreelancesListExcel")
 
 	// validar el token
-	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	err, codigo, email := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if err != nil {
 		return c.Status(codigo).SendString(err.Error())
 	}
 
+	err, userGoogle := userGoogle.GetInternUserITP(email)
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionFreelance)
 	filter := bson.D{}
+	if userGoogle.Rol != constantes.Board {
+		filter = bson.D{{Key: "vertical", Value: userGoogle.Rol}}
+	}
 	opts := options.Find().SetSort(bson.D{{Key: "idFreelance", Value: 1}})
 	cursor, _ := coll.Find(context.Background(), filter, opts)
 	var results []freelances.Freelances

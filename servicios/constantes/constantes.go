@@ -6,6 +6,7 @@ const (
 	AnyRol           = ""
 	Admin            = "admin"
 	PeopleOperation  = "po"
+	Board            = "board"
 )
 
 const CecosNotValids = "(99999999999)"
