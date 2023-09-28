@@ -618,14 +618,13 @@ func freelanceInsert(file *excelize.File, freelance freelances.Freelances, row i
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AE%d", row), freelance.DomDepto)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AF%d", row), freelance.DomLocalidad)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AG%d", row), freelance.DomProvincia)
-	for _, ceco := range freelance.Cecos {
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AH%d", row+quantityOfCecos), ceco.CcNum)
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AI%d", row+quantityOfCecos), ceco.CcCliente)
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AJ%d", row+quantityOfCecos), ceco.CcNombre)
-		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AK%d", row+quantityOfCecos), ceco.CcPorcentaje)
-		quantityOfCecos++
+	for index, ceco := range freelance.Cecos {
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AH%d", row+index), ceco.CcNum)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AI%d", row+index), ceco.CcCliente)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AJ%d", row+index), ceco.CcNombre)
+		file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("AK%d", row+index), ceco.CcPorcentaje)
+		quantityOfCecos = index
 	}
-	quantityOfCecos--
 
 	return nil, quantityOfCecos
 }
