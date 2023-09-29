@@ -25,6 +25,7 @@ const CollectionRecurso = "recursos"
 const CollectionUserITP = "usersITP"
 const CollectionCecos = "centroDeCostos"
 const CollectionFreelance = "freelance"
+const CollectionHistorial = "historial"
 
 const (
 	SheetGeneral    = "General"

@@ -235,6 +235,10 @@ func main() {
 		app.Delete("/Freelance/:id", freelances.DeleteFreelance)
 		app.Put("/Freelance", freelances.UpdateFreelance)
 
+		//Historial
+		app.Get("/Historial/Freelance", freelances.GetFreelanceHistorial)
+		app.Get("/Historial/Freelance/:id", freelances.GetFreelanceHistorialById)
+
 		//GoogleUser
 		app.Post("/user", userGoogle.InsertUserITP)
 		app.Get("/user", userGoogle.GetSelfUserITP)

@@ -13,7 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/proyectoNovedades/servicios/constantes"
-	"github.com/proyectoNovedades/servicios/freelances"
+	"github.com/proyectoNovedades/servicios/models"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
@@ -203,7 +203,7 @@ func GetFreelancesListExcel(c *fiber.Ctx) error {
 	}
 	opts := options.Find().SetSort(bson.D{{Key: "idFreelance", Value: 1}})
 	cursor, _ := coll.Find(context.Background(), filter, opts)
-	var results []freelances.Freelances
+	var results []models.Freelances
 	err = cursor.All(context.Background(), &results)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString(err.Error())
@@ -298,7 +298,7 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 	return nil
 }
 
-func ingresarDatosExcelFreelance(freelancesList []freelances.Freelances) error {
+func ingresarDatosExcelFreelance(freelancesList []models.Freelances) error {
 	// Abrir archivo de excel
 	os.Remove("EXCEL_FILE_FREELANCE")
 	file := excelize.NewFile()
@@ -583,7 +583,7 @@ func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) (er
 	return nil, row
 }
 
-func freelanceInsert(file *excelize.File, freelance freelances.Freelances, row int) (error, int) {
+func freelanceInsert(file *excelize.File, freelance models.Freelances, row int) (error, int) {
 	var quantityOfCecos int = 0
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("A%d", row), freelance.IdFreelance)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("B%d", row), freelance.NroFreelance)
