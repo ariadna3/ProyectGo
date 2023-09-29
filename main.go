@@ -234,7 +234,8 @@ func main() {
 		app.Get("/Freelance/:id", freelances.GetFreelance)
 		app.Get("/Freelance", freelances.GetFreelancesList)
 		app.Delete("/Freelance/:id", freelances.DeleteFreelance)
-		app.Put("/Freelance", freelances.UpdateFreelance)
+		app.Put("/Freelance", freelances.ReplaceFreelance)
+		app.Patch("/Freelance", freelances.UpdateFreelance)
 
 		//Historial
 		app.Get("/Historial/Freelance", freelances.GetFreelanceHistorial)
