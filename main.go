@@ -11,6 +11,7 @@ import (
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/userGoogle"
+	"github.com/proyectoNovedades/servicios/utils"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -290,6 +291,7 @@ func createConnectionWithMongo() bool {
 		userGoogle.ConnectMongoDb(client)
 		excel.ConnectMongoDb(client)
 		freelances.ConnectMongoDb(client)
+		utils.ConnectMongoDb(client)
 		return true
 	}
 	return false
