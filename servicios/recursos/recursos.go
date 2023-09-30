@@ -31,17 +31,25 @@ func ConnectMongoDb(clientMongo *mongo.Client) {
 }
 
 type Recursos struct {
-	IdRecurso   int       `bson:"idRecurso"`
-	Gerente     string    `bson:"gerente"`
-	Nombre      string    `bson:"nombre"`
-	Apellido    string    `bson:"apellido"`
-	Legajo      int       `bson:"legajo"`
-	Mail        string    `bson:"mail"`
-	Fecha       time.Time `bson:"date"`
-	FechaString string    `bson:"fechaString"`
-	FechaIng    string    `bson:"fechaIng"`
-	Sueldo      int       `bson:"sueldo"`
-	Rcc         []P       `bson:"p"`
+	IdRecurso   int          `bson:"idRecurso"`
+	Gerente     string       `bson:"gerente"`
+	Nombre      string       `bson:"nombre"`
+	Apellido    string       `bson:"apellido"`
+	Legajo      int          `bson:"legajo"`
+	Mail        string       `bson:"mail"`
+	Fecha       time.Time    `bson:"date"`
+	FechaString string       `bson:"fechaString"`
+	FechaIng    string       `bson:"fechaIng"`
+	Sueldo      int          `bson:"sueldo"`
+	Rcc         []P          `bson:"p"`
+	Vacaciones  []Vacaciones `bson:"vacaciones"`
+}
+
+type Vacaciones struct {
+	CantidadComun      int `bson:"cantidadComun"`
+	CantidadPatagonian int `bson:"cantidadPatagonian"`
+	CantidadOtros      int `bson:"cantidadOtros"`
+	Anio               int `bson:"anio"`
 }
 
 type RecursosWithID struct {
@@ -429,6 +437,113 @@ func PutRecurso(c *fiber.Ctx) error {
 	return c.Status(200).JSON(recurso)
 }
 
+func InsertVacacionesThisYear() error {
+	ActualDate := time.Now()
+	decemberDate := time.Date(ActualDate.Year(), 12, 31, 0, 0, 0, 0, time.UTC)
+	year := ActualDate.Year()
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+
+	var recursos []Recursos
+
+	cursor, err := coll.Find(context.Background(), bson.M{})
+	if err != nil {
+		return err
+	}
+	if err = cursor.All(context.Background(), &recursos); err != nil {
+		return err
+	}
+
+	for index, recurso := range recursos {
+		quantityCommon := 14
+		diffYears := decemberDate.Year() - recurso.Fecha.Year()
+		if diffYears == 0 {
+			diffDays := decemberDate.YearDay() - recurso.Fecha.YearDay()
+			if diffDays < 180 {
+				quantityCommon = int(diffDays / 15)
+			}
+		} else if diffYears >= 5 {
+			quantityCommon = 21
+		} else if diffYears >= 10 {
+			quantityCommon = 28
+		} else if diffYears >= 20 {
+			quantityCommon = 35
+		}
+		var vacaciones Vacaciones
+		vacaciones.Anio = year
+		vacaciones.CantidadComun = quantityCommon
+		vacaciones.CantidadPatagonian = 7
+		vacaciones.CantidadOtros = 0
+		// verifica que las ultimas vacaciones no sean del mismo año
+		if len(recurso.Vacaciones) != 0 {
+			if recurso.Vacaciones[len(recurso.Vacaciones)-1].Anio == year {
+				continue
+			}
+		}
+		recursos[index].Vacaciones = append(recursos[index].Vacaciones, vacaciones)
+	}
+
+	for _, recurso := range recursos {
+		filter := bson.D{{Key: "idRecurso", Value: recurso.IdRecurso}}
+		update := bson.D{{Key: "$set", Value: recurso}}
+		result, err := coll.UpdateOne(context.Background(), filter, update)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		fmt.Printf("Updated %v documents in the trainers collection\n", result.ModifiedCount)
+	}
+
+	return nil
+}
+
+func UpdateVacaciones(c *fiber.Ctx) error {
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	//obtener el id del recurso
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	//obtencion de datos
+	vacacionesSolicitadas := new(Vacaciones)
+	if err := c.BodyParser(vacacionesSolicitadas); err != nil {
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
+	}
+
+	//obtener el recurso
+	var recurso Recursos
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: idNumber}}).Decode(&recurso)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+
+	//verificar que no se pase de los dias
+	var encontrado bool = false
+	for index, vacaciones := range recurso.Vacaciones {
+		if vacaciones.Anio == vacacionesSolicitadas.Anio {
+			recurso.Vacaciones[index].CantidadComun = vacacionesSolicitadas.CantidadComun
+			recurso.Vacaciones[index].CantidadPatagonian = vacacionesSolicitadas.CantidadPatagonian
+			recurso.Vacaciones[index].CantidadOtros = vacacionesSolicitadas.CantidadOtros
+			encontrado = true
+			break
+		}
+	}
+	if !encontrado {
+		return c.Status(fiber.StatusNotFound).SendString("No se encontro el año solicitado")
+	}
+
+	//actualizar el recurso
+	filter := bson.D{{Key: "idRecurso", Value: idNumber}}
+	update := bson.D{{Key: "$set", Value: recurso}}
+	result, err := coll.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+	return c.JSON(result)
+}
+
 // borrar recurso por id
 func DeleteRecurso(c *fiber.Ctx) error {
 
@@ -475,6 +590,46 @@ func GetRecursoHash(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).SendString(hash)
+}
+
+func UseVacaciones(id int, vacacionesSolicitadas Vacaciones) error {
+	//obtener el id del recurso
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+
+	//obtener el recurso
+	var recurso Recursos
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: id}}).Decode(&recurso)
+	if err != nil {
+		return err
+	}
+
+	//verificar que no se pase de los dias
+	var verificado bool = false
+	for index, vacaciones := range recurso.Vacaciones {
+		if vacaciones.Anio == vacacionesSolicitadas.Anio {
+			verificado = (vacaciones.CantidadComun >= vacacionesSolicitadas.CantidadComun) && (vacaciones.CantidadPatagonian >= vacacionesSolicitadas.CantidadPatagonian) && (vacaciones.CantidadOtros >= vacacionesSolicitadas.CantidadOtros)
+			if verificado {
+				recurso.Vacaciones[index].CantidadComun -= vacacionesSolicitadas.CantidadComun
+				recurso.Vacaciones[index].CantidadPatagonian -= vacacionesSolicitadas.CantidadPatagonian
+				recurso.Vacaciones[index].CantidadOtros -= vacacionesSolicitadas.CantidadOtros
+			}
+		}
+	}
+	if !verificado {
+		return errors.New("No se puede realizar la solicitud, año o cantidad no valida")
+	}
+
+	//actualizar el recurso
+	filter := bson.D{{Key: "idRecurso", Value: id}}
+	update := bson.D{{Key: "$set", Value: recurso}}
+	result, err := coll.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return err
+	}
+	if result.ModifiedCount == 0 {
+		return errors.New("No se pudo actualizar el recurso")
+	}
+	return nil
 }
 
 func GetRecursoInterno(email string, id int, legajo int) (error, Recursos) {

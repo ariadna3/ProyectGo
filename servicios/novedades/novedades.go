@@ -136,6 +136,10 @@ type Paso struct {
 	Responsable string `bson:"responsable"`
 }
 
+type FileDto struct {
+	Archivo string
+}
+
 var client *mongo.Client
 
 func ConnectMongoDb(clientMongo *mongo.Client) {
@@ -357,15 +361,15 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 		if c.Query("estadoWF") == "all" {
 			responsables := bson.A{}
 			var orTodo bson.D = bson.D{}
-			if c.Query("responsableWF") != ""{
+			if c.Query("responsableWF") != "" {
 				responsablesArray := strings.Split(c.Query("responsableWF"), "|")
-				if contieneElArray(responsablesArray, "soporte"){
+				if contieneElArray(responsablesArray, "soporte") {
 					responsables = append(responsables, bson.D{{Key: "aprobador", Value: recurso.Gerente}})
 				}
-				if contieneElArray(responsablesArray, "gerente"){
+				if contieneElArray(responsablesArray, "gerente") {
 					responsables = append(responsables, bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}})
 				}
-				if contieneElArray(responsablesArray, "grupo"){
+				if contieneElArray(responsablesArray, "grupo") {
 					responsables = append(responsables, bson.D{{Key: "aprobador", Value: usuario.Rol}})
 				}
 			} else {
@@ -378,22 +382,22 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 					responsables = bson.A{mail, grupo, soporte}
 				}
 			}
-			
+
 			orTodo = bson.D{{Key: "$or", Value: responsables}}
 
 			busqueda["workflow"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
 		} else {
 			estadoWFRegex := bson.M{"$regex": c.Query("estadoWF"), "$options": "im"}
 			responsables := bson.A{}
-			if c.Query("responsableWF") != ""{
+			if c.Query("responsableWF") != "" {
 				responsablesArray := strings.Split(c.Query("responsableWF"), "|")
-				if contieneElArray(responsablesArray, "soporte"){
+				if contieneElArray(responsablesArray, "soporte") {
 					responsables = append(responsables, bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: recurso.Gerente}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}})
 				}
-				if contieneElArray(responsablesArray, "gerente"){
+				if contieneElArray(responsablesArray, "gerente") {
 					responsables = append(responsables, bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: strconv.Itoa(recurso.Legajo)}}, bson.D{{Key: "estado", Value: estadoWFRegex}}}}})
 				}
-				if contieneElArray(responsablesArray, "grupo"){
+				if contieneElArray(responsablesArray, "grupo") {
 					responsables = append(responsables, bson.D{{Key: "$and", Value: bson.A{bson.D{{Key: "aprobador", Value: usuario.Rol}, {Key: "estado", Value: estadoWFRegex}}}}})
 				}
 			} else {
@@ -406,7 +410,7 @@ func GetNovedadFiltro(c *fiber.Ctx) error {
 					responsables = bson.A{andMail, andGrupo, andSoporte}
 				}
 			}
-			
+
 			orTodo := bson.D{{Key: "$or", Value: responsables}}
 
 			busqueda["workflow"] = bson.D{{Key: "$elemMatch", Value: orTodo}}
@@ -632,6 +636,101 @@ func UpdateFileAdd(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).SendString("Subidos archivos correctamente")
+}
+
+func UpdateFile(c *fiber.Ctx) error {
+	fmt.Println("put de novedad adjuntos")
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	//obtener el id del recurso
+	id := c.Params("id")
+	idNovedad, _ := strconv.Atoi(id)
+
+	//obtencion de datos de la base de datos
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+	var novedad Novedades
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "idSecuencial", Value: idNovedad}}).Decode(&novedad)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+
+	// eliminar los archivos de adjuntos de la carpeta
+	for _, adjunto := range novedad.Adjuntos {
+		direccionArchivo := os.Getenv("FOLDER_FILE") + "/" + (strconv.Itoa(novedad.IdSecuencial) + adjunto)
+		os.Remove(direccionArchivo)
+	}
+
+	// obtener los archivos
+	form, err := c.MultipartForm()
+	if err != nil {
+		return c.Status(fiber.StatusNoContent).SendString("archivo no encontrado")
+	} else {
+		for _, fileHeaders := range form.File {
+			for _, fileHeader := range fileHeaders {
+				fmt.Println(fileHeader)
+				novedad.Adjuntos = append(novedad.Adjuntos, fileHeader.Filename)
+				c.SaveFile(fileHeader, os.Getenv("FOLDER_FILE")+"/"+id+fileHeader.Filename)
+			}
+		}
+	}
+
+	// actualiza los adjuntos
+	filter := bson.D{{Key: "idSecuencial", Value: idNovedad}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "adjuntos", Value: novedad.Adjuntos}}}}
+
+	_, err = coll.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+
+	return c.Status(fiber.StatusOK).SendString("Subidos archivos correctamente")
+}
+
+// Eliminar archivos a una notificacion
+func DeleteFile(c *fiber.Ctx) error {
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionNovedad)
+	idNumber, _ := strconv.Atoi(c.Params("id"))
+	var novedad Novedades
+	err := coll.FindOne(context.TODO(), bson.M{"idSecuencial": idNumber}).Decode(&novedad)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString("novedad no encontrada")
+	}
+
+	//ingresa los archivos
+	var archivo FileDto
+	if err := c.BodyParser(&archivo); err != nil {
+		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
+	}
+	var borrado bool = false
+	for i, adjunto := range novedad.Adjuntos {
+		if adjunto == archivo.Archivo {
+			novedad.Adjuntos = append(novedad.Adjuntos[:i], novedad.Adjuntos[i+1:]...)
+			direccionArchivo := os.Getenv("FOLDER_FILE") + "/" + (strconv.Itoa(novedad.IdSecuencial) + archivo.Archivo)
+			os.Remove(direccionArchivo)
+			borrado = true
+		}
+	}
+
+	filter := bson.D{{Key: "idSecuencial", Value: idNumber}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "adjuntos", Value: novedad.Adjuntos}}}}
+
+	_, err = coll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+	if borrado {
+		return c.Status(fiber.StatusOK).SendString("Eliminado archivos correctamente")
+	}
+	return c.Status(fiber.StatusOK).SendString("El archivos no pudo eliminarse")
 }
 
 // ----Tipo Novedades----
@@ -883,13 +982,12 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 
 	//2- comprobacion por soporte
 	comprobacionSop := false
-	if os.Getenv("APROVE_ROL") != ""{
+	if os.Getenv("APROVE_ROL") != "" {
 		errSop, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, os.Getenv("APROVE_ROL"))
 		if errSop == nil {
 			comprobacionSop = (aprobador == recurso.Gerente)
 		}
 	}
-	
 
 	if strconv.Itoa(recurso.Legajo) != aprobador && errGrupo != nil && !comprobacionSop {
 		return c.Status(fiber.ErrForbidden.Code).SendString("Usuario no autorizado")
@@ -905,6 +1003,17 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 		if err.Error() == FinalDeLosPasos {
 			novedad.Estado = constantes.Aceptada
 			enviarMailWorkflow(novedad)
+
+			if strings.Contains(constantes.DescripcionLicenciasComunes, novedad.Descripcion) {
+				// Crear vacaciones y setearlas
+				vacaciones := new(recursos.Vacaciones)
+				vacaciones.CantidadComun = 0
+				vacaciones.CantidadPatagonian = 0
+				vacaciones.CantidadOtros = 0
+				vacaciones.Anio = 0
+
+				//recursos.UseVacaciones(novedad.IdSecuencial, *vacaciones)
+			}
 		}
 	}
 	//crea el filtro
@@ -956,7 +1065,7 @@ func RechazarWorkflow(c *fiber.Ctx) error {
 
 	//2- comprobacion por soporte
 	comprobacionSop := false
-	if os.Getenv("APROVE_ROL") != ""{
+	if os.Getenv("APROVE_ROL") != "" {
 		errSop, _, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, os.Getenv("APROVE_ROL"))
 		if errSop == nil {
 			comprobacionSop = (aprobador == recurso.Gerente)
@@ -1346,7 +1455,7 @@ func ingresarPaqueteDeCecos(paqueteDeCecos PackageOfCecos) {
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedIDs...)
 }
 
-func contieneElArray(arrayBuscador []string, buscado string) bool{
+func contieneElArray(arrayBuscador []string, buscado string) bool {
 	for _, encontrado := range arrayBuscador {
 		if encontrado == buscado {
 			return true

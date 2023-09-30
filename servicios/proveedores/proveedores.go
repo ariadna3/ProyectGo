@@ -247,3 +247,27 @@ func ingresarPaqueteDeProveedores(paqueteDeProveedores PackageOfProveedores) {
 	}
 	fmt.Printf("Inserted document with _id: %v\n", result.InsertedIDs...)
 }
+
+func ObtenerProveedores(IdProveedor int, CodProv int, razonSocial string) (Proveedores, error) {
+    coll := client.Database(constantes.Database).Collection(constantes.CollectionProveedor)
+    var proveedor Proveedores
+    var filter bson.M
+
+    switch {
+    case IdProveedor != 0:
+        filter = bson.M{"IdProveedor": IdProveedor}
+    case CodProv != 0:
+        filter = bson.M{"CodProv": CodProv}
+    case razonSocial != "":
+        filter = bson.M{"razonSocial": razonSocial}
+    default:
+        return proveedor, errors.New("No se obtuvo un proveedor válido")
+    }
+
+    err := coll.FindOne(context.TODO(), filter).Decode(&proveedor)
+    if err != nil {
+        return proveedor, err
+    }
+
+    return proveedor, nil
+}

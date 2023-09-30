@@ -6,10 +6,12 @@ import (
 	"github.com/proyectoNovedades/servicios/actividades"
 	"github.com/proyectoNovedades/servicios/constantes"
 	"github.com/proyectoNovedades/servicios/excel"
+	"github.com/proyectoNovedades/servicios/freelances"
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
 	"github.com/proyectoNovedades/servicios/userGoogle"
+	"github.com/proyectoNovedades/servicios/utils"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
@@ -26,6 +28,7 @@ import (
 	"io/ioutil"
 	"net/smtp"
 	"os"
+	"time"
 )
 
 type Actividades struct {
@@ -152,6 +155,10 @@ func main() {
 	connectedWithMongo := createConnectionWithMongo()
 	connectedWithSql := createConnectionWithMysql()
 
+	alarmVacations := createAlarm(9, 25)
+	go alarmSetVacations(alarmVacations)
+	fmt.Print("Alarma de vacaciones seteada para el dia: " + alarmVacations.String() + "\n")
+
 	if connectedWithMongo {
 
 		fmt.Println("Conectado con mongo")
@@ -174,7 +181,11 @@ func main() {
 		app.Get("/Novedad/*", novedades.GetNovedadFiltro)
 		app.Delete("/Novedad/:id", novedades.DeleteNovedad)
 
-		app.Get("/Excel/Novedad", excel.GetExcelFile)
+		//Excel
+		app.Get("/Excel/Novedad/*", excel.GetExcelFile)
+		app.Get("/Excel/PagoProveedores/*", excel.GetExcelPP)
+		app.Get("/Excel/Admin/*", excel.GetExcelAdmin)
+		app.Get("/Excel/Freelance/*", excel.GetFreelancesListExcel)
 
 		//Workflow novedad
 		app.Post("/Workflow", novedades.InsertWorkFlow)
@@ -183,7 +194,9 @@ func main() {
 
 		//obtener adjuntos novedades
 		app.Get("/Archivos/Novedad/Adjuntos/:id/*", novedades.GetFiles)
-		app.Put("/Archivos/Novedad/Adjuntos/:id", novedades.UpdateFileAdd)
+		app.Post("/Archivos/Novedad/Adjuntos/:id", novedades.UpdateFileAdd)
+		app.Delete("/Archivos/Novedad/Adjuntos/:id", novedades.DeleteFile)
+		app.Put("/Archivos/Novedad/Adjuntos/:id", novedades.UpdateFile)
 
 		//Tipo Novedades
 		app.Get("/TipoNovedades", novedades.GetTipoNovedad)
@@ -214,7 +227,19 @@ func main() {
 		app.Post("/Recurso/Package", recursos.InsertRecursoPackage)
 		app.Patch("/Recurso/:id/*", recursos.UpdateRecurso)
 		app.Put("/Recurso", recursos.PutRecurso)
-		//app.Get("/HashRecurso/:id", recursos.GetRecursoHash)
+		app.Patch("/Vacaciones/:id", recursos.UpdateVacaciones)
+
+		//Freelances
+		app.Post("/Freelance", freelances.InsertFreelance)
+		app.Get("/Freelance/:id", freelances.GetFreelance)
+		app.Get("/Freelance", freelances.GetFreelancesList)
+		app.Delete("/Freelance/:id", freelances.DeleteFreelance)
+		app.Put("/Freelance", freelances.ReplaceFreelance)
+		app.Patch("/Freelance", freelances.UpdateFreelance)
+
+		//Historial
+		app.Get("/Historial/Freelance", freelances.GetFreelanceHistorial)
+		app.Get("/Historial/Freelance/:id", freelances.GetFreelanceHistorialById)
 
 		//GoogleUser
 		app.Post("/user", userGoogle.InsertUserITP)
@@ -223,6 +248,7 @@ func main() {
 		app.Delete("user/:email", userGoogle.DeleteUserITP)
 		app.Patch("/user", userGoogle.UpdateUserITP)
 		app.Get("/users", userGoogle.GetUserITPAll)
+		app.Get("/Permisos", userGoogle.GetPermisos)
 
 	} else {
 		fmt.Println("Problema al conectarse con mongo")
@@ -265,6 +291,8 @@ func createConnectionWithMongo() bool {
 		recursos.ConnectMongoDb(client)
 		userGoogle.ConnectMongoDb(client)
 		excel.ConnectMongoDb(client)
+		freelances.ConnectMongoDb(client)
+		utils.ConnectMongoDb(client)
 		return true
 	}
 	return false
@@ -318,4 +346,27 @@ func pruebaConexionEmail() error {
 		return nil
 	}
 	return nil
+}
+
+func createAlarm(month int, day int) time.Time {
+	m := time.Month(month)
+	alarm := time.Date(time.Now().Year(), m, day, 20, 0, 0, 0, time.FixedZone("Buenos Aires", -3*60*60))
+	if alarm.Before(time.Now()) {
+		alarm = time.Date(time.Now().AddDate(1, 0, 0).Year(), m, day, 20, 0, 0, 0, time.FixedZone("Buenos Aires", -3*60*60))
+	}
+	return alarm
+}
+
+func alarmSetVacations(alarm time.Time) {
+	ticker1 := time.NewTicker(24 * time.Hour)
+	for c := range ticker1.C {
+		if alarm.Before(c) {
+			err := recursos.InsertVacacionesThisYear()
+			if err != nil {
+				fmt.Println(err)
+			}
+			alarm = alarm.AddDate(1, 0, 0)
+			fmt.Print("Alarma de vacaciones seteada para el dia: " + alarm.String() + "\n")
+		}
+	}
 }
