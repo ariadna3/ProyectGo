@@ -146,6 +146,8 @@ func ReplaceFreelance(c *fiber.Ctx) error {
 			diferencias[key] = value
 		}
 	}
+	// ingresa el campo id
+	diferencias["idFreelance"] = freelanceNew.IdFreelance
 
 	update := bson.D{{Key: "$set", Value: freelanceNew}}
 	result, err := coll.UpdateOne(context.Background(), filter, update)
