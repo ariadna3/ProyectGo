@@ -198,7 +198,7 @@ func GetFreelancesListExcel(c *fiber.Ctx) error {
 	}
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionFreelance)
 	filter := bson.D{}
-	if userGoogle.Rol != constantes.Board {
+	if !stringContains(constantes.BoardAndPO, userGoogle.Rol) {
 		filter = bson.D{{Key: "vertical", Value: userGoogle.Rol}}
 	}
 	opts := options.Find().SetSort(bson.D{{Key: "idFreelance", Value: 1}})
@@ -1069,4 +1069,16 @@ func utf8_decode(str string) string {
 		result += string(str[i])
 	}
 	return result
+}
+
+func stringContains(str string, substr string) bool {
+	if str != "" {
+		result := strings.Split(str, ",")
+		for _, part := range result {
+			if part == substr {
+				return true
+			}
+		}
+	}
+	return false
 }

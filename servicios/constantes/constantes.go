@@ -7,6 +7,7 @@ const (
 	Admin            = "admin"
 	PeopleOperation  = "po"
 	Board            = "board"
+	BoardAndPO       = "board,po"
 )
 
 const CecosNotValids = "(99999999999)"

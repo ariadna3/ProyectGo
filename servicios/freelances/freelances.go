@@ -122,14 +122,38 @@ func ReplaceFreelance(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 
-	freelance := new(models.Freelances)
-	if err := c.BodyParser(freelance); err != nil {
+	freelanceNew := new(models.Freelances)
+	if err := c.BodyParser(freelanceNew); err != nil {
 		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
 
+	var freelanceOld models.Freelances
+	// obtener el freelance
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionFreelance)
-	filter := bson.D{{Key: "idFreelance", Value: freelance.IdFreelance}}
-	update := bson.D{{Key: "$set", Value: freelance}}
+	filter := bson.D{{Key: "idFreelance", Value: freelanceNew.IdFreelance}}
+	coll.FindOne(context.Background(), filter).Decode(&freelanceOld)
+
+	// crear un mapa de diferencias
+	freelanceOldMap := utils.FreelanceToMap(freelanceOld)
+	freelanceNewMap := utils.FreelanceToMap(*freelanceNew)
+	diferencias := make(map[string]interface{})
+	// comparar los cecos con DeepEqual
+	if !reflect.DeepEqual(freelanceOld.Cecos, freelanceNew.Cecos) {
+		diferencias["cecos"] = freelanceNew.Cecos
+	}
+	// eliminar el campo cecos
+	delete(freelanceOldMap, "Cecos")
+	delete(freelanceNewMap, "Cecos")
+	// comparar los mapas
+	for key, value := range freelanceNewMap {
+		if freelanceOldMap[key] != value {
+			diferencias[key] = value
+		}
+	}
+	// ingresa el campo id
+	diferencias["idFreelance"] = freelanceNew.IdFreelance
+
+	update := bson.D{{Key: "$set", Value: freelanceNew}}
 	result, err := coll.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString(err.Error())
@@ -140,12 +164,12 @@ func ReplaceFreelance(c *fiber.Ctx) error {
 	if result.ModifiedCount == 0 {
 		return c.Status(fiber.StatusNotFound).SendString("No se modifico el freelance")
 	}
-	err = utils.SaveFreelanceInsert(usuario, *freelance, "replace")
+	err = utils.SaveMapInsert(usuario, diferencias, "replace")
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	fmt.Printf("Matched %v documents and updated %v documents.\n", result.MatchedCount, result.ModifiedCount)
-	return c.Status(200).JSON(freelance)
+	return c.Status(200).JSON(diferencias)
 }
 
 func UpdateFreelance(c *fiber.Ctx) error {

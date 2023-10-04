@@ -52,11 +52,11 @@ type Rcc struct {
 
 // Historial de cambios freelance
 type HistorialFreelance struct {
-	IdHistorial     int        `bson:"idHistorial"`
-	UsuarioEmail    string     `bson:"usuarioEmail"`
-	UsuarioNombre   string     `bson:"usuarioNombre"`
-	UsuarioApellido string     `bson:"usuarioApellido"`
-	Freelance       Freelances `bson:"freelance"`
-	Tipo            string     `bson:"tipo"`
-	FechaHora       time.Time  `bson:"fechaHora"`
+	IdHistorial     int                    `bson:"idHistorial"`
+	UsuarioEmail    string                 `bson:"usuarioEmail"`
+	UsuarioNombre   string                 `bson:"usuarioNombre"`
+	UsuarioApellido string                 `bson:"usuarioApellido"`
+	Freelance       map[string]interface{} `bson:"freelance"`
+	Tipo            string                 `bson:"tipo"`
+	FechaHora       time.Time              `bson:"fechaHora"`
 }
