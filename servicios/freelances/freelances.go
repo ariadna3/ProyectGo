@@ -137,6 +137,10 @@ func ReplaceFreelance(c *fiber.Ctx) error {
 	freelanceOldMap := utils.FreelanceToMap(freelanceOld)
 	freelanceNewMap := utils.FreelanceToMap(*freelanceNew)
 	diferencias := make(map[string]interface{})
+	// comparar los cecos con DeepEqual
+	if !reflect.DeepEqual(freelanceOld.Cecos, freelanceNew.Cecos) {
+		diferencias["cecos"] = freelanceNew.Cecos
+	}
 	// eliminar el campo cecos
 	delete(freelanceOldMap, "Cecos")
 	delete(freelanceNewMap, "Cecos")
