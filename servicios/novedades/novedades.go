@@ -663,6 +663,7 @@ func UpdateFile(c *fiber.Ctx) error {
 		direccionArchivo := os.Getenv("FOLDER_FILE") + "/" + (strconv.Itoa(novedad.IdSecuencial) + adjunto)
 		os.Remove(direccionArchivo)
 	}
+	novedad.Adjuntos = []string{}
 
 	// obtener los archivos
 	form, err := c.MultipartForm()
