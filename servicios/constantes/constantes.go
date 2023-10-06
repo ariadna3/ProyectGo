@@ -71,9 +71,9 @@ const (
 	DescLicencia          = "Licencia"
 	DescTarjetaBeneficios = "Tarjeta de beneficios"
 	DescPagos             = "Pagos"
-	FactServicios         = "Facturacion de servicio"
-	RendGastos            = "Rendicion de gastos"
-	NuevoCeco             = "Nuevo ceco"
+	DescFactServicios     = "Facturacion de servicio"
+	DescRendGastos        = "Rendicion de gastos"
+	DescNuevoCeco         = "Nuevo ceco"
 )
 
 var HorasExtrasTipos = map[string]string{

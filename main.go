@@ -155,9 +155,9 @@ func main() {
 	connectedWithMongo := createConnectionWithMongo()
 	connectedWithSql := createConnectionWithMysql()
 
-	alarmVacations := createAlarm(9, 25)
+	alarmVacations := createAlarm(10, 5)
 	go alarmSetVacations(alarmVacations)
-	fmt.Print("Alarma de vacaciones seteada para el dia: " + alarmVacations.String() + "\n")
+	fmt.Printf("Alarma de vacaciones setteada para: %s\n", alarmVacations.String())
 
 	if connectedWithMongo {
 

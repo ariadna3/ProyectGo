@@ -232,6 +232,23 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 	var rowLicencias int = 3
 	var rowNovedades int = 3
 
+	//obtener todos los pasos de workflow
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
+	cursor, err := coll.Find(context.Background(), bson.M{})
+	if err != nil {
+		return err
+	}
+	var pasosWorkflow []novedades.PasosWorkflow
+	if err = cursor.All(context.Background(), &pasosWorkflow); err != nil {
+		return err
+	}
+
+	// crear un mapa strins -> string con key descripcion y value tipoExcel
+	var pasosWorkflowMap map[string]string = make(map[string]string)
+	for _, item := range pasosWorkflow {
+		pasosWorkflowMap[item.Tipo] = item.TipoExcel
+	}
+
 	for _, item := range novedadesArr {
 		if !verificacionNovedad(item, fechaDesde, fechaHasta) {
 			if periodo {
@@ -242,44 +259,41 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 				continue
 			}
 		}
-		var pasosWorkflow novedades.PasosWorkflow
-		coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
-		err := coll.FindOne(context.TODO(), bson.M{"tipo": item.Descripcion}).Decode(&pasosWorkflow)
 
-		if pasosWorkflow.TipoExcel == constantes.DescAnticipo {
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescAnticipo {
 			err = anticipoPrestamo(file, item, rowGeneral, 1)
 			if err == nil {
 				rowGeneral = rowGeneral + 1
 			}
 		}
-		if pasosWorkflow.TipoExcel == constantes.DescSueldoNuevo {
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescSueldoNuevo {
 			err = nuevoSueldo(file, item, &rowGeneral)
 		}
-		if pasosWorkflow.TipoExcel == constantes.DescSueldoNuevoMasivo {
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescSueldoNuevoMasivo {
 			err = nuevoSueldoMasivo(file, item, &rowGeneral)
 		}
-		if pasosWorkflow.TipoExcel == constantes.DescLicencia {
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescLicencia {
 			err = licencias(file, item, rowLicencias)
 			if err == nil {
 				rowLicencias = rowLicencias + 1
 			}
 		}
-		if pasosWorkflow.TipoExcel == constantes.DescPrestamo {
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescPrestamo {
 			err = anticipoPrestamo(file, item, rowGeneral, 6)
 			if err == nil {
 				rowGeneral = rowGeneral + 1
 			}
 		}
-		if pasosWorkflow.TipoExcel == constantes.DescTarjetaBeneficios {
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescTarjetaBeneficios {
 			err = tarjetaBeneficio(file, item, rowGeneral)
 			if err == nil {
 				rowGeneral = rowGeneral + 1
 			}
 		}
-		if pasosWorkflow.TipoExcel == constantes.DescHorasExtras {
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescHorasExtras {
 			horasExtras(file, item, &rowHorasExtras)
 		}
-		if pasosWorkflow.TipoExcel == constantes.DescPagos {
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescPagos {
 			pagos(file, item, &rowGeneral)
 		}
 		err, rowNovedades = allNovedades(file, item, rowNovedades)
@@ -290,7 +304,7 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 	}
 
 	// guardar archivo
-	err := file.SaveAs(os.Getenv("EXCEL_FILE"))
+	err = file.SaveAs(os.Getenv("EXCEL_FILE"))
 	if err != nil {
 		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
 		return err
@@ -533,9 +547,6 @@ func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) (er
 
 	for _, recursoInterno := range novedad.Recursos {
 		var rowStop int = row
-		if novedad.IdSecuencial == 723 {
-			fmt.Print("stop")
-		}
 		for index, distribucion := range novedad.Distribuciones {
 			rowStop = row + index
 			file.SetCellValue(constantes.PestanaNovedades, fmt.Sprintf("A%d", rowStop), novedad.Fecha)
@@ -785,6 +796,10 @@ func initializeExcelAdmin(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaFactServicios, "N2", "COMENTARIOS")
 	file.SetCellValue(constantes.PestanaFactServicios, "D1", "USUARIO")
 	file.SetCellValue(constantes.PestanaFactServicios, "H1", "CONCEPTO DE FACTURACIÓN")
+	file.SetCellValue(constantes.PestanaFactServicios, "K1", "ORDEN DE COMPRA")
+	file.SetCellValue(constantes.PestanaFactServicios, "L1", "PROMOVIDO")
+	file.SetCellValue(constantes.PestanaFactServicios, "M1", "ENVIAR A")
+	file.SetCellValue(constantes.PestanaFactServicios, "N1", "CONTACTOS")
 	// Rendicion de gastos
 	// Unir celdas de Rendicion de gastos
 	file.MergeCell(constantes.PestanaRendGastos, "D1", "F1")
@@ -809,6 +824,9 @@ func initializeExcelAdmin(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaRendGastos, "D1", "USUARIO")
 	file.SetCellValue(constantes.PestanaRendGastos, "G1", "PROVEEDOR")
 	file.SetCellValue(constantes.PestanaRendGastos, "I1", "CONCEPTO DE FACTURACIÓN")
+	file.SetCellValue(constantes.PestanaRendGastos, "K1", "ENVIAR A")
+	file.SetCellValue(constantes.PestanaRendGastos, "L1", "CONTACTO")
+	file.SetCellValue(constantes.PestanaRendGastos, "M1", "RECURSO")
 	// Centro de costos
 	// Unir celdas de centros de costos
 	file.MergeCell(constantes.PestanaNuevoCeco, "D1", "F1")
@@ -833,6 +851,23 @@ func initializeExcelAdmin(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaNuevoCeco, "D1", "USUARIO")
 	file.SetCellValue(constantes.PestanaNuevoCeco, "G1", "PROVEEDOR")
 	file.SetCellValue(constantes.PestanaNuevoCeco, "I1", "CONCEPTO DE FACTURACIÓN")
+
+	// Horas extras
+	// Unir celdas de horas extras para sueldos y prestamos
+	file.MergeCell(constantes.PestanaHorasExtras, "F1", "K1")
+	// Ingresar los nombres de las celdas en horas extras
+	file.SetCellValue(constantes.PestanaHorasExtras, "A2", "FECHA")
+	file.SetCellValue(constantes.PestanaHorasExtras, "B2", "NOVEDAD")
+	file.SetCellValue(constantes.PestanaHorasExtras, "C2", "LEGAJO")
+	file.SetCellValue(constantes.PestanaHorasExtras, "D2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaHorasExtras, "E2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaHorasExtras, "F2", "PERIODO")
+	file.SetCellValue(constantes.PestanaHorasExtras, "G2", "AL 50% EXENTAS (CONCEPTO 2212)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "H2", "AL 100% EXENTAS (CONCEPTO 2220)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "I2", "NOCTURNAS AL 50% (CONCEPTO 2213)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "J2", "NOCTURNAS AL 100% (CONCEPTO 2221)")
+	file.SetCellValue(constantes.PestanaHorasExtras, "K2", "HORAS FERIADO")
+	file.SetCellValue(constantes.PestanaHorasExtras, "F1", "")
 
 	return nil
 }
@@ -911,40 +946,53 @@ func excelAdmin(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 	var rowNuevoCeco int = 3
 	var rowHorasExtras int = 3
 
+	//obtener todos los pasos de workflow
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
+	cursor, err := coll.Find(context.Background(), bson.M{})
+	if err != nil {
+		return err
+	}
+	var pasosWorkflow []novedades.PasosWorkflow
+	if err = cursor.All(context.Background(), &pasosWorkflow); err != nil {
+		return err
+	}
+
+	// crear un mapa strins -> string con key descripcion y value tipoExcel
+	var pasosWorkflowMap map[string]string = make(map[string]string)
+	for _, item := range pasosWorkflow {
+		pasosWorkflowMap[item.Tipo] = item.TipoExcel
+	}
+
+	// recorrer las novedades y guardarlas en el excel
 	for _, item := range novedadesArr {
 		if !verificacionNovedad(item, fechaDesde, fechaHasta) {
 			continue
 		}
-		var pasosWorkflow novedades.PasosWorkflow
-		coll := client.Database(constantes.Database).Collection(constantes.CollectionPasosWorkflow)
-		err := coll.FindOne(context.TODO(), bson.M{"tipo": item.Descripcion}).Decode(&pasosWorkflow)
 
-		if pasosWorkflow.TipoExcel == constantes.FactServicios {
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescFactServicios {
 			err = factServicios(file, item, rowFactServicios)
 			if err == nil {
 				rowFactServicios++
 			}
 		}
-		if pasosWorkflow.TipoExcel == constantes.RendGastos {
-			err = rendGastos(file, item, rowRendGastos)
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescRendGastos {
+			quantityOfRowUsed, err := rendGastos(file, item, rowRendGastos)
 			if err == nil {
-				rowRendGastos++
+				rowRendGastos += quantityOfRowUsed
 			}
 		}
-		if pasosWorkflow.TipoExcel == constantes.DescHorasExtras {
-			err = horasExtras(file, item, &rowHorasExtras)
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescHorasExtras {
+			horasExtras(file, item, &rowHorasExtras)
+		}
+		if pasosWorkflowMap[item.Descripcion] == constantes.DescNuevoCeco {
+			err = nuevoCeco(file, item, rowNuevoCeco)
 			if err == nil {
-				rowHorasExtras++
+				rowNuevoCeco++
 			}
 		}
-		err = nuevoCeco(file, item, rowNuevoCeco)
-		if err == nil {
-			rowNuevoCeco++
-		}
-
 	}
 	// guardar archivo
-	err := file.SaveAs(os.Getenv("EXCEL_FILE_ADMIN"))
+	err = file.SaveAs(os.Getenv("EXCEL_FILE_ADMIN"))
 	if err != nil {
 		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
 		return err
@@ -957,54 +1005,55 @@ func factServicios(file *excelize.File, novedad novedades.Novedades, row int) er
 	if err != nil {
 		return err
 	}
-	cellMappings := map[string]interface{}{
-		fmt.Sprintf("A%d", row): novedad.Fecha,
-		fmt.Sprintf("B%d", row): novedad.IdSecuencial,
-		fmt.Sprintf("C%d", row): novedad.Descripcion,
-		fmt.Sprintf("D%d", row): recurso.Legajo,
-		fmt.Sprintf("E%d", row): recurso.Nombre,
-		fmt.Sprintf("F%d", row): recurso.Apellido,
-		fmt.Sprintf("N%d", row): novedad.Cliente,
-		fmt.Sprintf("P%d", row): novedad.ConceptoDeFacturacion,
-		fmt.Sprintf("P%d", row): novedad.Periodo,
-		fmt.Sprintf("N%d", row): novedad.ImporteTotal,
-		fmt.Sprintf("P%d", row): novedad.Estado,
-		fmt.Sprintf("N%d", row): novedad.Motivo,
-		fmt.Sprintf("P%d", row): novedad.Proveedor,
-		fmt.Sprintf("P%d", row): novedad.Comentarios,
-	}
-	for cell, value := range cellMappings {
-		file.SetCellValue(constantes.PestanaFactServicios, cell, value)
-	}
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("A%d", row), novedad.Fecha)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("C%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("D%d", row), recurso.Legajo)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("E%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("F%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("G%d", row), novedad.Cliente)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("H%d", row), novedad.ConceptoDeFacturacion)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("I%d", row), novedad.Periodo)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("J%d", row), novedad.ImporteTotal)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("K%d", row), novedad.Estado)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("L%d", row), novedad.Motivo)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("M%d", row), novedad.Proveedor)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("N%d", row), novedad.Comentarios)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("O%d", row), novedad.OrdenDeCompra)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("P%d", row), novedad.Promovido)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("Q%d", row), novedad.EnviarA)
+	file.SetCellValue(constantes.PestanaFactServicios, fmt.Sprintf("R%d", row), novedad.Contacto)
 	return nil
 }
-func rendGastos(file *excelize.File, novedad novedades.Novedades, row int) error {
+func rendGastos(file *excelize.File, novedad novedades.Novedades, row int) (int, error) {
 	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	cellMappings := map[string]interface{}{
-		fmt.Sprintf("A%d", row): novedad.Fecha,
-		fmt.Sprintf("B%d", row): novedad.IdSecuencial,
-		fmt.Sprintf("C%d", row): novedad.Descripcion,
-		fmt.Sprintf("D%d", row): recurso.Legajo,
-		fmt.Sprintf("E%d", row): recurso.Nombre,
-		fmt.Sprintf("F%d", row): recurso.Apellido,
-		fmt.Sprintf("G%d", row): novedad.Proveedor,
-		fmt.Sprintf("H%d", row): novedad.Contacto,
-		fmt.Sprintf("I%d", row): novedad.ConceptoDeFacturacion,
-		fmt.Sprintf("J%d", row): novedad.Periodo,
-		fmt.Sprintf("K%d", row): novedad.ImporteTotal,
-		fmt.Sprintf("L%d", row): novedad.Estado,
-		fmt.Sprintf("M%d", row): novedad.Prioridad,
-		fmt.Sprintf("N%d", row): novedad.Cliente,
-		fmt.Sprintf("O%d", row): novedad.Comentarios,
+	var quantityOfRowUsed int = 0
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("A%d", row), novedad.Fecha)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("B%d", row), novedad.IdSecuencial)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("C%d", row), novedad.Descripcion)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("D%d", row), recurso.Legajo)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("E%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("F%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("G%d", row), novedad.Proveedor)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("H%d", row), novedad.Contacto)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("I%d", row), novedad.ConceptoDeFacturacion)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("J%d", row), novedad.Periodo)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("K%d", row), novedad.ImporteTotal)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("L%d", row), novedad.Estado)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("M%d", row), novedad.Prioridad)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("N%d", row), novedad.Cliente)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("O%d", row), novedad.Comentarios)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("P%d", row), novedad.EnviarA)
+	file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("Q%d", row), novedad.Contacto)
+	for i, recursoInt := range novedad.Recursos {
+		file.SetCellValue(constantes.PestanaRendGastos, fmt.Sprintf("R%d", row), recursoInt.Recurso)
+		quantityOfRowUsed = i
 	}
-	for cell, value := range cellMappings {
-		file.SetCellValue(constantes.PestanaRendGastos, cell, value)
-	}
-
-	return nil
+	quantityOfRowUsed++
+	return quantityOfRowUsed, nil
 }
 func nuevoCeco(file *excelize.File, novedad novedades.Novedades, row int) error {
 	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
