@@ -43,6 +43,27 @@ func FreelanceToMap(freelance models.Freelances) map[string]interface{} {
 
 }
 
+func StaffToMap(staff models.Staff) map[string]interface{} {
+
+	// Crear map
+	staffMap := make(map[string]interface{})
+	// Obtener tipo de la estructura
+	t := reflect.TypeOf(staff)
+	// Obtener valor de la estructura
+	v := reflect.ValueOf(staff)
+	// Recorrer campos de la estructura
+	for i := 0; i < t.NumField(); i++ {
+		// Obtener nombre del campo
+		name := t.Field(i).Name
+		// Obtener valor del campo
+		value := v.Field(i).Interface()
+		// Agregar campo al map
+		staffMap[name] = value
+	}
+	return staffMap
+
+}
+
 func SaveMapInsert(usuario userGoogle.UserITP, mapHistorial map[string]interface{}, tipo string) error {
 	var historial models.HistorialFreelance
 	historial.UsuarioEmail = usuario.Email
@@ -80,6 +101,37 @@ func SaveFreelanceInsert(usuario userGoogle.UserITP, freelance models.Freelances
 	historial.UsuarioNombre = usuario.Nombre
 	historial.UsuarioApellido = usuario.Apellido
 	historial.Freelance = FreelanceToMap(freelance)
+	historial.Tipo = tipo
+	historial.FechaHora = time.Now()
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionHistorial)
+	// Obtener el ultimo id
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{Key: "idHistorial", Value: -1}})
+	cursor, _ := coll.Find(context.Background(), filter, opts)
+	var results []models.HistorialFreelance
+	cursor.All(context.Background(), &results)
+	if len(results) == 0 {
+		historial.IdHistorial = 0
+	} else {
+		historial.IdHistorial = results[0].IdHistorial + 1
+	}
+
+	// Ingresar Historial
+	result, err := coll.InsertOne(context.Background(), historial)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return nil
+}
+
+func SaveStaffInsert(usuario userGoogle.UserITP, staff models.Staff, tipo string) error {
+	var historial models.HistorialStaff
+	historial.UsuarioEmail = usuario.Email
+	historial.UsuarioNombre = usuario.Nombre
+	historial.UsuarioApellido = usuario.Apellido
+	historial.Staff = StaffToMap(staff)
 	historial.Tipo = tipo
 	historial.FechaHora = time.Now()
 

@@ -60,3 +60,38 @@ type HistorialFreelance struct {
 	Tipo            string                 `bson:"tipo"`
 	FechaHora       time.Time              `bson:"fechaHora"`
 }
+
+// Historial de cambios staff
+type HistorialStaff struct {
+	IdHistorial     int                    `bson:"idHistorial"`
+	UsuarioEmail    string                 `bson:"usuarioEmail"`
+	UsuarioNombre   string                 `bson:"usuarioNombre"`
+	UsuarioApellido string                 `bson:"usuarioApellido"`
+	Staff           map[string]interface{} `bson:"staff"`
+	Tipo            string                 `bson:"tipo"`
+	FechaHora       time.Time              `bson:"fechaHora"`
+}
+
+type Staff struct {
+	IdStaff            int       `bson:"idStaff"`
+	NroLegajo          int       `bson:"nroLegajo"`
+	CUIT               string    `bson:"cuit"`
+	Apellido           string    `bson:"apellido"`
+	Nombre             string    `bson:"nombre"`
+	FechaIngreso       time.Time `bson:"fechaIngreso"`
+	Nomina             string    `bson:"nomina"`
+	Gerente            int       `bson:"gerente"`
+	Vertical           string    `bson:"vertical"`
+	HorasMen           int       `bson:"horasMen"`
+	Cargo              string    `bson:"cargo"`
+	SueldoFacturaMonto float64   `bson:"sueldoFacturaMonto"`
+	FacturaDesde       time.Time `bson:"facturaDesde"`
+	FacturaADCuit      string    `bson:"facturaADCuit"`
+	FacturaADMonto     float64   `bson:"facturaADMonto"`
+	FacturaADDesde     time.Time `bson:"facturaADDesde"`
+	B21Monto           float64   `bson:"b21Monto"`
+	B21Desde           time.Time `bson:"b21Desde"`
+	Comentario         string    `bson:"comentario"`
+	Habilitado         string    `bson:"habilitado"`
+	FechaBaja          time.Time `bson:"fechaBaja"`
+}
