@@ -108,7 +108,15 @@ const (
 )
 
 const (
-	DescripcionLicenciasComunes     = "Licencia comun"
-	DescripcionLicenciasPatagonians = "Licencia Patagonians"
+	DescripcionLicenciasComunes     = "Licencia por vacaciones"
+	DescripcionLicenciasPatagonians = "Licencia Patagonian Day"
 	DescripcionLicenciasOtras       = "Licencia otras"
+)
+
+const FinalDeLosPasos = "fin de los pasos"
+
+const (
+	VacacionesComunes    = "vacaciones comunes"
+	VacacionesPatagonian = "vacaciones patagonian"
+	VacacionesOtras      = "vacaciones otras"
 )

@@ -632,6 +632,37 @@ func UseVacaciones(id int, vacacionesSolicitadas Vacaciones) error {
 	return nil
 }
 
+func GetLastVacaciones(id int, tipo string) (Vacaciones, error) {
+	//obtener el id del recurso
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	var vacaciones Vacaciones
+
+	//obtener el recurso
+	var recurso Recursos
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: id}}).Decode(&recurso)
+	if err != nil {
+		return vacaciones, err
+	}
+
+	//obtener las vacaciones del año mas viejo
+	if len(recurso.Vacaciones) == 0 {
+		return vacaciones, errors.New("No se encontraron vacaciones")
+	}
+	vacaciones = recurso.Vacaciones[0]
+	for _, vacacion := range recurso.Vacaciones {
+		if vacacion.Anio < vacaciones.Anio {
+			if tipo == constantes.VacacionesComunes && vacacion.CantidadComun > 0 {
+				vacaciones = vacacion
+			} else if tipo == constantes.VacacionesPatagonian && vacacion.CantidadPatagonian > 0 {
+				vacaciones = vacacion
+			} else if tipo == constantes.VacacionesOtras && vacacion.CantidadOtros > 0 {
+				vacaciones = vacacion
+			}
+		}
+	}
+	return vacaciones, nil
+}
+
 func GetRecursoInterno(email string, id int, legajo int) (error, Recursos) {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	var recurso Recursos
