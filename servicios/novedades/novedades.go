@@ -94,7 +94,7 @@ type Distribuciones struct {
 }
 
 type RecursosNovedades struct {
-	Importe     int           `bson:"importe"`
+	Importe     float64       `bson:"importe"`
 	Comentarios string        `bson:"comentarios"`
 	Recurso     string        `bson:"recurso"`
 	Periodo     string        `bson:"periodo"`
