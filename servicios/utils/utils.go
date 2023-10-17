@@ -64,7 +64,7 @@ func StaffToMap(staff models.Staff) map[string]interface{} {
 
 }
 
-func SaveMapInsert(usuario userGoogle.UserITP, mapHistorial map[string]interface{}, tipo string) error {
+func SaveMapInsertFreelance(usuario userGoogle.UserITP, mapHistorial map[string]interface{}, tipo string) error {
 	var historial models.HistorialFreelance
 	historial.UsuarioEmail = usuario.Email
 	historial.UsuarioNombre = usuario.Nombre
@@ -79,6 +79,37 @@ func SaveMapInsert(usuario userGoogle.UserITP, mapHistorial map[string]interface
 	opts := options.Find().SetSort(bson.D{{Key: "idHistorial", Value: -1}})
 	cursor, _ := coll.Find(context.Background(), filter, opts)
 	var results []models.HistorialFreelance
+	cursor.All(context.Background(), &results)
+	if len(results) == 0 {
+		historial.IdHistorial = 0
+	} else {
+		historial.IdHistorial = results[0].IdHistorial + 1
+	}
+
+	// Ingresar Historial
+	result, err := coll.InsertOne(context.Background(), historial)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
+	return nil
+}
+
+func SaveMapInsertStaff(usuario userGoogle.UserITP, mapHistorial map[string]interface{}, tipo string) error {
+	var historial models.HistorialStaff
+	historial.UsuarioEmail = usuario.Email
+	historial.UsuarioNombre = usuario.Nombre
+	historial.UsuarioApellido = usuario.Apellido
+	historial.Staff = mapHistorial
+	historial.Tipo = tipo
+	historial.FechaHora = time.Now()
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionHistorial)
+	// Obtener el ultimo id
+	filter := bson.D{}
+	opts := options.Find().SetSort(bson.D{{Key: "idHistorial", Value: -1}})
+	cursor, _ := coll.Find(context.Background(), filter, opts)
+	var results []models.HistorialStaff
 	cursor.All(context.Background(), &results)
 	if len(results) == 0 {
 		historial.IdHistorial = 0
@@ -159,7 +190,7 @@ func SaveStaffInsert(usuario userGoogle.UserITP, staff models.Staff, tipo string
 
 func GetFreelanceHistorial() ([]models.HistorialFreelance, error) {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionHistorial)
-	filter := bson.D{}
+	filter := bson.D{{Key: "freelance", Value: bson.D{{Key: "$exists", Value: 1}, {Key: "$ne", Value: ""}}}}
 	opts := options.Find().SetSort(bson.D{{Key: "idHistorial", Value: -1}})
 	cursor, err := coll.Find(context.Background(), filter, opts)
 	if err != nil {
@@ -173,7 +204,31 @@ func GetFreelanceHistorial() ([]models.HistorialFreelance, error) {
 func GetFrelanceHistorialById(id int) (models.HistorialFreelance, error) {
 	var historial models.HistorialFreelance
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionHistorial)
-	filter := bson.D{{Key: "idHistorial", Value: id}}
+	filter := bson.D{{Key: "idHistorial", Value: id}, {Key: "freelance", Value: bson.D{{Key: "$exists", Value: 1}, {Key: "$ne", Value: ""}}}}
+	err := coll.FindOne(context.Background(), filter).Decode(&historial)
+	if err != nil {
+		return historial, err
+	}
+	return historial, nil
+}
+
+func GetStaffHistorial() ([]models.HistorialStaff, error) {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionHistorial)
+	filter := bson.D{{Key: "staff", Value: bson.D{{Key: "$exists", Value: 1}, {Key: "$ne", Value: ""}}}}
+	opts := options.Find().SetSort(bson.D{{Key: "idHistorial", Value: -1}})
+	cursor, err := coll.Find(context.Background(), filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	var results []models.HistorialStaff
+	cursor.All(context.Background(), &results)
+	return results, nil
+}
+
+func GetStaffHistorialById(id int) (models.HistorialStaff, error) {
+	var historial models.HistorialStaff
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionHistorial)
+	filter := bson.D{{Key: "idHistorial", Value: id}, {Key: "staff", Value: bson.D{{Key: "$exists", Value: 1}, {Key: "$ne", Value: ""}}}}
 	err := coll.FindOne(context.Background(), filter).Decode(&historial)
 	if err != nil {
 		return historial, err

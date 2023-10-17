@@ -1801,6 +1801,59 @@
 								}
 							]
 						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "archivo",
+									"type": "file",
+									"src": "/C:/Users/Lgonzalez/OneDrive/Documentos/Repositorio/ProyectGo/ejemplos/Postman/response.xlsx"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/Archivos/Novedad/Adjuntos/838/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Archivos",
+								"Novedad",
+								"Adjuntos",
+								"838",
+								""
+							],
+							"query": [
+								{
+									"key": "nombre",
+									"value": "8j49rdpjarr51.webp",
+									"disabled": true
+								},
+								{
+									"key": "pos",
+									"value": "0",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PutArchivo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PUT",
 						"header": [],
 						"body": {
@@ -1928,6 +1981,34 @@
 					"response": []
 				},
 				{
+					"name": "GetFreelanceHistorial",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Freelance/5",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Freelance",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GetFreelancesList",
 					"request": {
 						"auth": {
@@ -1991,7 +2072,7 @@
 					"response": []
 				},
 				{
-					"name": "UpdateFreelance",
+					"name": "ReplaceFreelance",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -2007,7 +2088,43 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\t\"idFreelance\": 1,\r\n\t\t\"nroFreelance\": 2,\r\n\t\t\"cuit\": 2,\r\n\t\t\"apellido\": \"apellido\",\r\n\t\t\"nombre\": \"nombre\",\r\n\t\t\"fechaIngreso\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"nomina\": \"nomina\",\r\n\t\t\"gerente\": 2,\r\n\t\t\"vertical\": \"vertical\",\r\n\t\t\"horasMen\": 2,\r\n\t\t\"cargo\": \"cargo\",\r\n\t\t\"facturaMondo\": 2,\r\n\t\t\"facturaDesde\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"facturaADCuit\": 2,\r\n\t\t\"facturaADMonto\": 2,\r\n\t\t\"facturaADDesde\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"b21Monto\": 2,\r\n\t\t\"b21Desde\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"comentario\": \"comentario\",\r\n\t\t\"habilitado\": \"habilitado\",\r\n\t\t\"fechaBaja\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"cecos\": 2,\r\n\t\t\"cecosDesc\": \"cecosDesc\",\r\n\t\t\"telefono\": \"telefono\",\r\n\t\t\"emailLaboral\": \"emailLaboral\",\r\n\t\t\"emailPersonal\": \"emailPersonal\",\r\n\t\t\"fechaNacimiento\": \"2022-02-02T00:00:00Z\",\r\n\t\t\"genero\": \"genero\",\r\n\t\t\"nacionalidad\": \"nacionalidad\",\r\n\t\t\"domCalle\": \"domCalle\",\r\n\t\t\"domNumero\": 2,\r\n\t\t\"domPiso\": 2,\r\n\t\t\"domDepto\": \"domDepto\",\r\n\t\t\"domLocalidad\": \"domLocalidad\",\r\n\t\t\"domProvincia\": \"domProvincia\"\r\n\t}",
+							"raw": "{\r\n    \"IdFreelance\": 2,\r\n    \"NroFreelance\": 434,\r\n    \"CUIT\": \"43-43242343-2\",\r\n    \"Apellido\": \"Serik\",\r\n    \"Nombre\": \"Martin\",\r\n    \"FechaIngreso\": \"2023-09-20T03:00:00Z\",\r\n    \"Nomina\": \"S\",\r\n    \"Gerente\": 42142,\r\n    \"Vertical\": \"po\",\r\n    \"HorasMen\": 4421,\r\n    \"Cargo\": \"dev\",\r\n    \"FacturaMonto\": 421,\r\n    \"FacturaDesde\": \"0001-01-01T00:00:00Z\",\r\n    \"FacturaADCuit\": \"\",\r\n    \"FacturaADMonto\": 0,\r\n    \"FacturaADDesde\": \"0001-01-01T00:00:00Z\",\r\n    \"B21Monto\": 0,\r\n    \"B21Desde\": \"0001-01-01T00:00:00Z\",\r\n    \"Comentario\": \"\",\r\n    \"Habilitado\": \"n\",\r\n    \"FechaBaja\": \"0001-01-01T00:00:00Z\",\r\n    \"Cecos\": [],\r\n    \"Telefono\": \"\",\r\n    \"EmailLaboral\": \"\",\r\n    \"EmailPersonal\": \"\",\r\n    \"FechaNacimiento\": \"0001-01-01T00:00:00Z\",\r\n    \"Genero\": \"\",\r\n    \"Nacionalidad\": \"\",\r\n    \"DomCalle\": \"\",\r\n    \"DomNumero\": 0,\r\n    \"DomPiso\": 0,\r\n    \"DomDepto\": \"\",\r\n    \"DomLocalidad\": \"\",\r\n    \"DomProvincia\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Freelance",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Freelance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateFreelance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\t\"idFreelance\": 1,\r\n\t\t\"genero\": \"masculino\"\r\n\t}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2078,6 +2195,223 @@
 								"Excel",
 								"Freelance",
 								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "staff",
+			"item": [
+				{
+					"name": "GetStaffHistorial",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Historial/Staff",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Historial",
+								"Staff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetStaffHistorialById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Historial/Staff/28",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Historial",
+								"Staff",
+								"28"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetStaff",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Staff/0",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Staff",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetStaffList",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Staff",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Staff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InsertStaff",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"NroLegajo\": 1733\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Staff",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Staff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ReplaceStaff",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"IdStaff\": 0,\r\n    \"NroLegajo\": 1733,\r\n    \"CUIT\": \"\",\r\n    \"Apellido\": \"ABRAMIAN\",\r\n    \"Nombre\": \"ERIC YAN\",\r\n    \"FechaIngreso\": \"2023-02-13T00:00:00Z\",\r\n    \"Nomina\": \"S\",\r\n    \"Gerente\": 1491,\r\n    \"Vertical\": \"asas\",\r\n    \"HorasMen\": 0,\r\n    \"Cargo\": \"\",\r\n    \"SueldoFacturaMonto\": 173300,\r\n    \"FacturaDesde\": \"0001-01-01T00:00:00Z\",\r\n    \"FacturaADCuit\": \"\",\r\n    \"FacturaADMonto\": 0,\r\n    \"FacturaADDesde\": \"0001-01-01T00:00:00Z\",\r\n    \"B21Monto\": 0,\r\n    \"B21Desde\": \"0001-01-01T00:00:00Z\",\r\n    \"Comentario\": \"\",\r\n    \"Habilitado\": \"\",\r\n    \"FechaBaja\": \"0001-01-01T00:00:00Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Staff",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Staff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteStaff",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/Staff/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Staff",
+								"1"
 							]
 						}
 					},
