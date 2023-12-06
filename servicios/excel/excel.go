@@ -404,7 +404,7 @@ func anticipoPrestamo(file *excelize.File, novedad novedades.Novedades, row int,
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("E%d", row), utf8_decode(recurso.Nombre))
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("F%d", row), utf8_decode(recurso.Apellido))
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("J%d", row), novedad.ImporteTotal)
-	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("K%d", row), novedad.ImporteTotal/float64(cuotas))
+	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("K%d", row), novedad.ImporteTotal/cuotas)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("L%d", row), cuotas)
 	file.SetCellValue(constantes.PestanaGeneral, fmt.Sprintf("P%d", row), novedad.Periodo)
 	return nil
