@@ -26,6 +26,7 @@ const CollectionRecurso = "recursos"
 const CollectionUserITP = "usersITP"
 const CollectionCecos = "centroDeCostos"
 const CollectionFreelance = "freelance"
+const CollectionStaff = "staff"
 const CollectionHistorial = "historial"
 
 const (
@@ -71,9 +72,9 @@ const (
 	DescLicencia          = "Licencia"
 	DescTarjetaBeneficios = "Tarjeta de beneficios"
 	DescPagos             = "Pagos"
-	FactServicios         = "Facturacion de servicio"
-	RendGastos            = "Rendicion de gastos"
-	NuevoCeco             = "Nuevo ceco"
+	DescFactServicios     = "Facturacion de servicio"
+	DescRendGastos        = "Rendicion de gastos"
+	DescNuevoCeco         = "Nuevo ceco"
 )
 
 var HorasExtrasTipos = map[string]string{
@@ -108,7 +109,15 @@ const (
 )
 
 const (
-	DescripcionLicenciasComunes     = "Licencia comun"
-	DescripcionLicenciasPatagonians = "Licencia Patagonians"
+	DescripcionLicenciasComunes     = "Licencia por vacaciones"
+	DescripcionLicenciasPatagonians = "Licencia Patagonian Day"
 	DescripcionLicenciasOtras       = "Licencia otras"
+)
+
+const FinalDeLosPasos = "fin de los pasos"
+
+const (
+	VacacionesComunes    = "vacaciones comunes"
+	VacacionesPatagonian = "vacaciones patagonian"
+	VacacionesOtras      = "vacaciones otras"
 )

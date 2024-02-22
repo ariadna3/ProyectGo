@@ -118,7 +118,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 	fmt.Print("obtencion de datos ")
 	fmt.Println(recurso)
 
-	err, _ := elRecursoYaExiste(recurso.Mail)
+	err, _ := elRecursoYaExisteLegajo(recurso.Legajo)
 	if err != nil {
 		eliminarRecurso(recurso.Mail)
 	}
@@ -563,6 +563,22 @@ func DeleteRecurso(c *fiber.Ctx) error {
 	return c.Status(200).SendString("recurso eliminado")
 }
 
+func DeleteAllRecurso(c *fiber.Ctx) error {
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	collection := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	mongoDeleteResult, err := collection.DeleteMany(context.Background(), bson.D{})
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection", mongoDeleteResult.DeletedCount)
+	return c.Status(200).SendString("recurso eliminado")
+}
+
 func checkPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
@@ -630,6 +646,37 @@ func UseVacaciones(id int, vacacionesSolicitadas Vacaciones) error {
 		return errors.New("No se pudo actualizar el recurso")
 	}
 	return nil
+}
+
+func GetLastVacaciones(id int, tipo string) (Vacaciones, error) {
+	//obtener el id del recurso
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	var vacaciones Vacaciones
+
+	//obtener el recurso
+	var recurso Recursos
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: id}}).Decode(&recurso)
+	if err != nil {
+		return vacaciones, err
+	}
+
+	//obtener las vacaciones del año mas viejo
+	if len(recurso.Vacaciones) == 0 {
+		return vacaciones, errors.New("No se encontraron vacaciones")
+	}
+	vacaciones = recurso.Vacaciones[0]
+	for _, vacacion := range recurso.Vacaciones {
+		if vacacion.Anio < vacaciones.Anio {
+			if tipo == constantes.VacacionesComunes && vacacion.CantidadComun > 0 {
+				vacaciones = vacacion
+			} else if tipo == constantes.VacacionesPatagonian && vacacion.CantidadPatagonian > 0 {
+				vacaciones = vacacion
+			} else if tipo == constantes.VacacionesOtras && vacacion.CantidadOtros > 0 {
+				vacaciones = vacacion
+			}
+		}
+	}
+	return vacaciones, nil
 }
 
 func GetRecursoInterno(email string, id int, legajo int) (error, Recursos) {

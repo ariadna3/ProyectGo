@@ -10,6 +10,7 @@ import (
 	"github.com/proyectoNovedades/servicios/novedades"
 	"github.com/proyectoNovedades/servicios/proveedores"
 	"github.com/proyectoNovedades/servicios/recursos"
+	"github.com/proyectoNovedades/servicios/staff"
 	"github.com/proyectoNovedades/servicios/userGoogle"
 	"github.com/proyectoNovedades/servicios/utils"
 	"gorm.io/driver/mysql"
@@ -155,9 +156,9 @@ func main() {
 	connectedWithMongo := createConnectionWithMongo()
 	connectedWithSql := createConnectionWithMysql()
 
-	alarmVacations := createAlarm(9, 25)
+	alarmVacations := createAlarm(10, 5)
 	go alarmSetVacations(alarmVacations)
-	fmt.Print("Alarma de vacaciones seteada para el dia: " + alarmVacations.String() + "\n")
+	fmt.Printf("Alarma de vacaciones setteada para: %s\n", alarmVacations.String())
 
 	if connectedWithMongo {
 
@@ -235,9 +236,18 @@ func main() {
 		app.Put("/Freelance", freelances.ReplaceFreelance)
 		app.Patch("/Freelance", freelances.UpdateFreelance)
 
+		//Staff
+		app.Post("/Staff", staff.InsertStaff)
+		app.Get("/Staff/:id", staff.GetStaff)
+		app.Get("/Staff", staff.GetStaffList)
+		app.Delete("/Staff/:id", staff.DeleteStaff)
+		app.Put("/Staff", staff.ReplaceStaff)
+
 		//Historial
 		app.Get("/Historial/Freelance", freelances.GetFreelanceHistorial)
 		app.Get("/Historial/Freelance/:id", freelances.GetFreelanceHistorialById)
+		app.Get("/Historial/Staff", staff.GetStaffHistorial)
+		app.Get("/Historial/Staff/:id", staff.GetStaffHistorialById)
 
 		//GoogleUser
 		app.Post("/user", userGoogle.InsertUserITP)
@@ -290,6 +300,7 @@ func createConnectionWithMongo() bool {
 		userGoogle.ConnectMongoDb(client)
 		excel.ConnectMongoDb(client)
 		freelances.ConnectMongoDb(client)
+		staff.ConnectMongoDb(client)
 		utils.ConnectMongoDb(client)
 		return true
 	}

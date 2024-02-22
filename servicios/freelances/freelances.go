@@ -164,7 +164,7 @@ func ReplaceFreelance(c *fiber.Ctx) error {
 	if result.ModifiedCount == 0 {
 		return c.Status(fiber.StatusNotFound).SendString("No se modifico el freelance")
 	}
-	err = utils.SaveMapInsert(usuario, diferencias, "replace")
+	err = utils.SaveMapInsertFreelance(usuario, diferencias, "replace")
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}

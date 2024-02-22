@@ -25,8 +25,6 @@ import (
 	"github.com/proyectoNovedades/servicios/userGoogle"
 )
 
-const FinalDeLosPasos = "fin de los pasos"
-
 type Novedades struct {
 	AdjuntoMotivo         string           `bson:"adjuntoMotivo"`
 	Adjuntos              []string         `bson:"adjuntos"`
@@ -49,7 +47,7 @@ type Novedades struct {
 	Freelance             bool                `bson:"freelance"`
 	Hora                  string              `bson:"hora"`
 	IdSecuencial          int                 `bson:"idSecuencial"`
-	ImporteTotal          float64             `bson:"importeTotal"`
+	ImporteTotal          int                 `bson:"importeTotal,truncate"`
 	Motivo                string              `bson:"motivo"`
 	OrdenDeCompra         string              `bson:"ordenDeCompra"`
 	Periodo               string              `bson:"periodo"`
@@ -94,7 +92,7 @@ type Distribuciones struct {
 }
 
 type RecursosNovedades struct {
-	Importe     int           `bson:"importe"`
+	Importe     int           `bson:"importe,truncate"`
 	Comentarios string        `bson:"comentarios"`
 	Recurso     string        `bson:"recurso"`
 	Periodo     string        `bson:"periodo"`
@@ -663,6 +661,7 @@ func UpdateFile(c *fiber.Ctx) error {
 		direccionArchivo := os.Getenv("FOLDER_FILE") + "/" + (strconv.Itoa(novedad.IdSecuencial) + adjunto)
 		os.Remove(direccionArchivo)
 	}
+	novedad.Adjuntos = []string{}
 
 	// obtener los archivos
 	form, err := c.MultipartForm()
@@ -1000,19 +999,63 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 	novedad.Workflow[len(novedad.Workflow)-1].FechaStr = time.Now().Format(constantes.FormatoFecha)
 	err = validarPasos(&novedad)
 	if err != nil {
-		if err.Error() == FinalDeLosPasos {
+		if err.Error() == constantes.FinalDeLosPasos {
 			novedad.Estado = constantes.Aceptada
 			enviarMailWorkflow(novedad)
 
 			if strings.Contains(constantes.DescripcionLicenciasComunes, novedad.Descripcion) {
 				// Crear vacaciones y setearlas
 				vacaciones := new(recursos.Vacaciones)
-				vacaciones.CantidadComun = 0
+				quantityCommon, err := difDatesInDays(novedad)
+				if err != nil {
+					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+				}
+				lastVacaciones, err := recursos.GetLastVacaciones(recurso.IdRecurso, constantes.VacacionesComunes)
+				if err != nil {
+					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+				}
+				vacaciones.CantidadComun = quantityCommon
 				vacaciones.CantidadPatagonian = 0
 				vacaciones.CantidadOtros = 0
-				vacaciones.Anio = 0
+				vacaciones.Anio = lastVacaciones.Anio
 
-				//recursos.UseVacaciones(novedad.IdSecuencial, *vacaciones)
+				recursos.UseVacaciones(novedad.IdSecuencial, *vacaciones)
+			}
+			if strings.Contains(constantes.DescripcionLicenciasComunes, novedad.Descripcion) {
+				// Crear vacaciones y setearlas
+				vacaciones := new(recursos.Vacaciones)
+				quantityCommon, err := difDatesInDays(novedad)
+				if err != nil {
+					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+				}
+				lastVacaciones, err := recursos.GetLastVacaciones(recurso.IdRecurso, constantes.VacacionesPatagonian)
+				if err != nil {
+					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+				}
+				vacaciones.CantidadComun = 0
+				vacaciones.CantidadPatagonian = quantityCommon
+				vacaciones.CantidadOtros = 0
+				vacaciones.Anio = lastVacaciones.Anio
+
+				recursos.UseVacaciones(novedad.IdSecuencial, *vacaciones)
+			}
+			if strings.Contains(constantes.DescripcionLicenciasOtras, novedad.Descripcion) {
+				// Crear vacaciones y setearlas
+				vacaciones := new(recursos.Vacaciones)
+				quantityCommon, err := difDatesInDays(novedad)
+				if err != nil {
+					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+				}
+				lastVacaciones, err := recursos.GetLastVacaciones(recurso.IdRecurso, constantes.VacacionesOtras)
+				if err != nil {
+					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+				}
+				vacaciones.CantidadComun = 0
+				vacaciones.CantidadPatagonian = 0
+				vacaciones.CantidadOtros = quantityCommon
+				vacaciones.Anio = lastVacaciones.Anio
+
+				recursos.UseVacaciones(novedad.IdSecuencial, *vacaciones)
 			}
 		}
 	}
@@ -1352,7 +1395,7 @@ func validarPasos(novedad *Novedades) error {
 	}
 	listaDePasos := pasosWorkflow.Pasos
 	if posicionActual == len(listaDePasos) {
-		return errors.New(FinalDeLosPasos)
+		return errors.New(constantes.FinalDeLosPasos)
 	}
 
 	pasoActual := listaDePasos[posicionActual]
