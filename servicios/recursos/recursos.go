@@ -118,7 +118,7 @@ func InsertRecurso(c *fiber.Ctx) error {
 	fmt.Print("obtencion de datos ")
 	fmt.Println(recurso)
 
-	err, _ := elRecursoYaExiste(recurso.Mail)
+	err, _ := elRecursoYaExisteLegajo(recurso.Legajo)
 	if err != nil {
 		eliminarRecurso(recurso.Mail)
 	}
@@ -560,6 +560,22 @@ func DeleteRecurso(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection", result.DeletedCount)
+	return c.Status(200).SendString("recurso eliminado")
+}
+
+func DeleteAllRecurso(c *fiber.Ctx) error {
+	// validar el token
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminRequired, anyRol)
+	if error != nil {
+		return c.Status(codigo).SendString(error.Error())
+	}
+
+	collection := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	mongoDeleteResult, err := collection.DeleteMany(context.Background(), bson.D{})
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection", mongoDeleteResult.DeletedCount)
 	return c.Status(200).SendString("recurso eliminado")
 }
 
