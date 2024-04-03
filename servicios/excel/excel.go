@@ -392,7 +392,7 @@ func nuevoSueldoMasivo(file *excelize.File, novedad novedades.Novedades, row *in
 	return nil
 }
 
-func anticipoPrestamo(file *excelize.File, novedad novedades.Novedades, row int, cuotas int) error {
+func anticipoPrestamo(file *excelize.File, novedad novedades.Novedades, row int, cuotas float64) error {
 	err, recurso := recursos.GetRecursoInterno(novedad.Usuario, 0, 0)
 	if err != nil {
 		return err
