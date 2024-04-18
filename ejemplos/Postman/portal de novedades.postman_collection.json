@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "e4407f17-b204-4400-80c5-92985adfbc5c",
+		"_postman_id": "2304d289-2ddd-483f-aacf-41c5dd3d5391",
 		"name": "portal de novedades",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "6631533",
-		"_collection_link": "https://lively-comet-798410.postman.co/workspace/Trabajo~67b715c2-b873-4078-90da-d16754eef985/collection/6631533-e4407f17-b204-4400-80c5-92985adfbc5c?action=share&source=collection_link&creator=6631533"
+		"_exporter_id": "32450039"
 	},
 	"item": [
 		{
@@ -144,7 +143,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"Descripcion\":\"Licencia por vacaciones\",\r\n    \"Comentarios\": \"\",\r\n    \"DistribucionesStr\": \"[{\\\"Cecos\\\": {\\\"Cliente\\\": \\\"NNNNN\\\",\\\"Codigo\\\": 100,\\\"IdCecos\\\": 38,\\\"Proyecto\\\": \\\"undefined\\\"},\\\"Porcentaje\\\":100}]\",\r\n    \"Fecha\": \"2023-05-10\",\r\n    \"Freelance\": false,\r\n    \"Hora\": \"13:57:54\",\r\n    \"ImporteTotal\": 66,\r\n    \"Periodo\": \"04-2023\",\r\n    \"Plazo\": \"undefined\",\r\n    \"EnviarA\":\"\",\r\n    \"Proveedor\": \"ABAXDECO S.R.L (000772)\",\r\n    \"Departamento\":\"Departamento de ejemplo\",\r\n    \"Tipo\": \"NP\",\r\n    \"Usuario\": \"lgonzalez@itpatagonia.com\",\r\n    \"Recurso\": {\r\n        \"HorasExtras\":[{\r\n            \"TipoDia\": \"Feriado\",\r\n            \"TipoHora\": \"Diurno\",\r\n            \"Cantidad\": 100\r\n        }],\r\n        \"Rcc\":[\r\n            {\r\n                \"ccNombre\": \"ICBC\",\r\n                \"ccPorc\": 100.0\r\n            }\r\n        ]\r\n    },\r\n    \"Workflow\": null\r\n}",
+							"raw": "{\r\n    \"Descripcion\":\"Licencia por vacaciones\",\r\n    \"Comentarios\": \"\",\r\n    \"DistribucionesStr\": \"[{\\\"Cecos\\\": {\\\"Cliente\\\": \\\"NNNNN\\\",\\\"Codigo\\\": 100,\\\"IdCecos\\\": 38,\\\"Proyecto\\\": \\\"undefined\\\"},\\\"Porcentaje\\\":100}]\",\r\n    \"Fecha\": \"2023-05-10\",\r\n    \"Freelance\": false,\r\n    \"Hora\": \"13:57:54\",\r\n    \"ImporteTotal\": 66,\r\n    \"Periodo\": \"04-2023\",\r\n    \"Plazo\": \"undefined\",\r\n    \"EnviarA\":\"\",\r\n    \"Proveedor\": \"ABAXDECO S.R.L (000772)\",\r\n    \"Departamento\":\"Departamento de ejemplo\",\r\n    \"Tipo\": \"NP\",\r\n    \"Usuario\": \"lgonzalez@itpatagonia.com\",\r\n    \"Recursos\":[{\r\n            \"Importe\": 12,\r\n            \"Comentarios\": \"\",\r\n            \"Recurso\": \"ariadna gonzalez\",\r\n            \"SbActual\": 10.3\r\n        }],\r\n    \"Recurso\": \r\n        \"HorasExtras\":[{\r\n            \"TipoDia\": \"Feriado\",\r\n            \"TipoHora\": \"Diurno\",\r\n            \"Cantidad\": 100\r\n        }],\r\n        \"Rcc\":[\r\n            {\r\n                \"ccNombre\": \"ICBC\",\r\n                \"ccPorc\": 100.0\r\n            }\r\n        ]\r\n    },\r\n    \"Workflow\": null\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -152,10 +151,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Novedad",
+							"raw": "http://localhost:3000/Novedad",
+							"protocol": "http",
 							"host": [
-								"{{url}}"
+								"localhost"
 							],
+							"port": "3000",
 							"path": [
 								"Novedad"
 							]
