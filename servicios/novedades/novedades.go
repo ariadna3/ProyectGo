@@ -47,7 +47,7 @@ type Novedades struct {
 	Freelance             bool                `bson:"freelance"`
 	Hora                  string              `bson:"hora"`
 	IdSecuencial          int                 `bson:"idSecuencial"`
-	ImporteTotal          int                 `bson:"importeTotal, truncate"`
+	ImporteTotal          float64             `bson:"importeTotal, truncate"`
 	Motivo                string              `bson:"motivo"`
 	OrdenDeCompra         string              `bson:"ordenDeCompra"`
 	Periodo               string              `bson:"periodo"`
@@ -92,7 +92,7 @@ type Distribuciones struct {
 }
 
 type RecursosNovedades struct {
-	Importe     int           `bson:"importe, truncate"`
+	Importe     float64       `bson:"importe, truncate"`
 	Comentarios string        `bson:"comentarios"`
 	Recurso     string        `bson:"recurso"`
 	Periodo     string        `bson:"periodo"`
