@@ -707,6 +707,18 @@ func GetRecursoInterno(email string, id int, legajo int) (error, Recursos) {
 	return nil, recurso
 }
 
+func GetAllRecursoInterno(id int) error {
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	var recurso Recursos
+
+	err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: id}}).Decode(&recurso)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func elRecursoYaExiste(email string) (error, int) {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	filter := bson.D{{Key: "mail", Value: email}}

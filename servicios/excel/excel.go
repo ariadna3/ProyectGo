@@ -91,6 +91,14 @@ func GetExcelFile(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &novedades); err != nil {
 		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
+	var recurso []recursos.Recursos
+	recurso = recursos.GetAllRecursoInterno
+	if err = cursor.All(context.Background(), &recurso); err != nil {
+		return nil
+	}
+
+	fmt.Print(recurso)
+	fmt.Println(" recursos found")
 
 	fmt.Print(len(novedades))
 	fmt.Println(" novedades found")
@@ -218,7 +226,7 @@ func GetFreelancesListExcel(c *fiber.Ctx) error {
 }
 
 // Ingresar datos a un excel
-func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta string, periodo bool) error {
+func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta string, periodo bool, recurso []recursos.Recursos) error {
 
 	// Abrir archivo de excel
 	os.Remove("EXCEL_FILE")
@@ -227,6 +235,7 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 	file.NewSheet(constantes.PestanaHorasExtras)
 	file.NewSheet(constantes.PestanaLicencias)
 	file.NewSheet(constantes.PestanaNovedades)
+	file.NewSheet(constantes.PestanaRecursos)
 	initializeExcel(file)
 	var rowGeneral int = 3
 	var rowHorasExtras int = 3
@@ -301,6 +310,12 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 		if err == nil {
 			rowNovedades = rowNovedades + 1
 		}
+	}
+
+	coll = client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	cursor, err = coll.Find(context.Background(), bson.M{})
+	if err != nil {
+		return err
 	}
 
 	// Guardar archivo
@@ -694,6 +709,23 @@ func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) (er
 	row--
 
 	return nil, row
+}
+
+func allRecursos(file *excelize.File, recurso recursos.Recursos, row int) error {
+	err := recursos.GetAllRecursoInterno(0)
+	if err != nil {
+		return err
+	}
+
+	file.SetCellValue(constantes.PestanaRecursos, fmt.Sprintf("A%d", row), recurso.IdRecurso)
+	file.SetCellValue(constantes.PestanaRecursos, fmt.Sprintf("B%d", row), recurso.Nombre)
+	file.SetCellValue(constantes.PestanaRecursos, fmt.Sprintf("C%d", row), recurso.Apellido)
+	file.SetCellValue(constantes.PestanaRecursos, fmt.Sprintf("D%d", row), recurso.Legajo)
+	file.SetCellValue(constantes.PestanaRecursos, fmt.Sprintf("E%d", row), recurso.Mail)
+	file.SetCellValue(constantes.PestanaRecursos, fmt.Sprintf("F%d", row), recurso.Gerente)
+	file.SetCellValue(constantes.PestanaRecursos, fmt.Sprintf("G%d", row), recurso.Sueldo)
+
+	return nil
 }
 
 func freelanceInsert(file *excelize.File, freelance models.Freelances, row int) (error, int) {
