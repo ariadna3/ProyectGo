@@ -1,0 +1,30 @@
+{
+  "user": "",
+  "password": "",
+  "token": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg1YmE5MzEzZmQ3YTdkNGFmYTg0ODg0YWJjYzg0MDMwMDQzNjMxODAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2ODY5NDU3ODksImF1ZCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjEwMzA4Nzc5OTcwNDM0NDcxMDA0NCIsImhkIjoiaXRwYXRhZ29uaWEuY29tIiwiZW1haWwiOiJjZmFndW5kZXpAaXRwYXRhZ29uaWEuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF6cCI6IjY2MTQzNzI0MDk4My01aGJpbnY4bWl1c3NwMmdxYzYwb2Vkb2Y1b2ZoNjhhaS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsIm5hbWUiOiJNYXJpYSBkZWwgQ2FybWVuIEZhZ3VuZGV6IiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FBY0hUdGUwVjkyY0JMRTNpdXN1S3h5TEZoME5EUXdXY0h3ZFpOZ1p1ajRuR0E9czk2LWMiLCJnaXZlbl9uYW1lIjoiTWFyaWEgZGVsIENhcm1lbiIsImZhbWlseV9uYW1lIjoiRmFndW5kZXoiLCJpYXQiOjE2ODY5NDYwODksImV4cCI6MTY4Njk0OTY4OSwianRpIjoiNGFiYTQzZDhmYWUxOGY1ZGY4MjQwNWRhYzczYTNiYTA2MTdjZjZmNSJ9.KIDjH8vUHcQetIX-sf-FqddNFzrfA4-cspSa0JBCNgeJc_L4_k3nE4u84QZxI_g5ox26rrPMx7B5wA3HPvKvz23MmJu64-_QLtElLM1QBD1DRqv0hV4wuEs3jFZX82uDbxN30WK2_ssej1-3oTONRotgFW_CwF-_-ziG747uPL5yLwtg6tNCn0Ib-95wW_DdsrwQXNyoY1_dHwwaGwnqGh-IfvEd-rTQGsz7pqhq4wfUetVpVd58EBb0zyCL_gkVyMD3cJPawBBKtIycex85hQe2T0N4VrV5XzhK88ptdOHzDym7o2ghSfIX1cu2M8N-nHLNf6tEVjkdcfp0cRg2BQ",
+  "server": "ITPNBK-062",
+  "database": "prueba_bejerman",
+  "urls": {
+    "testingUrl": "https://apiportaldev.itpatagonia.com"
+  },
+  "querys": [
+    {
+      "Path": "/Recurso",
+      "Server": "testingUrl",
+      "Tabla": "Personas",
+      "Query": "SELECT FORMAT(l.leg_numero, '0') as Legajo, l.leg_apellido AS Apellido, l.leg_nombre as Nombre, FORMAT(l.leg_numeromanager, '0') as Gerente, FORMAT(l.leg_fecing, 'yyyy/MM/dd') as FechaIng, l.Leg_mail as Mail,  FORMAT((l.leg_numero * 100), '0') as Sueldo,  Rcc.cco_codigo AS CcNum, FORMAT(Rcc.lcco_porcen, '00') AS CcPorc FROM SJITP.dbo.leg l LEFT JOIN SJITP.dbo.leg_cco_2 Rcc ON l.leg_numero = Rcc.leg_numero where leg_fecegr is NULL OR (leg_fecegr IS NOT NULL AND leg_fecegr >= DATEADD(DAY, -60, GETDATE()))   -- deja los que se fueron en los últimos 30 días ORDER BY leg_apellido, leg_nombre FOR JSON AUTO"
+    },
+    {
+      "Path": "/Proveedor",
+      "Server": "testingUrl",
+      "Tabla": "Proveedores",
+      "Query": "SELECT pro_cod as numeroDoc, (pro_RazSoc + ' (' +  pro_Cod) + ')' as razonSocial FROM SBDAITP.dbo.Proveed WHERE pro_Habilitado = 1 ORDER BY pro_RazSoc FOR JSON AUTO"
+    },
+    {
+      "Path": "/Cecos",
+      "Server": "testingUrl",
+      "Tabla": "Centro de costos",
+      "Query": "SELECT c.cco_codigo as codigo, '(' +  c.cco_codigo + ') - ' + cco_descrip + ' - ' + ISNULL(l.cli_RazSoc, ' ') + ' (' + ISNULL(cli_CUIT, ' ') + ')' as descripcioncecos, ISNULL(l.cli_RazSoc, ' ') as cliente, cco_descrip as proyecto FROM SBDAITP.dbo.cco c LEFT JOIN SBDAITP.dbo.Clientes l ON c.def2_codigo = SUBSTRING(l.cli_Cod, 3, 4) WHERE cco_habili = 1 ORDER BY c.cco_codigo FOR JSON AUTO"
+    }
+  ]
+}
