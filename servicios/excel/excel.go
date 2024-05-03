@@ -122,7 +122,7 @@ func GetExcelRecursos(c *fiber.Ctx) error {
 		return nil
 	}
 
-	fmt.Println(" recursos found")
+	fmt.Println((len(recurso)), "recursos found")
 
 	err = recursosExcel(recurso)
 
@@ -246,7 +246,7 @@ func GetFreelancesListExcel(c *fiber.Ctx) error {
 }
 
 // Imgresar datos a un excel
-func recursosExcel(recursos []recursos.Recursos) error {
+func recursosExcel(recurso []recursos.Recursos) error {
 
 	// Abrir archivo de excel
 	os.Remove("EXCEL_FILE_RECURSOS")
@@ -256,6 +256,24 @@ func recursosExcel(recursos []recursos.Recursos) error {
 	err := initializeExcelRecursos(file)
 	if err != nil {
 		return err
+	}
+
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+	if err = cursor.All(context.Background(), &recurso); err != nil {
+		return err
+	}
+
+	var RowRecurso int = 3
+
+	var recursosMap map[string]string = make(map[string]string)
+	for _, item := range recurso {
+		recursosMap[item.Nombre] = item.Nombre
+
+		err := allRecursos(file, item, RowRecurso)
+		if err == nil {
+			RowRecurso = RowRecurso + 1
+		}
 	}
 
 	// Guardar archivo
