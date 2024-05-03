@@ -91,14 +91,6 @@ func GetExcelFile(c *fiber.Ctx) error {
 	if err = cursor.All(context.Background(), &novedades); err != nil {
 		return c.Status(fiber.StatusServiceUnavailable).SendString(err.Error())
 	}
-	var recurso []recursos.Recursos
-	recurso = recursos.GetAllRecursoInterno
-	if err = cursor.All(context.Background(), &recurso); err != nil {
-		return nil
-	}
-
-	fmt.Print(recurso)
-	fmt.Println(" recursos found")
 
 	fmt.Print(len(novedades))
 	fmt.Println(" novedades found")
@@ -111,6 +103,34 @@ func GetExcelFile(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
 	}
 	return c.SendFile(os.Getenv("EXCEL_FILE"))
+}
+
+func GetExcelRecursos(c *fiber.Ctx) error {
+	fmt.Println("GetExcelRecurso")
+
+	// Validar token
+	err, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
+	if err != nil {
+		return c.Status(codigo).SendString(err.Error())
+	}
+
+	var recurso []recursos.Recursos
+	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+	cursor, err := coll.Find(context.TODO(), bson.M{})
+
+	if err = cursor.All(context.Background(), &recurso); err != nil {
+		return nil
+	}
+
+	fmt.Println(" recursos found")
+
+	err = recursosExcel(recurso)
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Error al crear archivo: " + err.Error())
+	}
+
+	return c.SendFile(os.Getenv("EXCEL_FILE_RECURSOS"))
 }
 
 // Crear excel PP
@@ -225,8 +245,31 @@ func GetFreelancesListExcel(c *fiber.Ctx) error {
 	return c.SendFile(os.Getenv("EXCEL_FILE_FREELANCE"))
 }
 
+// Imgresar datos a un excel
+func recursosExcel(recursos []recursos.Recursos) error {
+
+	// Abrir archivo de excel
+	os.Remove("EXCEL_FILE_RECURSOS")
+	file := excelize.NewFile()
+	file.SetSheetName("Sheet1", constantes.PestanaRecursos)
+
+	err := initializeExcelRecursos(file)
+	if err != nil {
+		return err
+	}
+
+	// Guardar archivo
+	err = file.SaveAs(os.Getenv("EXCEL_FILE_RECURSOS"))
+	if err != nil {
+		log.Printf("No se pudo guardar el archivo de Excel por el error %s", err.Error())
+		return err
+	}
+
+	return nil
+}
+
 // Ingresar datos a un excel
-func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta string, periodo bool, recurso []recursos.Recursos) error {
+func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHasta string, periodo bool) error {
 
 	// Abrir archivo de excel
 	os.Remove("EXCEL_FILE")
@@ -235,7 +278,6 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 	file.NewSheet(constantes.PestanaHorasExtras)
 	file.NewSheet(constantes.PestanaLicencias)
 	file.NewSheet(constantes.PestanaNovedades)
-	file.NewSheet(constantes.PestanaRecursos)
 	initializeExcel(file)
 	var rowGeneral int = 3
 	var rowHorasExtras int = 3
@@ -310,12 +352,6 @@ func datosExcel(novedadesArr []novedades.Novedades, fechaDesde string, fechaHast
 		if err == nil {
 			rowNovedades = rowNovedades + 1
 		}
-	}
-
-	coll = client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
-	cursor, err = coll.Find(context.Background(), bson.M{})
-	if err != nil {
-		return err
 	}
 
 	// Guardar archivo
@@ -712,7 +748,7 @@ func allNovedades(file *excelize.File, novedad novedades.Novedades, row int) (er
 }
 
 func allRecursos(file *excelize.File, recurso recursos.Recursos, row int) error {
-	err := recursos.GetAllRecursoInterno(0)
+	err := recursos.GetAllRecursoInterno(recurso)
 	if err != nil {
 		return err
 	}
@@ -906,6 +942,19 @@ func stringContains(str string, substr string) bool {
 		}
 	}
 	return false
+}
+
+func initializeExcelRecursos(file *excelize.File) error {
+	// Recursos
+	file.SetCellValue(constantes.PestanaRecursos, "A2", "ID")
+	file.SetCellValue(constantes.PestanaRecursos, "B2", "NOMBRE")
+	file.SetCellValue(constantes.PestanaRecursos, "C2", "APELLIDO")
+	file.SetCellValue(constantes.PestanaRecursos, "D2", "LEGAJO")
+	file.SetCellValue(constantes.PestanaRecursos, "E2", "MAIL")
+	file.SetCellValue(constantes.PestanaRecursos, "F2", "GERENTE")
+	file.SetCellValue(constantes.PestanaRecursos, "G2", "SUELDO")
+
+	return nil
 }
 
 func initializeExcel(file *excelize.File) error {

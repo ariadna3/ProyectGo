@@ -707,13 +707,16 @@ func GetRecursoInterno(email string, id int, legajo int) (error, Recursos) {
 	return nil, recurso
 }
 
-func GetAllRecursoInterno(id int) error {
+func GetAllRecursoInterno(Recursos) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
-	var recurso Recursos
-
-	err := coll.FindOne(context.TODO(), bson.D{{Key: "idRecurso", Value: id}}).Decode(&recurso)
+	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return err
+	}
+
+	var recurso Recursos
+	if err = cursor.All(context.Background(), &recurso); err != nil {
+		return nil
 	}
 
 	return nil
