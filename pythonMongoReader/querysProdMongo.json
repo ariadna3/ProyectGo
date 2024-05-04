@@ -1,0 +1,24 @@
+{
+  
+  "token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjZjZTExYWVjZjllYjE0MDI0YTQ0YmJmZDFiY2Y4YjMyYTEyMjg3ZmEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI2OTk2ODQzMDUyMzktNDRpZDFlNzBhM2Y1aG40cGpiMnVrNWFkMmRjcTQ2ZmkuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI2OTk2ODQzMDUyMzktNDRpZDFlNzBhM2Y1aG40cGpiMnVrNWFkMmRjcTQ2ZmkuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDAyODE5NTY2NDU0NTIzNzQ2ODUiLCJoZCI6Iml0cGF0YWdvbmlhLmNvbSIsImVtYWlsIjoiYWdvbnphbGV6QGl0cGF0YWdvbmlhLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYmYiOjE3MTM3MzM0ODYsIm5hbWUiOiJBcmlhZG5hIEdvbnphbGV6IiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0tHRFJWV2dZYVM0amtJNG1rMkJHb1BlaTdqcmxjem56Vy1DWERCV3B4aGxNQmR4dz1zOTYtYyIsImdpdmVuX25hbWUiOiJBcmlhZG5hIiwiZmFtaWx5X25hbWUiOiJHb256YWxleiIsImlhdCI6MTcxMzczMzc4NiwiZXhwIjoxNzEzNzM3Mzg2LCJqdGkiOiI3YzI2MDZlZDA3ZTFmMmQ0NTM2MjkyNjhmNDk5YjBjMWQ2N2YyMTQxIn0.Rp3fTPjB1A33a8u-AjVj9492YdpEU2y9LND0jDBwLtrR5aDxbbCwoWXmK4Ssc7yEOc8-wtZNDGZQJMDRVAYjf8Xcx3V2WzCc07_8sLeMBOL001uLgVitTbCxsnqf1rUb-K4eVPs3KkCeF1_PAbBawHRNnGsQrNZiTICL5hYBadlg4gwTcuu-XY8vG85FuVgxfT8IQcV8m_GGEyQ5AZRfb6I2h0Df-lFX56NKupGpI1RsnGtnlJJ9GeFwc3LVueauHr7gYuQbpqApCRZ-P-FbTBshCEiNWEpSQvCf-Liw7v5S8rElAYsLo7TFEzt-orcfZcLhg7Kbv8ABiwUgWuW2GA",
+  "user": "",
+  "password": "",
+  "server": "",
+  "database": "",
+  "mongo_user": "",
+  "mongo_password": "",
+  "mongo_url": "mongodb+srv://test:ZnN3Y6CW0pN2Ak3f@cluster0.t3d77.gcp.mongodb.net/",
+  "mongo_db": "portalDeNovedades",
+  "urls": {
+    "produccionUrl": "https://apiportal.itpatagonia.com",
+    "testingUrl": "https://apiportaldev.itpatagonia.com"
+  },
+  "querys": [
+    {
+      "Path": "/Recurso/Package",
+      "Server": "produccionUrl",
+      "Tabla": "recursos",
+      "Query": []
+    }
+  ]
+}
