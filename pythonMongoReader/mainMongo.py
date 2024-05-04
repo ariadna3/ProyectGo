@@ -27,18 +27,23 @@ URLS = data["urls"]
 #querys
 QUERYS = data["querys"]
 
+RECURSOS_CON_GERENTE_10001 = [1024, 1814, 1291, 1953]
+RECURSOS_CON_GERENTE_10002 = [1368, 1813,   76, 1965, 1774, 1773, 1989, 1935, 1803, 1714, 1356, 1839, 1677, 1902]
+
 
 
 
 def main():
     mydb = connect_mongo(url=MONGO_URL, database=MONGO_DB, user=MONGO_USER, password=MONGO_PASSWORD)
     for query in QUERYS:
-        package_to_send = get_package_from_mongo(mydb, query["Query"], query["Tabla"])
-        path: str = query["Path"]
-
-        response = send_package_to_api(url=URLS[query["Server"]], path=path,  package=package_to_send, token=TOKEN)
-
-        print(response.text)
+        array_recursos = get_data_mongo(mydb, query["Query"], query["Tabla"])
+        array_recursos = set_data(array_recursos)
+        map_of_querys = get_querys_map_from_array_with_legajos(array_recursos)
+        for key, value in map_of_querys.items():
+            res = json.loads(key.replace("'", "\""))
+            update_data_mongo(mydb, res, query["Tabla"], value)
+            print(key)
+            print(value)
 
 
 
@@ -60,18 +65,34 @@ def get_data_mongo(db, query: str, collection: str) -> list:
     #put the keys in lowercase
     array = [{k.lower(): v for k, v in d.items()} for d in array]
     #If type of a value is datetime, convert it to string
-    usanGerente10001 = [1024, 1814, 1291, 1953]
-    usanGerente10002 = [1368, 1813, 76, 1965, 1774, 1773, 1989, 1935, 1803, 1714, 1356, 1839, 1677, 1902]
     for d in array:
         for k, v in d.items():
             if isinstance(v, datetime.datetime):
                 d[k] = str(v)
-        if d["legajo"] in usanGerente10002:
-            d["gerente"] = 10002
-        if d["legajo"] in usanGerente10001:
-            d["gerente"] = 10001 
-            
+
     return array
+
+def set_data(array : list) -> list:
+    for recurso in array:
+        recurso = set_gerente(recurso)
+    return array
+
+def set_gerente(recurso: dict) -> dict:
+    if recurso["legajo"] in RECURSOS_CON_GERENTE_10001:
+        recurso["gerente"] = "10001"
+    elif recurso["legajo"] in RECURSOS_CON_GERENTE_10002:
+        recurso["gerente"] = "10002"
+    return recurso
+
+def update_data_mongo(db, query: dict, collection: str, new_values: dict):
+    db[collection].update_one(query, {"$set": new_values})
+
+def get_querys_map_from_array_with_legajos(array: list) -> dict:
+    map_of_querys = {}
+    for i in range(len(array)):
+        query = {"legajo": array[i]["legajo"]}
+        map_of_querys[str(query)] = array[i]
+    return map_of_querys
 
 def get_package_from_mongo(db, query: str, collection: str) -> dict:
     return {"Paquete": get_data_mongo(db, query, collection)}
