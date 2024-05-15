@@ -189,6 +189,8 @@ func main() {
 		app.Get("/Excel/Admin/*", excel.GetExcelAdmin)
 		app.Get("/Excel/Freelance/*", excel.GetFreelancesListExcel)
 
+		app.Get("/Excel/Recursos", excel.GetExcelRecursos)
+
 		//Workflow novedad
 		app.Post("/Workflow", novedades.InsertWorkFlow)
 		app.Get("/Aprobar/Novedad/:id", novedades.AprobarWorkflow)

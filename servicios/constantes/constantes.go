@@ -45,6 +45,7 @@ const (
 	PestanaRendGastos      = "Rendicion de gastos"
 	PestanaNuevoCeco       = "Nuevo cecos"
 	PestanaFactHorasExtras = "Fact. de Horas extras"
+	PestanaRecursos        = "Recursos"
 )
 
 const (
