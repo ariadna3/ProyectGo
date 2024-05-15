@@ -130,6 +130,7 @@ type Files struct {
 var app *fiber.App
 
 func main() {
+	//novedades.NovedadesPendientes = time.Now().AddDate(0, 0, -2)
 
 	err := godotenv.Load()
 	if err != nil {
@@ -377,5 +378,8 @@ func alarmSetVacations(alarm time.Time) {
 			alarm = alarm.AddDate(1, 0, 0)
 			fmt.Print("Alarma de vacaciones seteada para el dia: " + alarm.String() + "\n")
 		}
+		//if time.Since(novedades.NovedadesPendientes)>24 * time.Hour	{
+		//	novedades.EnviarMailNovedadesPendientes()
+		//}
 	}
 }
