@@ -709,6 +709,7 @@ func GetRecursoInterno(email string, id int, legajo int) (error, Recursos) {
 
 func GetAllRecursoInterno(Recursos) error {
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
+
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return err

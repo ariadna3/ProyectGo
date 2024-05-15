@@ -41,7 +41,7 @@ func GetExcelFile(c *fiber.Ctx) error {
 	fechaHasta := c.Query("fechaHasta")
 
 	// Validar token
-	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.PeopleOperation)
+	error, codigo, _ := userGoogle.Authorization(c.Get("Authorization"), constantes.AdminNotRequired, constantes.AnyRol)
 	if error != nil {
 		return c.Status(codigo).SendString(error.Error())
 	}
@@ -105,6 +105,7 @@ func GetExcelFile(c *fiber.Ctx) error {
 	return c.SendFile(os.Getenv("EXCEL_FILE"))
 }
 
+// Crear excel Recursos
 func GetExcelRecursos(c *fiber.Ctx) error {
 	fmt.Println("GetExcelRecurso")
 
@@ -114,12 +115,12 @@ func GetExcelRecursos(c *fiber.Ctx) error {
 		return c.Status(codigo).SendString(err.Error())
 	}
 
-	var recurso []recursos.Recursos
 	coll := client.Database(constantes.Database).Collection(constantes.CollectionRecurso)
 	cursor, err := coll.Find(context.TODO(), bson.M{})
 
+	var recurso []recursos.Recursos
 	if err = cursor.All(context.Background(), &recurso); err != nil {
-		return nil
+		return c.Status(fiber.StatusNotFound).SendString(err.Error())
 	}
 
 	fmt.Println((len(recurso)), "recursos found")
@@ -167,7 +168,7 @@ func GetExcelPP(c *fiber.Ctx) error {
 	return c.SendFile(os.Getenv("EXCELPP_FILE"))
 }
 
-// Crear excel Administration
+// Crear excel Administracion
 func GetExcelAdmin(c *fiber.Ctx) error {
 	fmt.Println("GetExcelFileAdministration")
 
