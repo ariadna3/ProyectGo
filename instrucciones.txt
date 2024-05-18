@@ -1,0 +1,4 @@
+docker build -t portalbackend .
+docker stop portal_back
+docker rm portal_back
+docker run --network=host --name=portal_back -p 20300:20300 -d portalbackend
