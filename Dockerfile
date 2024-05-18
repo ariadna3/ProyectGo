@@ -2,7 +2,7 @@
 FROM golang:1.22
 
 # Copia los de la pagina servicios a la carpeta /app de tu contenedor
-COPY /servicios/ /app
+COPY /servicios/ /app/servicios
 
 # Copia el mod y sum a la carpeta /app de tu contenedor
 COPY go.mod /app
