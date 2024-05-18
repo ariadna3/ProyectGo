@@ -66,7 +66,7 @@ const (
 const (
 	DescSueldoNuevoMasivo = "Nuevo sueldo masivo"
 	DescSueldoNuevo       = "Nuevo sueldo"
-	DescHorasExtras       = "Informe y autorización horas extras"
+	DescHorasExtras       = "Horas extras"
 	DescAnticipo          = "Anticipo"
 	DescPrestamo          = "Prestamo"
 	DescLicencia          = "Licencia"
