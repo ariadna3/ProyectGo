@@ -1,8 +1,18 @@
 # Utiliza la imagen oficial de Golang 1.22
 FROM golang:1.22
 
-# Copia los archivos de tu proyecto a la imagen
-COPY . /app
+# Copia los de la pagina servicios a la carpeta /app de tu contenedor
+COPY /servicios /app
+
+# Copia el mod y sum a la carpeta /app de tu contenedor
+COPY go.mod /app
+COPY go.sum /app
+
+# copia el archivo de configuracion a la carpeta /app de tu contenedor
+COPY .env /app
+
+# copia el main a la carpeta /app de tu contenedor
+COPY main.go /app
 
 # Establece el directorio de trabajo
 WORKDIR /app
