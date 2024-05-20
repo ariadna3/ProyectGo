@@ -998,67 +998,7 @@ func AprobarWorkflow(c *fiber.Ctx) error {
 	novedad.Workflow[len(novedad.Workflow)-1].Fecha = time.Now()
 	novedad.Workflow[len(novedad.Workflow)-1].FechaStr = time.Now().Format(constantes.FormatoFecha)
 	err = validarPasos(&novedad)
-	if err != nil {
-		if err.Error() == constantes.FinalDeLosPasos {
-			novedad.Estado = constantes.Aceptada
-			enviarMailWorkflow(novedad)
 
-			if strings.Contains(constantes.DescripcionLicenciasComunes, novedad.Descripcion) {
-				// Crear vacaciones y setearlas
-				vacaciones := new(recursos.Vacaciones)
-				quantityCommon, err := difDatesInDays(novedad)
-				if err != nil {
-					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-				}
-				lastVacaciones, err := recursos.GetLastVacaciones(recurso.IdRecurso, constantes.VacacionesComunes)
-				if err != nil {
-					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-				}
-				vacaciones.CantidadComun = quantityCommon
-				vacaciones.CantidadPatagonian = 0
-				vacaciones.CantidadOtros = 0
-				vacaciones.Anio = lastVacaciones.Anio
-
-				recursos.UseVacaciones(novedad.IdSecuencial, *vacaciones)
-			}
-			if strings.Contains(constantes.DescripcionLicenciasComunes, novedad.Descripcion) {
-				// Crear vacaciones y setearlas
-				vacaciones := new(recursos.Vacaciones)
-				quantityCommon, err := difDatesInDays(novedad)
-				if err != nil {
-					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-				}
-				lastVacaciones, err := recursos.GetLastVacaciones(recurso.IdRecurso, constantes.VacacionesPatagonian)
-				if err != nil {
-					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-				}
-				vacaciones.CantidadComun = 0
-				vacaciones.CantidadPatagonian = quantityCommon
-				vacaciones.CantidadOtros = 0
-				vacaciones.Anio = lastVacaciones.Anio
-
-				recursos.UseVacaciones(novedad.IdSecuencial, *vacaciones)
-			}
-			if strings.Contains(constantes.DescripcionLicenciasOtras, novedad.Descripcion) {
-				// Crear vacaciones y setearlas
-				vacaciones := new(recursos.Vacaciones)
-				quantityCommon, err := difDatesInDays(novedad)
-				if err != nil {
-					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-				}
-				lastVacaciones, err := recursos.GetLastVacaciones(recurso.IdRecurso, constantes.VacacionesOtras)
-				if err != nil {
-					return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-				}
-				vacaciones.CantidadComun = 0
-				vacaciones.CantidadPatagonian = 0
-				vacaciones.CantidadOtros = quantityCommon
-				vacaciones.Anio = lastVacaciones.Anio
-
-				recursos.UseVacaciones(novedad.IdSecuencial, *vacaciones)
-			}
-		}
-	}
 	//crea el filtro
 	filter := bson.D{{Key: "idSecuencial", Value: idNumber}}
 
