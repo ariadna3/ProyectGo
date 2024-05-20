@@ -656,7 +656,7 @@ func horasExtras(file *excelize.File, novedad novedades.Novedades, row *int) err
 	if err != nil {
 		return err
 	}
-	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("A%d", *row), recurso.Fecha)
+	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("A%d", *row), novedad.Fecha)
 	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("B%d", *row), novedad.IdSecuencial)
 	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("C%d", *row), recurso.Legajo)
 	file.SetCellValue(constantes.PestanaHorasExtras, fmt.Sprintf("D%d", *row), utf8_decode(recurso.Nombre))
@@ -1012,7 +1012,7 @@ func initializeExcel(file *excelize.File) error {
 	file.SetCellValue(constantes.PestanaHorasExtras, "C2", "LEGAJO")
 	file.SetCellValue(constantes.PestanaHorasExtras, "D2", "NOMBRE")
 	file.SetCellValue(constantes.PestanaHorasExtras, "E2", "APELLIDO")
-	file.SetCellValue(constantes.PestanaHorasExtras, "F2", "PERIODO")
+	file.SetCellValue(constantes.PestanaHorasExtras, "F2", "FECHA HORAS EXTRAS")
 	file.SetCellValue(constantes.PestanaHorasExtras, "G2", "AL 50% EXENTAS (CONCEPTO 2212)")
 	file.SetCellValue(constantes.PestanaHorasExtras, "H2", "AL 100% EXENTAS (CONCEPTO 2220)")
 	file.SetCellValue(constantes.PestanaHorasExtras, "I2", "NOCTURNAS AL 50% (CONCEPTO 2213)")
