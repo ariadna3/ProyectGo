@@ -18,9 +18,15 @@
       "Path": "/Recurso/Package",
       "Server": "testingUrl",
       "Tabla": "recursos",
-      "Query": {"$or": [{"legajo": 1024},{"legajo": 1814}, {"legajo": 1291},{"legajo": 1953},{"legajo": 1368},{"legajo": 1813}, {"legajo": 76},{"legajo": 1965}, {"legajo": 1774}, {"legajo": 1773}, {"legajo": 1989}, {"legajo": 1935}, {"legajo": 1803}, {"legajo": 1714}, {"legajo": 1356}, {"legajo": 1839}, {"legajo": 1677}, {"legajo": 1902}]}
-      
-
+      "Query": {"$or": [{"legajo": 1024},{"legajo": 1814}, {"legajo": 1291},{"legajo": 1953},{"legajo": 1368},{"legajo": 1813}, {"legajo": 76},{"legajo": 1965}, {"legajo": 1774}, {"legajo": 1773}, {"legajo": 1989}, {"legajo": 1935}, {"legajo": 1803}, {"legajo": 1714}, {"legajo": 1356}, {"legajo": 1839}, {"legajo": 1677}, {"legajo": 1902}]},
+      "Tipo": "replace"
+    },
+    {
+      "Path": "/Recurso/Package",
+      "Server": "testingUrl",
+      "Tabla": "recursos",
+      "Query": {"legajo": {"$in":[76,1368,1935,1965,1989,1803,1773,1774]}},
+      "Tipo": "delete"
     }
   ]
 }

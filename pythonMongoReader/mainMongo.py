@@ -36,14 +36,18 @@ RECURSOS_CON_GERENTE_10002 = [1368, 1813,   76, 1965, 1774, 1773, 1989, 1935, 18
 def main():
     mydb = connect_mongo(url=MONGO_URL, database=MONGO_DB, user=MONGO_USER, password=MONGO_PASSWORD)
     for query in QUERYS:
-        array_recursos = get_data_mongo(mydb, query["Query"], query["Tabla"])
-        array_recursos = set_data(array_recursos)
-        map_of_querys = get_querys_map_from_array_with_legajos(array_recursos)
-        for key, value in map_of_querys.items():
-            res = json.loads(key.replace("'", "\""))
-            update_data_mongo(mydb, res, query["Tabla"], value)
-            print(key)
-            print(value)
+        if query["Tipo"] == "replace":
+            array_recursos = get_data_mongo(mydb, query["Query"], query["Tabla"])
+            array_recursos = set_data(array_recursos)
+            map_of_querys = get_querys_map_from_array_with_legajos(array_recursos)
+            for key, value in map_of_querys.items():
+                res = json.loads(key.replace("'", "\""))
+                update_data_mongo(mydb, res, query["Tabla"], value)
+                print(key)
+                print(value)
+        if query["Tipo"] == "delete":
+            delete_data_mongo(mydb, query["Query"], query["Tabla"])
+            
 
 
 
@@ -71,6 +75,9 @@ def get_data_mongo(db, query: str, collection: str) -> list:
                 d[k] = str(v)
 
     return array
+
+def delete_data_mongo(db, query: str, collection: str):
+    db[collection].delete_many(query)
 
 def set_data(array : list) -> list:
     for recurso in array:
