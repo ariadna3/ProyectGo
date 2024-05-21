@@ -1,0 +1,152 @@
+[
+    {
+        "Legajo": 76,
+        "Apellido": "FAEL XAVIER",
+        "Nombre": "VERA MARIA",
+        "Gerente": "1368",
+        "FechaIng": "2003\/08\/01",
+        "Mail": "vxavier@itpatagonia.com",
+        "Sueldo": 1200294,
+        "Rcc": [
+            {
+                "CcNum": "70",
+                "CcPorc": 100
+            }
+        ]
+    },
+    {
+        "Legajo": 1368,
+        "Apellido": "GARCIA ",
+        "Nombre": "AGUSTIN HERNAN",
+        "Gerente": "1719",
+        "FechaIng": "2021\/06\/16",
+        "Mail": "agarcia@itpatagonia.com",
+        "Sueldo": 1800000,
+        "Rcc": [
+            {
+                "CcNum": "70",
+                "CcPorc": 100
+            }
+        ]
+    },
+    {
+        "Legajo": 1773,
+        "Apellido": "SCHONHOLZ",
+        "Nombre": "ABIGAIL RUTH",
+        "Gerente": "1368",
+        "FechaIng": "2023\/04\/18",
+        "Mail": "aschonholz@itpatagonia.com",
+        "Sueldo": 2214000,
+        "Rcc": [
+            {
+                "CcNum": "70",
+                "CcPorc": 100
+            }
+        ]
+    },
+    {
+        "Legajo": 1774,
+        "Apellido": "TORRADO",
+        "Nombre": "CAMILA VICTORIA",
+        "Gerente": "1368",
+        "FechaIng": "2023\/04\/18",
+        "Mail": "ctorrado@itpatagonia.com",
+        "Sueldo": 1310438,
+        "Rcc": [
+            {
+                "CcNum": "70",
+                "CcPorc": 100
+            }
+        ]
+    },
+    {
+        "Legajo": 1803,
+        "Apellido": "PEITROMONACO",
+        "Nombre": "JUAN MANUEL",
+        "Gerente": "1368",
+        "FechaIng": "2023\/05\/29",
+        "Mail": "jpietromonaco@itpatagonia.com",
+        "Sueldo": 1450000,
+        "Rcc": [
+            {
+                "CcNum": "70",
+                "CcPorc": 100
+            }
+        ]
+    },
+    {
+        "Legajo": 1935,
+        "Apellido": "HERMIDA",
+        "Nombre": "SILVANA CARINA",
+        "Gerente": "1368",
+        "FechaIng": "2024\/02\/05",
+        "Mail": "chermida@itpatagonia.com",
+        "Sueldo": 2000000,
+        "Rcc": [
+            {
+                "CcNum": "70",
+                "CcPorc": 100
+            }
+        ]
+    },
+    {
+        "Legajo": 1965,
+        "Apellido": "LOPEZ",
+        "Nombre": "NADIA SOLEDAD",
+        "Gerente": "1368",
+        "FechaIng": "2024\/03\/08",
+        "Mail": "nlopez@itpatagonia.com",
+        "Sueldo": 850000,
+        "Rcc": [
+            {
+                "CcNum": "70",
+                "CcPorc": 100
+            }
+        ]
+    },
+    {
+        "Legajo": 1989,
+        "Apellido": "MORONI",
+        "Nombre": "IVAN ALBERTO",
+        "Gerente": "1368",
+        "FechaIng": "2024\/04\/09",
+        "Mail": "imoroni@itpatagonia.com",
+        "Sueldo": 1850000,
+        "Rcc": [
+            {
+                "CcNum": "70",
+                "CcPorc": 100
+            }
+        ]
+    },
+    {
+        "Legajo": 1998,
+        "Apellido": "GARCIA",
+        "Nombre": "ANDRES ARIEL",
+        "Gerente": "1368",
+        "FechaIng": "2024\/05\/06",
+        "Mail": "angarcia@itpatagonia.com",
+        "Sueldo": 2000000,
+        "Rcc": [
+            {
+                "CcNum": "70",
+                "CcPorc": 100
+            }
+        ]
+    },
+    {
+        "Legajo": 2011,
+        "Apellido": "ARCHENZIO",
+        "Nombre": "CHRISTIAN GABRIEL",
+        "Gerente": "1368",
+        "FechaIng": "2024\/05\/20",
+        "Mail": "carchenzio@itpatagonia.com",
+        "Sueldo": 2200000,
+        "Rcc": [
+            {
+                "CcNum": "70",
+                "CcPorc": 100
+            }
+        ]
+    }
+]
